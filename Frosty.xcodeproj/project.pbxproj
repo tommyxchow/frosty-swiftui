@@ -8,18 +8,40 @@
 
 /* Begin PBXBuildFile section */
 		C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606731F26641A3E00B1C46C /* FrostyApp.swift */; };
-		C606732226641A3E00B1C46C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606732126641A3E00B1C46C /* ContentView.swift */; };
+		C606732226641A3E00B1C46C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606732126641A3E00B1C46C /* MainView.swift */; };
 		C606732426641A4300B1C46C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C606732326641A4300B1C46C /* Assets.xcassets */; };
 		C606732726641A4300B1C46C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C606732626641A4300B1C46C /* Preview Assets.xcassets */; };
+		C60673302664373B00B1C46C /* Streamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606732F2664373B00B1C46C /* Streamer.swift */; };
+		C606733426644D8A00B1C46C /* StreamerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733326644D8A00B1C46C /* StreamerCardView.swift */; };
+		C606733626645B6500B1C46C /* StreamerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733526645B6500B1C46C /* StreamerListView.swift */; };
+		C606733826654DB500B1C46C /* VideoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733726654DB400B1C46C /* VideoChatView.swift */; };
+		C606733A2665732100B1C46C /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60673392665732100B1C46C /* ChatView.swift */; };
+		C606733E2666935800B1C46C /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733D2666935600B1C46C /* Authentication.swift */; };
+		C672E005266CA9D200737AD6 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C672E004266CA9D200737AD6 /* README.md */; };
+		C6A6144226697B32003508D8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144126697B32003508D8 /* User.swift */; };
+		C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A61445266987A0003508D8 /* StreamerListViewModel.swift */; };
+		C6A6144826698873003508D8 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144726698873003508D8 /* Request.swift */; };
+		C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144D266C44DC003508D8 /* ChatViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		C606731C26641A3E00B1C46C /* Frosty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Frosty.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C606731F26641A3E00B1C46C /* FrostyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostyApp.swift; sourceTree = "<group>"; };
-		C606732126641A3E00B1C46C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C606732126641A3E00B1C46C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		C606732326641A4300B1C46C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C606732626641A4300B1C46C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C606732826641A4300B1C46C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C606732F2664373B00B1C46C /* Streamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Streamer.swift; sourceTree = "<group>"; };
+		C606733326644D8A00B1C46C /* StreamerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerCardView.swift; sourceTree = "<group>"; };
+		C606733526645B6500B1C46C /* StreamerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListView.swift; sourceTree = "<group>"; };
+		C606733726654DB400B1C46C /* VideoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoChatView.swift; sourceTree = "<group>"; };
+		C60673392665732100B1C46C /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		C606733D2666935600B1C46C /* Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
+		C672E004266CA9D200737AD6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		C6A6144126697B32003508D8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		C6A61445266987A0003508D8 /* StreamerListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListViewModel.swift; sourceTree = "<group>"; };
+		C6A6144726698873003508D8 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		C6A6144D266C44DC003508D8 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +58,7 @@
 		C606731326641A3E00B1C46C = {
 			isa = PBXGroup;
 			children = (
+				C672E004266CA9D200737AD6 /* README.md */,
 				C606731E26641A3E00B1C46C /* Frosty */,
 				C606731D26641A3E00B1C46C /* Products */,
 			);
@@ -53,7 +76,9 @@
 			isa = PBXGroup;
 			children = (
 				C606731F26641A3E00B1C46C /* FrostyApp.swift */,
-				C606732126641A3E00B1C46C /* ContentView.swift */,
+				C6A6144026693543003508D8 /* ViewModels */,
+				C606734B26687D1D00B1C46C /* Views */,
+				C606732E2664344400B1C46C /* Models */,
 				C606732326641A4300B1C46C /* Assets.xcassets */,
 				C606732826641A4300B1C46C /* Info.plist */,
 				C606732526641A4300B1C46C /* Preview Content */,
@@ -67,6 +92,38 @@
 				C606732626641A4300B1C46C /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C606732E2664344400B1C46C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C606732F2664373B00B1C46C /* Streamer.swift */,
+				C606733D2666935600B1C46C /* Authentication.swift */,
+				C6A6144126697B32003508D8 /* User.swift */,
+				C6A6144726698873003508D8 /* Request.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C606734B26687D1D00B1C46C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C606732126641A3E00B1C46C /* MainView.swift */,
+				C606733726654DB400B1C46C /* VideoChatView.swift */,
+				C606733326644D8A00B1C46C /* StreamerCardView.swift */,
+				C60673392665732100B1C46C /* ChatView.swift */,
+				C606733526645B6500B1C46C /* StreamerListView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C6A6144026693543003508D8 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C6A61445266987A0003508D8 /* StreamerListViewModel.swift */,
+				C6A6144D266C44DC003508D8 /* ChatViewModel.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,6 +183,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C672E005266CA9D200737AD6 /* README.md in Resources */,
 				C606732726641A4300B1C46C /* Preview Assets.xcassets in Resources */,
 				C606732426641A4300B1C46C /* Assets.xcassets in Resources */,
 			);
@@ -138,8 +196,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C606732226641A3E00B1C46C /* ContentView.swift in Sources */,
+				C606733626645B6500B1C46C /* StreamerListView.swift in Sources */,
+				C606732226641A3E00B1C46C /* MainView.swift in Sources */,
+				C606733826654DB500B1C46C /* VideoChatView.swift in Sources */,
+				C606733426644D8A00B1C46C /* StreamerCardView.swift in Sources */,
+				C6A6144826698873003508D8 /* Request.swift in Sources */,
+				C606733A2665732100B1C46C /* ChatView.swift in Sources */,
+				C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */,
+				C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */,
 				C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */,
+				C60673302664373B00B1C46C /* Streamer.swift in Sources */,
+				C606733E2666935800B1C46C /* Authentication.swift in Sources */,
+				C6A6144226697B32003508D8 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
