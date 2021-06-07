@@ -10,12 +10,19 @@ import SwiftUI
 struct ChatView: View {
     @ObservedObject var viewModel: ChatViewModel = ChatViewModel()
     var body: some View {
-        ScrollView {
-            ForEach(viewModel.messages.reversed(), id: \.self) { message in
-                HStack {
-                    Text(message)
-                    Spacer()
+        ScrollViewReader { scrollView in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 10.0) {
+                    ForEach(viewModel.messages, id: \.self) { message in
+                        if let pair = message {
+                            viewModel.emoteMessage(pair)
+                        }
+                    }
+                    .font(.footnote)
                 }
+                .onChange(of: viewModel.messages, perform: { value in
+                    scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                })
             }
         }
         .padding(5.0)
