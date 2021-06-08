@@ -102,7 +102,6 @@
 			isa = PBXGroup;
 			children = (
 				C606732F2664373B00B1C46C /* Streamer.swift */,
-				C606733D2666935600B1C46C /* Authentication.swift */,
 				C6A6144126697B32003508D8 /* User.swift */,
 				C6A6144726698873003508D8 /* Request.swift */,
 			);
@@ -113,11 +112,11 @@
 			isa = PBXGroup;
 			children = (
 				C606732126641A3E00B1C46C /* MainView.swift */,
-				C606733726654DB400B1C46C /* VideoChatView.swift */,
-				C606733326644D8A00B1C46C /* StreamerCardView.swift */,
-				C60673392665732100B1C46C /* ChatView.swift */,
 				C606733526645B6500B1C46C /* StreamerListView.swift */,
+				C606733326644D8A00B1C46C /* StreamerCardView.swift */,
+				C606733726654DB400B1C46C /* VideoChatView.swift */,
 				C6363A54266D40E000C47A7E /* VideoView.swift */,
+				C60673392665732100B1C46C /* ChatView.swift */,
 				C6363A56266D80C200C47A7E /* TestView.swift */,
 			);
 			path = Views;
@@ -126,6 +125,7 @@
 		C6A6144026693543003508D8 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				C606733D2666935600B1C46C /* Authentication.swift */,
 				C6A61445266987A0003508D8 /* StreamerListViewModel.swift */,
 				C6A6144D266C44DC003508D8 /* ChatViewModel.swift */,
 			);
