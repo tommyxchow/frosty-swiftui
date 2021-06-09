@@ -16,11 +16,13 @@ class StreamerListViewModel: ObservableObject {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
-            let result = try! decoder.decode(StreamerData.self, from: data)
-            
-            DispatchQueue.main.async {
-                self.streamers = result.data
-                self.loadThumbnails()
+            if let result = try? decoder.decode(StreamerData.self, from: data) {
+                DispatchQueue.main.async {
+                    self.streamers = result.data
+                    self.loadThumbnails()
+                }
+            } else {
+                print("Failed to parse followed streamers.")
             }
         }
     }
@@ -31,11 +33,13 @@ class StreamerListViewModel: ObservableObject {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
-            let result = try! decoder.decode(StreamerData.self, from: data)
-            
-            DispatchQueue.main.async {
-                self.streamers = result.data
-                self.loadThumbnails()
+            if let result = try? decoder.decode(StreamerData.self, from: data) {
+                DispatchQueue.main.async {
+                    self.streamers = result.data
+                    self.loadThumbnails()
+                }
+            } else {
+                print("Failed to parse top streamers.")
             }
         }
     }

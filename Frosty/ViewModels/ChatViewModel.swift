@@ -47,7 +47,9 @@ class ChatViewModel: ObservableObject {
         var count = 0
         func recieve() {
             if !chatting {
+                print("END CHAT")
                 websocket.cancel(with: .goingAway, reason: nil)
+                messages.removeAll()
                 return
             }
             websocket.receive { result in
@@ -93,10 +95,6 @@ class ChatViewModel: ObservableObject {
         let message = split.last![range]
         
         return ["\(name)":"\(message)"]
-    }
-    
-    func end() {
-        chatting = false
     }
     
     func sendPing() {
