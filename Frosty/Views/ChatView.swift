@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ChatView: View {
-    @ObservedObject var viewModel: ChatViewModel = ChatViewModel()
+    let streamer: StreamerInfo
+    @EnvironmentObject private var auth: Authentication
+    @StateObject private var viewModel: ChatViewModel = ChatViewModel()
     var body: some View {
         ScrollViewReader { scrollView in
             ScrollView {
@@ -27,16 +29,19 @@ struct ChatView: View {
         }
         .padding(5.0)
         .onAppear {
-            viewModel.start()
+            print("START")
+            viewModel.start(token: auth.userToken ?? "", user: auth.user?.login ?? "justinfan888", streamer: streamer.userLogin)
         }
         .onDisappear {
-            viewModel.end()
+            print("DISAPPEAR")
+            viewModel.chatting = false
+            print(viewModel.chatting)
         }
     }
 }
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView()
+        ChatView(streamer: StreamerInfo.data[0])
     }
 }

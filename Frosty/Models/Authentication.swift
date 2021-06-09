@@ -17,7 +17,7 @@ class Authentication: ObservableObject {
     @Published var user: User?
     
     
-    func getUserInfo(completionHandler: @escaping (UserData) -> Void) {
+    func getUserInfo() {
         let url = "https://api.twitch.tv/helix/users"
         let headers = ["Authorization" : "Bearer \(userToken!)", "Client-Id" : clientID]
         
@@ -27,7 +27,9 @@ class Authentication: ObservableObject {
             print(String(data: data, encoding: .utf8)!)
             
             if let response = try? decoder.decode(UserData.self, from: data) {
-                completionHandler(response)
+                DispatchQueue.main.async {
+                    self.user = response.data[0]
+                }
             } else {
                 print("Failed to get user info")
             }
@@ -61,7 +63,7 @@ class Authentication: ObservableObject {
         }
     }
     
-    func getDefaultToken(completionHandler: @escaping (String) -> Void) {
+    func getDefaultToken() {
         var newLoginUrl = URLComponents()
         newLoginUrl.scheme = "https"
         newLoginUrl.host = "id.twitch.tv"
@@ -79,8 +81,10 @@ class Authentication: ObservableObject {
             print(String(data: data, encoding: .utf8)!)
             
             if let result = try? decoder.decode(DefaultAccess.self, from: data) {
-                completionHandler(result.accessToken)
-            } else {
+                DispatchQueue.main.async {
+                    self.userToken = result.accessToken
+                }
+             } else {
                 print("Failed to decode default token")
             }
         }

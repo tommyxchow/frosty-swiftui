@@ -6,26 +6,20 @@
 //
 
 import SwiftUI
-import AVKit
-
 
 struct VideoChatView: View {
+    let streamer: StreamerInfo
     var body: some View {
         VStack {
-            let player = AVPlayer(url:  URL(string:"")!)
-            VideoPlayer(player: player, videoOverlay: {})
-                .frame(height:211)
-                .onAppear(perform: {
-                    player.play()
-                })
+            // VideoView()
             Spacer()
-            ChatView()
+            ChatView(streamer: streamer)
         }
     }
 }
 
 struct VideoChatView_Previews: PreviewProvider {
     static var previews: some View {
-        VideoChatView()
+        VideoChatView(streamer: StreamerInfo.data[0])
     }
 }
