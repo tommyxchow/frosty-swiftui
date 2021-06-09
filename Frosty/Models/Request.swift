@@ -18,7 +18,6 @@ struct Request {
     static func perform(_ method: HTTPMethod, to url: URL, headers: [String:String]? = nil, completionHandler: @escaping (Data) -> Void) {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
-        
                         
         if let headers = headers {
             for header in headers {
