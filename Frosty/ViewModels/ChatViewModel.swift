@@ -10,18 +10,18 @@ import SwiftUI
 
 class ChatViewModel: ObservableObject {
     @Published var messages: [[String:String]] = []
-    static let twitchURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
-    static let session = URLSession.shared
-    
-    let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:")
-    let NICKNAME = URLSessionWebSocketTask.Message.string("NICK ")
-    let JOIN = URLSessionWebSocketTask.Message.string("JOIN #xqcow")
+    static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
+    static private let session = URLSession.shared
     
     var chatting: Bool = false
     
-    let websocket = session.webSocketTask(with: twitchURL)
+    let websocket = session.webSocketTask(with: websocketURL)
     
-    func start() {
+    func start(token: String, user: String, streamer: String) {
+        let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
+        let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
+        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer)")
+        
         websocket.resume()
         
         chatting = true
@@ -32,14 +32,12 @@ class ChatViewModel: ObservableObject {
                 return
             }
         }
-
         websocket.send(NICKNAME) { error in
             if let error = error {
                 print(error.localizedDescription)
                 return
             }
         }
-
         websocket.send(JOIN) { error in
             if let error = error {
                 print(error.localizedDescription)
@@ -62,9 +60,12 @@ class ChatViewModel: ObservableObject {
                         print(data)
                     case .string(let string):
                         if count == 3 {
-                            DispatchQueue.main.async {
+                            DispatchQueue.main.async { [self] in
                                 print(string)
-                                self.messages.append(self.parseMessage(string))
+                                messages.append(parseMessage(string))
+                                if messages.count > 60 {
+                                    messages.removeFirst(10)
+                                }
                             }
                         } else {
                             count += 1
@@ -103,7 +104,6 @@ class ChatViewModel: ObservableObject {
             if let error = error {
                 print("Ping failed: \(error.localizedDescription)")
             }
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                 print("SENDING PING...")
                 self.sendPing()
@@ -114,13 +114,12 @@ class ChatViewModel: ObservableObject {
     func emoteMessage(_ pair: [String:String]) -> some View {
         var split = pair.first!.value.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
-
         
         var result = Text("\(pair.first!.key):").bold()
-        print(split)
+        
         for word in split {
-            if word == "OMEGALUL" {
-                result = result + Text(" ") + Text(Image("OMEGALUL")).baselineOffset(-8)
+            if word == "KEKW" {
+                result = result + Text(" ") + Text(Image("KEKW")).baselineOffset(-8)
             } else {
                 result = result + Text(" ") + Text(word)
             }
