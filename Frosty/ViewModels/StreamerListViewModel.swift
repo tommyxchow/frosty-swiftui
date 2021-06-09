@@ -9,10 +9,10 @@ import Foundation
 
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []
-    let headers = ["Authorization": "Bearer ", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
     
-    func updateFollowedStreamers() {
-        Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams/followed?user_id=")!, headers: headers) { data in
+    func updateFollowedStreamers(id: String, token: String) {
+        let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
+        Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams/followed?user_id=\(id)")!, headers: headers) { data in
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
@@ -25,7 +25,8 @@ class StreamerListViewModel: ObservableObject {
         }
     }
     
-    func updateTopStreamers() {
+    func updateTopStreamers(token: String) {
+        let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams")!, headers: headers) { data in
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
