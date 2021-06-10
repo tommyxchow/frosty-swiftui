@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [[String:String]] = []
+    @Published var messages: [[String]] = []
     static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
     static private let session = URLSession.shared
     
@@ -49,7 +49,9 @@ class ChatViewModel: ObservableObject {
             if !chatting {
                 print("END CHAT")
                 websocket.cancel(with: .goingAway, reason: nil)
-                messages.removeAll()
+                DispatchQueue.main.async {
+                    self.messages.removeAll()
+                }
                 return
             }
             websocket.receive { result in
@@ -83,7 +85,7 @@ class ChatViewModel: ObservableObject {
         recieve()
     }
     
-    func parseMessage(_ string: String) -> [String:String] {
+    func parseMessage(_ string: String) -> [String] {
         let split = string.split(separator: " ", maxSplits: 3)
 
         let start = split[0].index(after: split[0].startIndex)
@@ -94,7 +96,7 @@ class ChatViewModel: ObservableObject {
         let range = split.last!.index(after: split.last!.startIndex)..<split.last!.endIndex
         let message = split.last![range]
         
-        return ["\(name)":"\(message)"]
+        return [String(name), String(message), UUID().uuidString]
     }
     
     func sendPing() {
@@ -109,14 +111,15 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    func emoteMessage(_ pair: [String:String]) -> some View {
-        var split = pair.first!.value.components(separatedBy: " ")
+    func emoteMessage(_ pair: [String]) -> some View {
+        var split = pair[1].components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
-        var result = Text("\(pair.first!.key):").bold()
+        var result = Text("\(pair[0]):").bold()
         
         for word in split {
             if word == "KEKW" {
+                UserDefaults.standard.setValue(Image("KEKW"), forKey: "Emotes")
                 result = result + Text(" ") + Text(Image("KEKW")).baselineOffset(-8)
             } else {
                 result = result + Text(" ") + Text(word)

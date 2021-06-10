@@ -92,7 +92,7 @@ class Authentication: ObservableObject {
     
 }
 
-struct ValidateResponse: Decodable {
+private struct ValidateResponse: Decodable {
     let clientId: String
     let login: String
     let scopes: [String]
@@ -100,7 +100,7 @@ struct ValidateResponse: Decodable {
     let expiresIn: Int
 }
 
-struct DefaultAccess: Decodable {
+private struct DefaultAccess: Decodable {
     let accessToken: String
     let expiresIn: Int
     let tokenType: String

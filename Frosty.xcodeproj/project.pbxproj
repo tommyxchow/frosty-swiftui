@@ -28,6 +28,7 @@
 		C6A6144826698873003508D8 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144726698873003508D8 /* Request.swift */; };
 		C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144D266C44DC003508D8 /* ChatViewModel.swift */; };
 		C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */; };
+		C6D57D4626718C7300071C77 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D57D4526718C7300071C77 /* ChatMessage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		C6A6144726698873003508D8 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		C6A6144D266C44DC003508D8 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLoggedInView.swift; sourceTree = "<group>"; };
+		C6D57D4526718C7300071C77 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 				C606732F2664373B00B1C46C /* Streamer.swift */,
 				C6A6144126697B32003508D8 /* User.swift */,
 				C6A6144726698873003508D8 /* Request.swift */,
+				C6D57D4526718C7300071C77 /* ChatMessage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -229,6 +232,7 @@
 				C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */,
 				C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */,
 				C60673302664373B00B1C46C /* Streamer.swift in Sources */,
+				C6D57D4626718C7300071C77 /* ChatMessage.swift in Sources */,
 				C6A6144226697B32003508D8 /* User.swift in Sources */,
 				C6363A55266D40E000C47A7E /* VideoView.swift in Sources */,
 				C64C277C26708AE800719BCF /* SettingsViewModel.swift in Sources */,
@@ -361,6 +365,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Frosty/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Frosty/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -382,6 +387,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Frosty/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Frosty/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

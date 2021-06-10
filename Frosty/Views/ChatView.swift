@@ -16,8 +16,8 @@ struct ChatView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10.0) {
                     ForEach(viewModel.messages, id: \.self) { message in
-                        if let pair = message {
-                            viewModel.emoteMessage(pair)
+                        if let triple = message {
+                            viewModel.emoteMessage(triple)
                         }
                     }
                     .font(.footnote)

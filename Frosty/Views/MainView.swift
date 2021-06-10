@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct MainView: View {
-    @EnvironmentObject var auth: Authentication
-    @State var isPresented = false
+    @EnvironmentObject private var authHandler: Authentication
+    @State private var isPresented = false
     
     var body: some View {
         StreamerListView()

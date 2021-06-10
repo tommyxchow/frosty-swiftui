@@ -9,13 +9,13 @@ import SwiftUI
 
 @main
 struct FrostyApp: App {
-    @StateObject var auth: Authentication = Authentication()
+    @StateObject var authHandler: Authentication = Authentication()
     
     var body: some Scene {
         WindowGroup {
             NavigationView {
                 MainView()
-                    .environmentObject(auth)
+                    .environmentObject(authHandler)
             }
         }
     }

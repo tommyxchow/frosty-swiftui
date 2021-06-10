@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct StreamerListView: View {
-    @EnvironmentObject var auth: Authentication
-    @StateObject private var viewModel: StreamerListViewModel = StreamerListViewModel()
+    @EnvironmentObject var authHandler: Authentication
+    @StateObject private var streamersVM = StreamerListViewModel()
     
     var body: some View {
-        if let token = auth.userToken {
+        if let token = authHandler.userToken {
             List {
-                ForEach(viewModel.streamers, id: \.userName) { streamer in
+                ForEach(streamersVM.streamers, id: \.userName) { streamer in
                     NavigationLink(destination: VideoChatView(streamer: streamer)) {
                         StreamerCardView(streamer: streamer)
                     }
@@ -25,7 +25,7 @@ struct StreamerListView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        auth.isLoggedIn ? viewModel.updateFollowedStreamers(id: auth.user!.id, token: token) : viewModel.updateTopStreamers(token: token)
+                        authHandler.isLoggedIn ? streamersVM.updateFollowedStreamers(id: authHandler.user!.id, token: token) : streamersVM.updateTopStreamers(token: token)
                     }, label: {
                         Label("Refresh", systemImage: "arrow.clockwise")
                     })
@@ -33,13 +33,13 @@ struct StreamerListView: View {
             }
             .onAppear {
                 print("REFRESHING")
-                auth.isLoggedIn ? viewModel.updateFollowedStreamers(id: auth.user!.id, token: token) : viewModel.updateTopStreamers(token: token)
+                authHandler.isLoggedIn ? streamersVM.updateFollowedStreamers(id: authHandler.user!.id, token: token) : streamersVM.updateTopStreamers(token: token)
             }
         } else {
             Text("Getting token...")
                 .onAppear {
                     print("GETTING TOKEN")
-                    auth.getDefaultToken()
+                    authHandler.getDefaultToken()
                 }
         }
     }

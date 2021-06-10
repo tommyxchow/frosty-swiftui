@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject var auth: Authentication
+    @EnvironmentObject private var auth: Authentication
     @StateObject private var loginVM: LoginViewModel = LoginViewModel()
     @StateObject private var viewModel: SettingsViewModel = SettingsViewModel()
     var body: some View {
