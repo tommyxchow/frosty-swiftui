@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct StreamerListView: View {
-    @EnvironmentObject var authHandler: Authentication
-    @StateObject private var streamersVM = StreamerListViewModel()
+    @EnvironmentObject var auth: Authentication
+    @StateObject private var streamerListVM = StreamerListViewModel()
+    @State private var firstTime = true
     
     var body: some View {
-        if let token = authHandler.userToken {
+        if let token = auth.userToken {
             List {
-                ForEach(streamersVM.streamers, id: \.userName) { streamer in
+                ForEach(streamerListVM.streamers, id: \.userName) { streamer in
                     NavigationLink(destination: VideoChatView(streamer: streamer)) {
                         StreamerCardView(streamer: streamer)
                     }
@@ -25,21 +26,27 @@ struct StreamerListView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        authHandler.isLoggedIn ? streamersVM.updateFollowedStreamers(id: authHandler.user!.id, token: token) : streamersVM.updateTopStreamers(token: token)
+                        auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
                     }, label: {
                         Label("Refresh", systemImage: "arrow.clockwise")
                     })
                 }
             }
+            .onChange(of: auth.user) { value in
+                auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
+            }
             .onAppear {
-                print("REFRESHING")
-                authHandler.isLoggedIn ? streamersVM.updateFollowedStreamers(id: authHandler.user!.id, token: token) : streamersVM.updateTopStreamers(token: token)
+                if firstTime {
+                    print("REFRESHING")
+                    auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
+                    firstTime.toggle()
+                }
             }
         } else {
             Text("Getting token...")
                 .onAppear {
                     print("GETTING TOKEN")
-                    authHandler.getDefaultToken()
+                    auth.getDefaultToken()
                 }
         }
     }

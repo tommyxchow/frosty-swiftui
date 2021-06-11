@@ -67,9 +67,9 @@ class ChatViewModel: ObservableObject {
                             DispatchQueue.main.async { [self] in
                                 print(string)
                                 messages.append(parseMessage(string))
-                                if messages.count > 60 {
-                                    messages.removeFirst(10)
-                                }
+//                                if messages.count > 60 {
+//                                    messages.removeFirst(10)
+//                                }
                             }
                         } else {
                             count += 1
@@ -104,7 +104,7 @@ class ChatViewModel: ObservableObject {
             if let error = error {
                 print("Ping failed: \(error.localizedDescription)")
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
                 print("SENDING PING...")
                 self.sendPing()
             }
@@ -119,7 +119,6 @@ class ChatViewModel: ObservableObject {
         
         for word in split {
             if word == "KEKW" {
-                UserDefaults.standard.setValue(Image("KEKW"), forKey: "Emotes")
                 result = result + Text(" ") + Text(Image("KEKW")).baselineOffset(-8)
             } else {
                 result = result + Text(" ") + Text(word)

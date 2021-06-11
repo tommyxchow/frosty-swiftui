@@ -11,7 +11,7 @@ struct UserData: Decodable {
     let data: [User]
 }
 
-struct User: Decodable {
+struct User: Decodable, Equatable {
     let id : String
     let login: String
     let displayName: String

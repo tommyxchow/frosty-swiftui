@@ -12,7 +12,7 @@ class Authentication: ObservableObject {
     private var refreshToken: String?
     let clientID = "k6tnwmfv24ct9pzanhnp2x1yht30oi"
     var tokenIsValid: Bool = false
-    @Published var userToken: String?
+    @Published var userToken: String? = ""
     @Published var isLoggedIn: Bool = false
     @Published var user: User?
     

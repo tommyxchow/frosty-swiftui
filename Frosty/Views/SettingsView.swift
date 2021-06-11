@@ -8,16 +8,19 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject private var auth: Authentication
+    @EnvironmentObject private var authHandler: Authentication
     @StateObject private var loginVM: LoginViewModel = LoginViewModel()
-    @StateObject private var viewModel: SettingsViewModel = SettingsViewModel()
+    
     var body: some View {
-        if let user = auth.user, auth.isLoggedIn {
+        if let user = authHandler.user, authHandler.isLoggedIn {
             SettingsLoggedInView(user: user)
         } else {
             Button("Login", action: {
-                loginVM.login(auth: auth)
+                loginVM.login(auth: authHandler)
             })
+            .onAppear {
+                print("Settings")
+            }
         }
     }
 }
