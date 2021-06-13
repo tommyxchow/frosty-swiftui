@@ -15,11 +15,12 @@ struct SettingsView: View {
         if let user = authHandler.user, authHandler.isLoggedIn {
             SettingsLoggedInView(user: user)
         } else {
-            Button("Login", action: {
-                loginVM.login(auth: authHandler)
-            })
-            .onAppear {
-                print("Settings")
+            VStack {
+                Button(action: {
+                    loginVM.login(auth: authHandler)
+                }, label: {
+                    Text("Login")
+                })
             }
         }
     }

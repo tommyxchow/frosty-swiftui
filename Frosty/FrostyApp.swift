@@ -13,8 +13,10 @@ struct FrostyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView()
-                .environmentObject(authHandler)
+            NavigationView {
+                MainView()
+                    .environmentObject(authHandler)
+            }
         }
     }
 }

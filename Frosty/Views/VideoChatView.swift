@@ -11,16 +11,20 @@ struct VideoChatView: View {
     let streamer: StreamerInfo
     var body: some View {
         VStack {
-            VideoView()
+            //VideoView()
             Spacer()
             ChatView(streamer: streamer)
         }
         .navigationTitle(streamer.userName)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 struct VideoChatView_Previews: PreviewProvider {
     static var previews: some View {
-        VideoChatView(streamer: StreamerInfo.data[0])
+        NavigationView {
+            VideoChatView(streamer: StreamerInfo.data[0])
+                .environmentObject(Authentication())
+        }
     }
 }

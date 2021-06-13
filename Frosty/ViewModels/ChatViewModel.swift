@@ -21,34 +21,38 @@ class ChatViewModel: ObservableObject {
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
         let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer)")
+//        let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
+//        let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
+//        let END = URLSessionWebSocketTask.Message.string("CAP END")
+//        let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
+//        let PART = URLSessionWebSocketTask.Message.string("PART #\(streamer)")
+        
+        let commands = [PASS, NICKNAME, JOIN]
         
         websocket.resume()
         
         chatting = true
         
-        websocket.send(PASS) { error in
-            if let error = error {
-                print(error.localizedDescription)
-                return
+        for command in commands {
+            websocket.send(command) { error in
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
             }
         }
-        websocket.send(NICKNAME) { error in
-            if let error = error {
-                print(error.localizedDescription)
-                return
-            }
-        }
-        websocket.send(JOIN) { error in
-            if let error = error {
-                print(error.localizedDescription)
-                return
-            }
-        }
+        
         var count = 0
         func recieve() {
             if !chatting {
                 print("END CHAT")
                 websocket.cancel(with: .goingAway, reason: nil)
+//                websocket.send(PART) { error in
+//                    if let error = error {
+//                        print(error.localizedDescription)
+//                        return
+//                    }
+//                }
                 DispatchQueue.main.async {
                     self.messages.removeAll()
                 }
@@ -118,8 +122,8 @@ class ChatViewModel: ObservableObject {
         var result = Text("\(pair[0]):").bold()
         
         for word in split {
-            if word == "KEKW" {
-                result = result + Text(" ") + Text(Image("KEKW")).baselineOffset(-8)
+            if word == "OMEGALUL" {
+                result = result + Text(" ") + Text(Image("OMEGALUL")).baselineOffset(-8)
             } else {
                 result = result + Text(" ") + Text(word)
             }

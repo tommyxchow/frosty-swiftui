@@ -27,7 +27,7 @@ struct ChatView: View {
                 })
             }
         }
-        .padding(5.0)
+        .padding([.bottom, .horizontal], 5.0)
         .onAppear {
             print("START")
             viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer.userLogin)
