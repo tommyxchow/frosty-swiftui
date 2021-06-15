@@ -16,7 +16,7 @@ struct SettingsLoggedInView: View {
 
 struct SettingsLoggedInView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsLoggedInView(user: User())
+        SettingsLoggedInView(user: User(id: "888", login: "Frosty", displayName: "Frosty", type: "", broadcasterType: "", description: "", profileImageUrl: "", offlineImageUrl: "", viewCount: 888, createdAt: ""))
     }
 }
 

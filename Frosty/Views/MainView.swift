@@ -11,33 +11,35 @@ struct MainView: View {
     @State private var isPresented = false
     
     var body: some View {
-        StreamerListView()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        isPresented = true
-                    }, label: {
-                        Label("Settings", systemImage: "gearshape")
-                    })
+        NavigationView {
+            StreamerListView()
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            isPresented = true
+                        }, label: {
+                            Label("Settings", systemImage: "gearshape")
+                        })
+                    }
                 }
-            }
-            .sheet(isPresented: $isPresented, content: {
-                NavigationView {
-                    SettingsView()
-                        .onAppear {
-                            print("Settings")
-                        }
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: {
-                                    isPresented = false
-                                }, label: {
-                                    Text("Dismiss")
-                                })
+                .sheet(isPresented: $isPresented, content: {
+                    NavigationView {
+                        SettingsView()
+                            .onAppear {
+                                print("Settings")
                             }
-                        }
-                }
-            })
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        isPresented = false
+                                    }, label: {
+                                        Text("Dismiss")
+                                    })
+                                }
+                            }
+                    }
+                })
+        }
     }
 }
 

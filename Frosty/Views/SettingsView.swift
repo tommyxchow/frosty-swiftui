@@ -16,12 +16,15 @@ struct SettingsView: View {
             SettingsLoggedInView(user: user)
         } else {
             VStack {
+                Text("You are not logged in")
                 Button(action: {
                     loginVM.login(auth: authHandler)
                 }, label: {
                     Text("Login")
                 })
+                    .controlProminence(.increased)
             }
+            .buttonStyle(.bordered)
         }
     }
 }

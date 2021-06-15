@@ -17,7 +17,7 @@ struct ChatView: View {
                 LazyVStack(alignment: .leading, spacing: 10.0) {
                     ForEach(viewModel.messages, id: \.self) { message in
                         if let triple = message {
-                            viewModel.emoteMessage(triple)
+                            MessageView(message: triple, viewModel: viewModel)
                         }
                     }
                     .font(.footnote)

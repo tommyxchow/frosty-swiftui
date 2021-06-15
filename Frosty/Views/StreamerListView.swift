@@ -13,41 +13,22 @@ struct StreamerListView: View {
     @State private var firstTime = true
     
     var body: some View {
-        if let token = auth.userToken {
-            List {
-                ForEach(streamerListVM.streamers, id: \.userName) { streamer in
-                    NavigationLink(destination: VideoChatView(streamer: streamer)) {
-                        StreamerCardView(streamer: streamer)
-                    }
+        List {
+            ForEach(streamerListVM.streamers, id: \.userName) { streamer in
+                NavigationLink(destination: VideoChatView(streamer: streamer)) {
+                    StreamerCardView(streamer: streamer)
                 }
+                .listRowSeparator(.hidden)
             }
-            .listStyle(GroupedListStyle())
-            .navigationTitle("Live")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
-                    }, label: {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    })
-                }
-            }
-            .onChange(of: auth.user) { value in
-                auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
-            }
-            .onAppear {
-                if firstTime {
-                    print("REFRESHING")
-                    auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
-                    firstTime.toggle()
-                }
-            }
-        } else {
-            Text("Getting token...")
-                .onAppear {
-                    print("GETTING TOKEN")
-                    auth.getDefaultToken()
-                }
+        }
+        .listStyle(.grouped)
+        .navigationTitle("Live")
+        .task {
+            await streamerListVM.update(auth: auth)
+        }
+        .refreshable {
+            await streamerListVM.update(auth: auth)
+            
         }
     }
 }
