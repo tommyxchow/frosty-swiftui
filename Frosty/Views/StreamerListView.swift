@@ -11,15 +11,14 @@ struct StreamerListView: View {
     @EnvironmentObject var auth: Authentication
     @StateObject private var streamerListVM = StreamerListViewModel()
     @State private var firstTime = true
+    @State private var search = ""
     
     var body: some View {
-        List {
-            ForEach(streamerListVM.streamers, id: \.userName) { streamer in
-                NavigationLink(destination: VideoChatView(streamer: streamer)) {
-                    StreamerCardView(streamer: streamer)
-                }
-                .listRowSeparator(.hidden)
+        List(streamerListVM.streamers, id: \.userName) { streamer in
+            NavigationLink(destination: VideoChatView(streamer: streamer)) {
+                StreamerCardView(streamer: streamer)
             }
+            .listRowSeparator(.hidden)
         }
         .listStyle(.grouped)
         .navigationTitle("Live")

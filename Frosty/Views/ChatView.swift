@@ -28,9 +28,9 @@ struct ChatView: View {
             }
         }
         .padding([.bottom, .horizontal], 5.0)
-        .onAppear {
+        .task {
             print("START")
-            viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer.userLogin)
+            await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
         }
         .onDisappear {
             print("DISAPPEAR")

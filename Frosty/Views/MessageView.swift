@@ -9,14 +9,9 @@ import SwiftUI
 
 struct MessageView: View {
     let message: [String]
-    @State var finalMessage: Text = Text("")
     @ObservedObject var viewModel: ChatViewModel
     var body: some View {
-        finalMessage
-            .task {
-                let newTextView = await viewModel.emotify(message)
-                finalMessage = newTextView
-            }
+        viewModel.emotify(message)
     }
 }
 
