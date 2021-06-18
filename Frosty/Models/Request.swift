@@ -35,7 +35,7 @@ struct Request {
             
             return data
         } catch {
-            print("Request failed")
+            print("Request failed to \(url)")
             return nil
         }
     }

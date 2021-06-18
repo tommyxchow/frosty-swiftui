@@ -13,28 +13,45 @@ struct EmoteManager {
     static let cache = NSCache<NSString, NSData>()
     static private let decoder = JSONDecoder()
     
+    static func clearCache() {
+        let folders = ["TwitchGlobalEmotes1", "TwitchChannelEmotes", "BTTVGlobalEmotes1", "BTTVChannelEmotes", "FFZChannelEmotes"]
+        for folder in folders {
+            let path = cachesDirectory.appendingPathComponent(folder)
+            do {
+                try fileManager.removeItem(at: path)
+            } catch {
+                print("Folder does not exist")
+            }
+        }
+        
+    }
+        
     static func getGlobalEmotesTwitch(token: String) async {
         let endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
         let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
-        let folder = cachesDirectory.appendingPathComponent("GlobalEmotesTwitch")
+        let folder = cachesDirectory.appendingPathComponent("TwitchGlobalEmotes")
         print(folder)
         
         if fileManager.fileExists(atPath: folder.path) {
             print("Folder already exists")
-            if let files = fileManager.enumerator(atPath: folder.path) {
-                while let emote = files.nextObject() as? String {
-                    print("EMOTE EXISTS", emote)
+            do {
+                let contents = try fileManager.contentsOfDirectory(atPath: folder.path)
+                for emote in contents {
+                    let emotePath = folder.appendingPathComponent(emote)
+                    let emoteData = try Data(contentsOf: emotePath)
+                    cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote))
                 }
+            } catch {
+                print("Fail")
             }
         } else if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
             do {
-                try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
-                
                 let result = try decoder.decode(EmoteDataTwitch.self, from: data)
                 for emote in result.data {
                     let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)
                     if let emoteData = emoteData {
-                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.name))
+                        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.name + ".png"))
                         let filePath = folder.appendingPathComponent("\(emote.name).png")
                         fileManager.createFile(atPath: filePath.path, contents: emoteData)
                     } else {
@@ -53,19 +70,34 @@ struct EmoteManager {
         let endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=\(id)")!
         let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
         let decoder = JSONDecoder()
-        //decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let folder = cachesDirectory.appendingPathComponent("TwitchChannelEmotes/\(id)")
         
-        if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
+        if fileManager.fileExists(atPath: folder.path) {
+            print("Folder already exists")
+            do {
+                let contents = try fileManager.contentsOfDirectory(atPath: folder.path)
+                for emote in contents {
+                    let emotePath = folder.appendingPathComponent(emote)
+                    let emoteData = try Data(contentsOf: emotePath)
+                    cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote))
+                }
+            } catch {
+                print("Fail")
+            }
+        } else if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
             do {
                 let result = try decoder.decode(EmoteDataTwitch.self, from: data)
                 for emote in result.data {
                     if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)  {
-                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.name))
+                        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.name + ".png"))
+                        let filePath = folder.appendingPathComponent("\(emote.name).png")
+                        try emoteData.write(to: filePath, options: .atomic)
                     }
                     
                 }
             } catch {
-                print("Failed to decode", error.localizedDescription)
+                print("Twitch channel emote get failed", error.localizedDescription)
             }
         } else {
             print("Failed to get channel emote data")
@@ -76,13 +108,30 @@ struct EmoteManager {
         let endpoint = "https://api.betterttv.net/3/cached/emotes/global"
         let decoder = JSONDecoder()
         
-        if let data = await Request.perform(.GET, to: URL(string: endpoint)!) {
+        let folder = cachesDirectory.appendingPathComponent("BTTVGlobalEmotes")
+        
+        if fileManager.fileExists(atPath: folder.path) {
+            print("Folder already exists")
+            do {
+                let contents = try fileManager.contentsOfDirectory(atPath: folder.path)
+                for emote in contents {
+                    let emotePath = folder.appendingPathComponent(emote)
+                    let emoteData = try Data(contentsOf: emotePath)
+                    cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote))
+                }
+            } catch {
+                print("Fail")
+            }
+        } else if let data = await Request.perform(.GET, to: URL(string: endpoint)!) {
             do {
                 let result = try decoder.decode([EmoteBTTV].self, from: data)
                 for emote in result {
                     let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
                     if let emoteData = emoteData {
-                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
+                        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code + ".png"))
+                        let filePath = folder.appendingPathComponent("\(emote.code).png")
+                        try emoteData.write(to: filePath, options: .atomic)
                     } else {
                         print("BTTV GLOBAL FAILED")
                     }
@@ -99,13 +148,30 @@ struct EmoteManager {
         let endpoint = "https://api.betterttv.net/3/cached/users/twitch/\(id)"
         let decoder = JSONDecoder()
         
-        if let data = await Request.perform(.GET, to: URL(string: endpoint)!) {
+        let folder = cachesDirectory.appendingPathComponent("BTTVChannelEmotes/\(id)")
+        
+        if fileManager.fileExists(atPath: folder.path) {
+            print("Folder already exists")
+            do {
+                let contents = try fileManager.contentsOfDirectory(atPath: folder.path)
+                for emote in contents {
+                    let emotePath = folder.appendingPathComponent(emote)
+                    let emoteData = try Data(contentsOf: emotePath)
+                    cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote))
+                }
+            } catch {
+                print("Fail")
+            }
+        } else if let data = await Request.perform(.GET, to: URL(string: endpoint)!) {
             do {
                 let result = try decoder.decode(ChannelEmotesBTTV.self, from: data)
                 for emote in result.channelEmotes {
                     let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
                     if let emoteData = emoteData {
-                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
+                        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code + ".png"))
+                        let filePath = folder.appendingPathComponent("\(emote.code).png")
+                        try emoteData.write(to: filePath, options: .atomic)
                     } else {
                         print("BTTV CHANNEL EMOTE FAILED")
                     }
@@ -113,7 +179,7 @@ struct EmoteManager {
                 for emote in result.sharedEmotes {
                     let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
                     if let emoteData = emoteData {
-                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code + ".png"))
                     } else {
                         print("BTTV SHARED EMOTE FAILED")
                     }
@@ -130,13 +196,30 @@ struct EmoteManager {
         let endpoint = "https://api.betterttv.net/3/cached/frankerfacez/users/twitch/\(id)"
         let decoder = JSONDecoder()
         
-        if let data = await Request.perform(.GET, to: URL(string: endpoint)!) {
+        let folder = cachesDirectory.appendingPathComponent("FFZChannelEmotes/\(id)")
+        
+        if fileManager.fileExists(atPath: folder.path) {
+            print("Folder already exists")
+            do {
+                let contents = try fileManager.contentsOfDirectory(atPath: folder.path)
+                for emote in contents {
+                    let emotePath = folder.appendingPathComponent(emote)
+                    let emoteData = try Data(contentsOf: emotePath)
+                    cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote))
+                }
+            } catch {
+                print("Fail")
+            }
+        } else if let data = await Request.perform(.GET, to: URL(string: endpoint)!) {
             do {
                 let result = try decoder.decode([ChannelEmotesFFZ].self, from: data)
                 for emote in result {
                     let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!)
                     if let emoteData = emoteData {
-                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
+                        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code + ".png"))
+                        let filePath = folder.appendingPathComponent("\(emote.code).png")
+                        try emoteData.write(to: filePath, options: .atomic)
                     } else {
                         print("FFZ CHANNEL EMOTE FAILED")
                     }
