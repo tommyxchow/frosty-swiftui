@@ -9,28 +9,36 @@ import Foundation
 
 struct EmoteManager {
     static let fileManager = FileManager.default
-    static let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    static let cache = NSCache<NSString, NSData>()
+    static private let decoder = JSONDecoder()
     
     static func getGlobalEmotesTwitch(token: String) async {
         let endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
         let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
-         
-        if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
+        let folder = cachesDirectory.appendingPathComponent("GlobalEmotesTwitch")
+        print(folder)
+        
+        if fileManager.fileExists(atPath: folder.path) {
+            print("Folder already exists")
+            if let files = fileManager.enumerator(atPath: folder.path) {
+                while let emote = files.nextObject() as? String {
+                    print("EMOTE EXISTS", emote)
+                }
+            }
+        } else if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
             do {
-                let decoder = JSONDecoder()
+                try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                
                 let result = try decoder.decode(EmoteDataTwitch.self, from: data)
                 for emote in result.data {
-                    let finalURL = cachesDirectory.appendingPathComponent("\(emote.name).png")
-                    if !fileManager.fileExists(atPath: finalURL.path) {
-                        print(emote)
-                        let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)
-                        if let emoteData = emoteData {
-                            try emoteData.write(to: finalURL, options: .atomic)
-                        } else {
-                            print("Twitch emote request failed")
-                        }
+                    let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)
+                    if let emoteData = emoteData {
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.name))
+                        let filePath = folder.appendingPathComponent("\(emote.name).png")
+                        fileManager.createFile(atPath: filePath.path, contents: emoteData)
                     } else {
-                        print("FILE ALREADY EXISTS")
+                        print("Twitch emote request failed")
                     }
                 }
             } catch {
@@ -48,11 +56,14 @@ struct EmoteManager {
         //decoder.keyDecodingStrategy = .convertFromSnakeCase
         
         if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
-            print(id)
-            print(String(data: data, encoding: .utf8)!)
             do {
                 let result = try decoder.decode(EmoteDataTwitch.self, from: data)
-                print(result)
+                for emote in result.data {
+                    if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)  {
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.name))
+                    }
+                    
+                }
             } catch {
                 print("Failed to decode", error.localizedDescription)
             }
@@ -69,16 +80,11 @@ struct EmoteManager {
             do {
                 let result = try decoder.decode([EmoteBTTV].self, from: data)
                 for emote in result {
-                    let path = cachesDirectory.appendingPathComponent("\(emote.code).png")
-                    if !fileManager.fileExists(atPath: path.path) {
-                        let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
-                        if let emoteData = emoteData {
-                            try emoteData.write(to: path, options: .atomic)
-                        } else {
-                            print("BTTV GLOBAL FAILED")
-                        }
+                    let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
+                    if let emoteData = emoteData {
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
                     } else {
-                        print("BTTV Global Emote already saved")
+                        print("BTTV GLOBAL FAILED")
                     }
                 }
             } catch {
@@ -90,7 +96,6 @@ struct EmoteManager {
     }
     
     static func getChannelEmotesBTTV(id: String) async {
-        print(id)
         let endpoint = "https://api.betterttv.net/3/cached/users/twitch/\(id)"
         let decoder = JSONDecoder()
         
@@ -98,29 +103,19 @@ struct EmoteManager {
             do {
                 let result = try decoder.decode(ChannelEmotesBTTV.self, from: data)
                 for emote in result.channelEmotes {
-                    let path = cachesDirectory.appendingPathComponent("\(emote.code).png")
-                    if !fileManager.fileExists(atPath: path.path) {
-                        let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
-                        if let emoteData = emoteData {
-                            try emoteData.write(to: path, options: .atomic)
-                        } else {
-                            print("BTTV CHANNEL EMOTE FAILED")
-                        }
+                    let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
+                    if let emoteData = emoteData {
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
                     } else {
-                        print("BTTV Channel Emote already saved")
+                        print("BTTV CHANNEL EMOTE FAILED")
                     }
                 }
                 for emote in result.sharedEmotes {
-                    let path = cachesDirectory.appendingPathComponent("\(emote.code).png")
-                    if !fileManager.fileExists(atPath: path.path) {
-                        let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
-                        if let emoteData = emoteData {
-                            try emoteData.write(to: path, options: .atomic)
-                        } else {
-                            print("BTTV SHARED EMOTE FAILED")
-                        }
+                    let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
+                    if let emoteData = emoteData {
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
                     } else {
-                        print("BTTV Shared Emote already saved")
+                        print("BTTV SHARED EMOTE FAILED")
                     }
                 }
             } catch {
@@ -132,7 +127,6 @@ struct EmoteManager {
     }
     
     static func getChannelEmotesFFZ(id: String) async {
-        print(id)
         let endpoint = "https://api.betterttv.net/3/cached/frankerfacez/users/twitch/\(id)"
         let decoder = JSONDecoder()
         
@@ -140,16 +134,11 @@ struct EmoteManager {
             do {
                 let result = try decoder.decode([ChannelEmotesFFZ].self, from: data)
                 for emote in result {
-                    let path = cachesDirectory.appendingPathComponent("\(emote.code).png")
-                    if !fileManager.fileExists(atPath: path.path) {
-                        let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!)
-                        if let emoteData = emoteData {
-                            try emoteData.write(to: path, options: .atomic)
-                        } else {
-                            print("FFZ CHANNEL EMOTE FAILED")
-                        }
+                    let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!)
+                    if let emoteData = emoteData {
+                        cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code))
                     } else {
-                        print("FFZ Channel Emote already saved")
+                        print("FFZ CHANNEL EMOTE FAILED")
                     }
                 }
             } catch {
