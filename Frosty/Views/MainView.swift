@@ -21,6 +21,13 @@ struct MainView: View {
                             Label("Settings", systemImage: "gearshape")
                         })
                     }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            isPresented = true
+                        }, label: {
+                            Label("Settings", systemImage: "magnifyingglass")
+                        })
+                    }
                 }
                 .sheet(isPresented: $isPresented, content: {
                     NavigationView {
@@ -45,9 +52,7 @@ struct MainView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            MainView()
-                .environmentObject(Authentication())
-        }
+        MainView()
+            .environmentObject(Authentication())
     }
 }

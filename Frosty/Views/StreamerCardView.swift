@@ -25,13 +25,22 @@ struct StreamerCardView: View {
                         .font(.footnote)
                 }
                 Spacer()
-                if let thumbnail = streamer.thumbnail {
-                    Image(uiImage: UIImage(data: thumbnail)!)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 150)
-                        .cornerRadius(10.0)
+                AsyncImage(url: URL(string: streamer.thumbnailUrl)!) { image in
+                    image.resizable()
+                } placeholder: {
+                    ProgressView()
                 }
+                .scaledToFit()
+                .frame(width: 150)
+                .cornerRadius(10.0)
+                
+//                if let thumbnail = streamer.thumbnail {
+//                    Image(uiImage: UIImage(data: thumbnail)!)
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 150)
+//                        .cornerRadius(10.0)
+//                }
             }
         }
         .padding(5.0)

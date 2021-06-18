@@ -15,6 +15,11 @@ struct FrostyApp: App {
         WindowGroup {
             MainView()
                 .environmentObject(authHandler)
+                .task {
+                    await EmoteManager.getGlobalEmotesBTTV()
+                    await EmoteManager.getGlobalEmotesFFZ()
+                    await EmoteManager.getGlobalEmotesTwitch(token: authHandler.userToken!)
+                }
         }
     }
 }

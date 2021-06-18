@@ -25,9 +25,13 @@ struct StreamerListView: View {
         .task {
             await streamerListVM.update(auth: auth)
         }
+        .onChange(of: auth.user) { value in
+            async {
+                await streamerListVM.update(auth: auth)
+            }
+        }
         .refreshable {
             await streamerListVM.update(auth: auth)
-            
         }
     }
 }

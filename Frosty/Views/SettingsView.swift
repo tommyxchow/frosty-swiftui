@@ -23,6 +23,11 @@ struct SettingsView: View {
                     Text("Login")
                 })
                     .controlProminence(.increased)
+                Button(action: {
+                    EmoteManager.clearCache()
+                }, label: {
+                    Text("Clear Cache")
+                })
             }
             .buttonStyle(.bordered)
         }
