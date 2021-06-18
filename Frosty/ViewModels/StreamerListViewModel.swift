@@ -27,7 +27,7 @@ class StreamerListViewModel: ObservableObject {
             
             if let result = try? decoder.decode(StreamerData.self, from: data) {
                 streamers = result.data
-                await loadThumbnails()
+                loadThumbnails()
             } else {
                 print("Failed to parse followed streamers.")
             }
@@ -43,18 +43,17 @@ class StreamerListViewModel: ObservableObject {
             do {
                 let result = try decoder.decode(StreamerData.self, from: data)
                 streamers = result.data
-                await loadThumbnails()
+                loadThumbnails()
             } catch {
                 print("Failed to parse top streamers.")
             }
         }
     }
     
-    func loadThumbnails() async {
+    func loadThumbnails() {
         for i in streamers.indices {
             let url = streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "")
-            async let data = Request.perform(.GET, to: URL(string: url)!)
-            streamers[i].thumbnail = await data
+            streamers[i].thumbnailUrl = url
         }
     }
 }

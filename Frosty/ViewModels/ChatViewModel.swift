@@ -17,10 +17,15 @@ class ChatViewModel: ObservableObject {
     
     let websocket = session.webSocketTask(with: websocketURL)
     
-    func start(token: String, user: String, streamer: String) {
+    func start(token: String, user: String, streamer: StreamerInfo) async {
+        
+        await EmoteManager.getChannelEmotesTwitch(token: token, id: streamer.userId)
+        await EmoteManager.getChannelEmotesBTTV(id: streamer.userId)
+        await EmoteManager.getChannelEmotesFFZ(id: streamer.userId)
+        
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
-        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer)")
+        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer.userLogin)")
 //        let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
 //        let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
 //        let END = URLSessionWebSocketTask.Message.string("CAP END")
@@ -69,7 +74,7 @@ class ChatViewModel: ObservableObject {
                     case .string(let string):
                         if count == 3 {
                             DispatchQueue.main.async { [self] in
-                                print(string)
+                                //print(string)
                                 messages.append(parseMessage(string))
 //                                if messages.count > 60 {
 //                                    messages.removeFirst(10)
@@ -115,20 +120,24 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    func emoteMessage(_ pair: [String]) -> some View {
+    func emotify(_ pair: [String]) -> Text {
         var split = pair[1].components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
         var result = Text("\(pair[0]):").bold()
         
+        var hits: [String:Data] = [:]
         for word in split {
-            if word == "OMEGALUL" {
-                result = result + Text(" ") + Text(Image("OMEGALUL")).baselineOffset(-8)
+            if let emoteData = hits[word] {
+                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!)).baselineOffset(-10)
+            } else if let cachedVersion = EmoteManager.cache.object(forKey: NSString(string: "\(word).png")) {
+                let emoteData = Data(referencing: cachedVersion)
+                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!)).baselineOffset(-10)
+                hits[word] = emoteData
             } else {
                 result = result + Text(" ") + Text(word)
             }
         }
-        
         return result
     }
 }
