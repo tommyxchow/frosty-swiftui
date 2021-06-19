@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [[String]] = []
+    @Published var messages: [Message] = []
     static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
     static private let session = URLSession.shared
     
@@ -18,21 +18,16 @@ class ChatViewModel: ObservableObject {
     let websocket = session.webSocketTask(with: websocketURL)
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
-        
-        await EmoteManager.getChannelEmotesTwitch(token: token, id: streamer.userId)
-        await EmoteManager.getChannelEmotesBTTV(id: streamer.userId)
-        await EmoteManager.getChannelEmotesFFZ(id: streamer.userId)
-        
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
         let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer.userLogin)")
-//        let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
-//        let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
-//        let END = URLSessionWebSocketTask.Message.string("CAP END")
-//        let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
-//        let PART = URLSessionWebSocketTask.Message.string("PART #\(streamer)")
+        let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
+        let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
+        let END = URLSessionWebSocketTask.Message.string("CAP END")
+        let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
+        // let PART = URLSessionWebSocketTask.Message.string("PART #\(streamer)")
         
-        let commands = [PASS, NICKNAME, JOIN]
+        let commands = [CAP, PASS, NICKNAME, COMMAND, TAG, END, JOIN]
         
         websocket.resume()
         
@@ -41,13 +36,17 @@ class ChatViewModel: ObservableObject {
         for command in commands {
             websocket.send(command) { error in
                 if let error = error {
-                    print(error.localizedDescription)
+                    print("WS CONNECTION FAILED", error.localizedDescription)
                     return
                 }
             }
         }
         
-        var count = 0
+        // TODO: Make these throw and run concurrently (async let)
+        await ChatManager.getChannelEmotesTwitch(token: token, id: streamer.userId)
+        await ChatManager.getChannelEmotesBTTV(id: streamer.userId)
+        await ChatManager.getChannelEmotesFFZ(id: streamer.userId)
+        
         func recieve() {
             if !chatting {
                 print("END CHAT")
@@ -72,17 +71,16 @@ class ChatViewModel: ObservableObject {
                     case .data(let data):
                         print(data)
                     case .string(let string):
-                        if count == 3 {
+                        print(string)
+                        if string[string.startIndex] == "@" {
                             DispatchQueue.main.async { [self] in
-                                //print(string)
-                                messages.append(parseMessage(string))
+                                if let parsed = parseMessage(string) {
+                                    messages.append(parsed)
+                                }
 //                                if messages.count > 60 {
 //                                    messages.removeFirst(10)
 //                                }
                             }
-                        } else {
-                            count += 1
-                            print(string)
                         }
                     @unknown default:
                         print("ERROR")
@@ -94,18 +92,37 @@ class ChatViewModel: ObservableObject {
         recieve()
     }
     
-    func parseMessage(_ string: String) -> [String] {
-        let split = string.split(separator: " ", maxSplits: 3)
+    func parseMessage(_ whole: String) -> Message? {
+        let divider = whole.firstIndex(of: " ")!
+        let tags = String(whole[...whole.index(before: divider)])
+        let message = String(whole[whole.index(after: divider)...])
 
-        let start = split[0].index(after: split[0].startIndex)
-        let end = split[0].index(before: split[0].firstIndex(of: "!")!)
+        let tagSplit = tags.components(separatedBy: ";")
+        var mapping: [String:String] = [:]
+        for item in tagSplit {
+            let split = item.components(separatedBy: "=")
+            if split.count > 1 {
+                mapping[split[0]] = split[1]
+            }
+        }
+        
+        
+        
+        let messageSplit = message.split(separator: " ", maxSplits: 3)
+        print(messageSplit[1])
+        if messageSplit[1] == "PRIVMSG" {
+            let start = messageSplit[0].index(after: messageSplit[0].startIndex)
+            let end = messageSplit[0].index(before: messageSplit[0].firstIndex(of: "!")!)
 
-        let name = split[0][start...end]
-        
-        let range = split.last!.index(after: split.last!.startIndex)..<split.last!.endIndex
-        let message = split.last![range]
-        
-        return [String(name), String(message), UUID().uuidString]
+            let name = messageSplit[0][start...end]
+            
+            let range = messageSplit.last!.index(after: messageSplit.last!.startIndex)..<messageSplit.last!.endIndex
+            let userMessage = messageSplit.last![range]
+            
+            return Message(name: String(name), message: String(userMessage), tags: mapping)
+        } else {
+            return nil
+        }
     }
     
     func sendPing() {
@@ -120,17 +137,19 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    func emotify(_ pair: [String]) -> Text {
-        var split = pair[1].components(separatedBy: " ")
+    func emotify(_ message: Message) -> Text {
+        var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
-        var result = Text("\(pair[0]):").bold()
+        let hexColor = hexStringToUIColor(hex: message.tags["color"]!)
+        
+        var result = Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor))
         
         var hits: [String:Data] = [:]
         for word in split {
             if let emoteData = hits[word] {
                 result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!)).baselineOffset(-10)
-            } else if let cachedVersion = EmoteManager.cache.object(forKey: NSString(string: "\(word).png")) {
+            } else if let cachedVersion = ChatManager.cache.object(forKey: NSString(string: "\(word).png")) {
                 let emoteData = Data(referencing: cachedVersion)
                 result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!)).baselineOffset(-10)
                 hits[word] = emoteData
@@ -139,5 +158,27 @@ class ChatViewModel: ObservableObject {
             }
         }
         return result
+    }
+    
+    func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+
+        var rgbValue:UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
+
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
     }
 }

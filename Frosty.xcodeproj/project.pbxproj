@@ -27,9 +27,11 @@
 		C6A6144826698873003508D8 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144726698873003508D8 /* Request.swift */; };
 		C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144D266C44DC003508D8 /* ChatViewModel.swift */; };
 		C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */; };
+		C6F09CB2267CCA4C001451FE /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB1267CCA4C001451FE /* Badges.swift */; };
+		C6F09CB4267E19DA001451FE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB3267E19DA001451FE /* Message.swift */; };
 		C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B0C2678A33300471B73 /* Emotes.swift */; };
 		C6F48B0F2678B81D00471B73 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B0E2678B81D00471B73 /* MessageView.swift */; };
-		C6F48B11267A214700471B73 /* EmoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B10267A214700471B73 /* EmoteManager.swift */; };
+		C6F48B11267A214700471B73 /* ChatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B10267A214700471B73 /* ChatManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,9 +57,11 @@
 		C6A6144726698873003508D8 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		C6A6144D266C44DC003508D8 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLoggedInView.swift; sourceTree = "<group>"; };
+		C6F09CB1267CCA4C001451FE /* Badges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
+		C6F09CB3267E19DA001451FE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		C6F48B0C2678A33300471B73 /* Emotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emotes.swift; sourceTree = "<group>"; };
 		C6F48B0E2678B81D00471B73 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
-		C6F48B10267A214700471B73 /* EmoteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmoteManager.swift; sourceTree = "<group>"; };
+		C6F48B10267A214700471B73 /* ChatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +122,9 @@
 				C6A6144126697B32003508D8 /* User.swift */,
 				C6A6144726698873003508D8 /* Request.swift */,
 				C6F48B0C2678A33300471B73 /* Emotes.swift */,
-				C6F48B10267A214700471B73 /* EmoteManager.swift */,
+				C6F48B10267A214700471B73 /* ChatManager.swift */,
+				C6F09CB1267CCA4C001451FE /* Badges.swift */,
+				C6F09CB3267E19DA001451FE /* Message.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -229,13 +235,15 @@
 				C606733A2665732100B1C46C /* ChatView.swift in Sources */,
 				C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */,
 				C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */,
+				C6F09CB2267CCA4C001451FE /* Badges.swift in Sources */,
 				C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */,
-				C6F48B11267A214700471B73 /* EmoteManager.swift in Sources */,
+				C6F48B11267A214700471B73 /* ChatManager.swift in Sources */,
 				C64C277E2670A5A700719BCF /* Authentication.swift in Sources */,
 				C6F48B0F2678B81D00471B73 /* MessageView.swift in Sources */,
 				C6363A5A2670153B00C47A7E /* LoginViewModel.swift in Sources */,
 				C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */,
 				C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */,
+				C6F09CB4267E19DA001451FE /* Message.swift in Sources */,
 				C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */,
 				C60673302664373B00B1C46C /* Streamer.swift in Sources */,
 				C6A6144226697B32003508D8 /* User.swift in Sources */,

@@ -1,5 +1,5 @@
 //
-//  EmoteManager.swift
+//  ChatManager.swift
 //  Frosty
 //
 //  Created by Tommy Chow on 6/16/21.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct EmoteManager {
+struct ChatManager {
     static let fileManager = FileManager.default
     static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
     static let cache = NSCache<NSString, NSData>()
@@ -235,4 +235,51 @@ struct EmoteManager {
     static func getGlobalEmotesFFZ() async {
         
     }
+    
+    // Badges
+    func parseUserTags(_ mappings: [String:String]) -> String? {
+        if mappings["@badge-info"] == nil {
+//            let turbo = mappings["turbo"]
+//            let badges = mappings["badges"]
+            let color = mappings["color"]
+//            let subscriber = mappings["subscriber"]
+//            let mod = mappings["mod"]
+            
+            return color
+        }
+        return nil
+    }
+    
+    enum Badge {
+        case global
+        case channel
+    }
+    
+    static func getBadges(badgeType: Badge, token: String, id: String? = nil) async -> [Badges]? {
+        var endpoint: String
+        
+        switch badgeType {
+        case .global:
+            endpoint = "https://api.twitch.tv/helix/chat/badges/global"
+        case .channel:
+            endpoint = "https://api.twitch.tv/helix/chat/badges?broadcaster_id=\(id!)"
+        }
+        
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
+        
+        if let data = await Request.perform(.GET, to: URL(string: endpoint)!, headers: headers) {
+            do {
+                let result = try decoder.decode(BadgeData.self, from: data)
+                return result.data
+            } catch {
+                print("Badge failed ", error.localizedDescription)
+                return nil
+            }
+        } else {
+            return nil
+        }
+    }
+
 }

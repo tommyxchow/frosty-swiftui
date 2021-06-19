@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MessageView: View {
-    let message: [String]
+    let message: Message
     @ObservedObject var viewModel: ChatViewModel
     var body: some View {
         viewModel.emotify(message)
@@ -17,6 +17,6 @@ struct MessageView: View {
 
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageView(message: ["Bob", "This is a test OMEGALUL"], viewModel: ChatViewModel())
+        MessageView(message: Message(name: "Bob", message: "hello", tags: [:]), viewModel: ChatViewModel())
     }
 }

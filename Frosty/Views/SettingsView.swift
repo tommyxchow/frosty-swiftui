@@ -24,7 +24,7 @@ struct SettingsView: View {
                 })
                     .controlProminence(.increased)
                 Button(action: {
-                    EmoteManager.clearCache()
+                    ChatManager.clearCache()
                 }, label: {
                     Text("Clear Cache")
                 })
