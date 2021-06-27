@@ -12,14 +12,21 @@ struct ChatView: View {
     @EnvironmentObject private var authHandler: Authentication
     @StateObject private var viewModel: ChatViewModel = ChatViewModel()
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 10.0) {
-            Text("Loading emotes and connecting to chat...")
-            ForEach(viewModel.messages) { message in
-                if let triple = message {
-                    MessageView(message: triple, viewModel: viewModel)
+        ScrollViewReader { scrollView in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 10.0) {
+                    Text("Loading emotes and connecting to chat...")
+                    ForEach(viewModel.messages, id: \.self) { message in
+                        if let triple = message {
+                            MessageView(message: triple, viewModel: viewModel)
+                        }
+                    }
+                    .font(.footnote)
                 }
+                .onChange(of: viewModel.messages, perform: { value in
+                    scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                })
             }
-            .font(.footnote)
         }
         .padding([.bottom, .horizontal], 5.0)
         .task {

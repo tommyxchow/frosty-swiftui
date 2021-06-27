@@ -16,6 +16,7 @@
 		C606733626645B6500B1C46C /* StreamerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733526645B6500B1C46C /* StreamerListView.swift */; };
 		C606733826654DB500B1C46C /* VideoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733726654DB400B1C46C /* VideoChatView.swift */; };
 		C606733A2665732100B1C46C /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60673392665732100B1C46C /* ChatView.swift */; };
+		C60D0B37267E58C9006246F1 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60D0B36267E58C9006246F1 /* Cache.swift */; };
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
 		C6363A57266D80C200C47A7E /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A56266D80C200C47A7E /* TestView.swift */; };
 		C6363A5A2670153B00C47A7E /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A592670153A00C47A7E /* LoginViewModel.swift */; };
@@ -46,6 +47,7 @@
 		C606733526645B6500B1C46C /* StreamerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListView.swift; sourceTree = "<group>"; };
 		C606733726654DB400B1C46C /* VideoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoChatView.swift; sourceTree = "<group>"; };
 		C60673392665732100B1C46C /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		C60D0B36267E58C9006246F1 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		C6363A54266D40E000C47A7E /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		C6363A56266D80C200C47A7E /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		C6363A592670153A00C47A7E /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				C606734B26687D1D00B1C46C /* Views */,
 				C6A6144026693543003508D8 /* ViewModels */,
 				C606732E2664344400B1C46C /* Models */,
+				C60D0B35267E56AC006246F1 /* Utility */,
 				C606732326641A4300B1C46C /* Assets.xcassets */,
 				C606732826641A4300B1C46C /* Info.plist */,
 				C606732526641A4300B1C46C /* Preview Content */,
@@ -117,12 +120,9 @@
 		C606732E2664344400B1C46C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				C64C277D2670A5A700719BCF /* Authentication.swift */,
 				C606732F2664373B00B1C46C /* Streamer.swift */,
 				C6A6144126697B32003508D8 /* User.swift */,
-				C6A6144726698873003508D8 /* Request.swift */,
 				C6F48B0C2678A33300471B73 /* Emotes.swift */,
-				C6F48B10267A214700471B73 /* ChatManager.swift */,
 				C6F09CB1267CCA4C001451FE /* Badges.swift */,
 				C6F09CB3267E19DA001451FE /* Message.swift */,
 			);
@@ -146,9 +146,20 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		C60D0B35267E56AC006246F1 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				C6F48B10267A214700471B73 /* ChatManager.swift */,
+				C6A6144726698873003508D8 /* Request.swift */,
+				C60D0B36267E58C9006246F1 /* Cache.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
 		C6A6144026693543003508D8 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				C64C277D2670A5A700719BCF /* Authentication.swift */,
 				C6A61445266987A0003508D8 /* StreamerListViewModel.swift */,
 				C6A6144D266C44DC003508D8 /* ChatViewModel.swift */,
 				C6363A592670153A00C47A7E /* LoginViewModel.swift */,
@@ -226,6 +237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C60D0B37267E58C9006246F1 /* Cache.swift in Sources */,
 				C6363A57266D80C200C47A7E /* TestView.swift in Sources */,
 				C606733626645B6500B1C46C /* StreamerListView.swift in Sources */,
 				C606732226641A3E00B1C46C /* MainView.swift in Sources */,

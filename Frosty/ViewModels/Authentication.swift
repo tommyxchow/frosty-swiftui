@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 class Authentication: ObservableObject {
     private let secret = ""
     private var refreshToken: String?
@@ -18,6 +17,7 @@ class Authentication: ObservableObject {
     @Published var user: User?
     private let decoder = JSONDecoder()
     
+    @MainActor
     func getUserInfo() async {
         let url = "https://api.twitch.tv/helix/users"
         let headers = ["Authorization" : "Bearer \(userToken!)", "Client-Id" : clientID]

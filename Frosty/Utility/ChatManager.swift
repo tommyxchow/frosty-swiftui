@@ -7,6 +7,14 @@
 
 import Foundation
 
+// TODO: Get global sub emotes through the twitch tags
+
+// FIXME: When exiting the channel and rejoining, certain emotes won't return (i.e. PogU or BTTV/FFZ?). Look into caching bugs
+// fixed: Wasn't writing BTTV shared emotes to the cache directory
+
+// FIXME: Twitch global emotes aren't being rendered in chat (i.e. LUL, Kappa, 4Head). Might be something to do with emotify
+// fixed: Forgot to add the await for global emotes in viewmodel
+
 struct ChatManager {
     static let fileManager = FileManager.default
     static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
@@ -14,7 +22,7 @@ struct ChatManager {
     static private let decoder = JSONDecoder()
     
     static func clearCache() {
-        let folders = ["TwitchGlobalEmotes1", "TwitchChannelEmotes", "BTTVGlobalEmotes1", "BTTVChannelEmotes", "FFZChannelEmotes"]
+        let folders = ["TwitchGlobalEmotes", "TwitchChannelEmotes", "BTTVGlobalEmotes", "BTTVChannelEmotes", "FFZChannelEmotes"]
         for folder in folders {
             let path = cachesDirectory.appendingPathComponent(folder)
             do {
@@ -25,9 +33,10 @@ struct ChatManager {
         }
         
     }
-        
+    
+    // TODO: Instead of fetching from cache, storing emote data in a dictionary might be more efficient
     static func getGlobalEmotesTwitch(token: String) async {
-        let endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
+        let endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=0")!
         let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
         let folder = cachesDirectory.appendingPathComponent("TwitchGlobalEmotes")
         print(folder)
@@ -69,7 +78,6 @@ struct ChatManager {
     static func getChannelEmotesTwitch(token: String, id: String) async {
         let endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=\(id)")!
         let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
-        let decoder = JSONDecoder()
         let folder = cachesDirectory.appendingPathComponent("TwitchChannelEmotes/\(id)")
         
         if fileManager.fileExists(atPath: folder.path) {
@@ -106,7 +114,6 @@ struct ChatManager {
     
     static func getGlobalEmotesBTTV() async {
         let endpoint = "https://api.betterttv.net/3/cached/emotes/global"
-        let decoder = JSONDecoder()
         
         let folder = cachesDirectory.appendingPathComponent("BTTVGlobalEmotes")
         
@@ -146,7 +153,6 @@ struct ChatManager {
     
     static func getChannelEmotesBTTV(id: String) async {
         let endpoint = "https://api.betterttv.net/3/cached/users/twitch/\(id)"
-        let decoder = JSONDecoder()
         
         let folder = cachesDirectory.appendingPathComponent("BTTVChannelEmotes/\(id)")
         
@@ -179,6 +185,9 @@ struct ChatManager {
                 for emote in result.sharedEmotes {
                     let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
                     if let emoteData = emoteData {
+                        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+                        let filePath = folder.appendingPathComponent("\(emote.code).png")
+                        try emoteData.write(to: filePath, options: .atomic)
                         cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote.code + ".png"))
                     } else {
                         print("BTTV SHARED EMOTE FAILED")
@@ -194,7 +203,6 @@ struct ChatManager {
     
     static func getChannelEmotesFFZ(id: String) async {
         let endpoint = "https://api.betterttv.net/3/cached/frankerfacez/users/twitch/\(id)"
-        let decoder = JSONDecoder()
         
         let folder = cachesDirectory.appendingPathComponent("FFZChannelEmotes/\(id)")
         
@@ -233,7 +241,7 @@ struct ChatManager {
     }
     
     static func getGlobalEmotesFFZ() async {
-        
+        // https://api.betterttv.net/3/cached/frankerfacez/emotes/global
     }
     
     // Badges

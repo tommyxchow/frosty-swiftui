@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []
     

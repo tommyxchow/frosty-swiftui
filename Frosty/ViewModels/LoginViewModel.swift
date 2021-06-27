@@ -8,7 +8,6 @@
 import Foundation
 import AuthenticationServices
 
-@MainActor
 class LoginViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
     
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
