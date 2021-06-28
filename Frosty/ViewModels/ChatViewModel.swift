@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+// TODO: Add pinging so rooms last more than 5 min
+// TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
+
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
     static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
@@ -67,17 +70,23 @@ class ChatViewModel: ObservableObject {
             }
             websocket.receive { result in
                 switch result {
-                case.failure(let error):
+                case .failure(let error):
                     print(error)
-                case.success(let response):
+                case .success(let response):
                     switch response {
                     case .data(let data):
-                        print(data)
+                        print("WS DATA ", data)
                     case .string(let string):
                         if string[string.startIndex] == "@" {
                             DispatchQueue.main.async { [self] in
                                 if let parsed = parseMessage(string) {
-                                    messages.append(parsed)
+                                    var newList = messages
+                                    newList.append(parsed)
+                                    if newList.count > 50 {
+                                        print("Removing Messages")
+                                        newList.removeFirst(10)
+                                    }
+                                    messages = newList
                                 }
                             }
                         }
@@ -135,6 +144,7 @@ class ChatViewModel: ObservableObject {
         }
     }
     
+    // FIXME: Most colors (name) come up as grey?
     func emotify(_ message: Message) -> Text {
         var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
