@@ -16,10 +16,7 @@ struct FrostyApp: App {
             MainView()
                 .environmentObject(authHandler)
                 .task {
-                    await ChatManager.getGlobalEmotesBTTV()
-                    await ChatManager.getGlobalEmotesFFZ()
-                    await ChatManager.getGlobalEmotesTwitch(token: authHandler.userToken!)
-                    
+                    await ChatManager.getGlobalEmotes(token: authHandler.userToken!)
                     // print(await ChatManager.getBadges(badgeType: .global, token: authHandler.userToken!))
                 }
         }

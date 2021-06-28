@@ -37,7 +37,7 @@ struct ChatView: View {
             print("DISAPPEAR")
             viewModel.chatting = false
             print(viewModel.chatting)
-            ChatManager.cache.removeAllObjects()
+            Cache.cache.removeAllObjects()
         }
     }
 }

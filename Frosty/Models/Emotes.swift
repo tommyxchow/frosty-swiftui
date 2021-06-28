@@ -59,7 +59,7 @@ struct ChannelEmotesBTTV: Decodable {
 
 
 // FFZ Emotes
-struct ChannelEmotesFFZ: Decodable {
+struct EmotesFFZ: Decodable {
     struct UserFFZ: Decodable {
         let id: Int
         let name: String

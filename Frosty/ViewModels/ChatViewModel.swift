@@ -21,6 +21,7 @@ class ChatViewModel: ObservableObject {
     let websocket = session.webSocketTask(with: websocketURL)
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
+        print(ChatManager.emoteToId)
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
         let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer.userLogin)")
@@ -46,12 +47,8 @@ class ChatViewModel: ObservableObject {
         }
         
         // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
-        await ChatManager.getGlobalEmotesTwitch(token: token)
-        await ChatManager.getGlobalEmotesBTTV()
-        await ChatManager.getGlobalEmotesFFZ()
-        await ChatManager.getChannelEmotesTwitch(token: token, id: streamer.userId)
-        await ChatManager.getChannelEmotesBTTV(id: streamer.userId)
-        await ChatManager.getChannelEmotesFFZ(id: streamer.userId)
+        await ChatManager.getGlobalEmotes(token: token)
+        await ChatManager.getChannelEmotes(token: token, id: streamer.userId)
         
         func recieve() {
             if !chatting {
@@ -116,7 +113,7 @@ class ChatViewModel: ObservableObject {
         }
         
         let messageSplit = message.split(separator: " ", maxSplits: 3)
-        print(messageSplit[1], whole)
+        //print(messageSplit[1], whole)
         if messageSplit[1] == "PRIVMSG" {
             let start = messageSplit[0].index(after: messageSplit[0].startIndex)
             let end = messageSplit[0].index(before: messageSplit[0].firstIndex(of: "!")!)
@@ -157,10 +154,12 @@ class ChatViewModel: ObservableObject {
         for word in split {
             if let emoteData = hits[word] {
                 result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-            } else if let cachedVersion = ChatManager.cache.object(forKey: NSString(string: "\(word).png")) {
-                let emoteData = Data(referencing: cachedVersion)
-                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-                hits[word] = emoteData
+            } else if let emoteId = ChatManager.emoteToId[word] {
+                if let cachedVersion = Cache.cache.object(forKey: NSString(string: "\(emoteId).png")) {
+                    let emoteData = Data(referencing: cachedVersion)
+                    result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
+                    hits[word] = emoteData
+                }
             } else {
                 result = result + Text(" ") + Text(word)
             }
