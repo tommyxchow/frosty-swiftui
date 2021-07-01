@@ -13,7 +13,7 @@ import Foundation
 
 // TODO: Instead of fetching from cache, storing emote data in a dictionary might be more efficient
 
-// TODO: Instead of storing folder per user, store single folders with BTTV/FFZ/Twitch emotes each. This will reduce redundant operations (fetching and decoding emotes that already exists). Would likely reduce loading time due to less decoding.
+// TODO: Instead of storing folder per user, store single folders with BTTV/FFZ/Twitch emotes each. This will reduce redundant operations (fetching and decoding emotes that already exists). Would likely reduce loading time due to less decoding. Also, use userdefaults to store a registry per channel
 
 // FIXME: When exiting the channel and rejoining, certain emotes won't return (i.e. PogU or BTTV/FFZ?). Look into caching bugs
 // fixed: Wasn't writing BTTV shared emotes to the cache directory
@@ -24,7 +24,7 @@ import Foundation
 struct ChatManager {
     static let fileManager = FileManager.default
     static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-    static var emoteToId: [String:String] = [:]
+    static var emoteToId: [String:String] = UserDefaults.standard.object(forKey: "emoteRegistry") as? [String:String] ?? [String:String]()
     
     static func clearCache() {
         let folders = ["TwitchGlobalAssets", "TwitchChannelAssets", "BTTVGlobalEmotes", "BTTVChannelAssets", "FFZGlobalEmotes", "FFZChannelAssets"]
@@ -36,14 +36,17 @@ struct ChatManager {
                 print("Folder does not exist")
             }
         }
-        
+        UserDefaults.standard.removeObject(forKey: "emoteRegistry")
     }
     
     static func getGlobalEmotes(token: String) async {
         do {
-            try await Cache.cacheContents(type: .emoteTwitchGlobal, token: token)
-            try await Cache.cacheContents(type: .emoteBTTVGlobal)
-            try await Cache.cacheContents(type: .emoteFFZGlobal)
+            async let one = Cache.cacheContents(type: .emoteTwitchGlobal, token: token)
+            async let two = Cache.cacheContents(type: .emoteBTTVGlobal)
+            async let three = Cache.cacheContents(type: .emoteFFZGlobal)
+            
+            let result = try await [one, two, three]
+            print(result)
         } catch {
             print("Failed to get global emotes, ", error.localizedDescription)
         }
@@ -51,9 +54,12 @@ struct ChatManager {
     
     static func getChannelEmotes(token: String, id: String) async {
         do {
-            try await Cache.cacheContents(type: .emoteTwitchChannel(id: id), token: token)
-            try await Cache.cacheContents(type: .emoteBTTVChannel(id: id))
-            try await Cache.cacheContents(type: .emoteFFZChannel(id: id))
+            async let one = Cache.cacheContents(type: .emoteTwitchChannel(id: id), token: token)
+            async let two = Cache.cacheContents(type: .emoteBTTVChannel(id: id))
+            async let three = Cache.cacheContents(type: .emoteFFZChannel(id: id))
+            
+            let result = try await [one, two, three]
+            print(result)
         } catch {
             print("Failed to get channel emotes, ", error.localizedDescription)
         }
