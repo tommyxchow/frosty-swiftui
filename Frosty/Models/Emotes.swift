@@ -29,14 +29,14 @@ struct EmoteTwitch: Decodable {
 
 
 // BTTV Emotes
-struct EmoteBTTV: Decodable {
+struct EmoteBTTVGlobal: Decodable {
     let id: String
     let code: String
     let imageType: String
     let userId: String
 }
 
-struct ChannelEmotesBTTV: Decodable {
+struct EmoteBTTVChannel: Decodable {
     struct UserBTTV: Decodable {
         let id: String
         let name: String
@@ -53,7 +53,7 @@ struct ChannelEmotesBTTV: Decodable {
     
     let id: String
     let bots: [String]
-    let channelEmotes: [EmoteBTTV]
+    let channelEmotes: [EmoteBTTVGlobal]
     let sharedEmotes: [SharedEmoteBTTV]
 }
 

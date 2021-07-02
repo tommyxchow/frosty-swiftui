@@ -8,54 +8,53 @@
 import Foundation
 
 // TODO: Some channels might have identical BTTV/FFZ channel emotes, figure out a way to reuse those instead of caching individual folders per user
-// TODO: 
+
 struct Cache {
     static private let fileManager = FileManager.default
-    static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent(Bundle.main.bundleIdentifier!)
     static let cache = NSCache<NSString, NSData>()
     static private let decoder = JSONDecoder()
     static let defaults = UserDefaults.standard
     
-    static func cacheContents(type: APIData, token: String? = nil) async throws -> Bool {
+    static func cacheContents(type: Category, token: String? = nil, id: String) async throws -> [String:String] {
         let folder: URL
+        let requestedDataType: APIData
         
         switch type {
-        case .emoteTwitchGlobal:
-            folder = cachesDirectory.appendingPathComponent("TwitchGlobalAssets")
-        case .emoteTwitchChannel(let id):
-            folder = cachesDirectory.appendingPathComponent("TwitchChannelAssets/\(id)")
-        case .emoteBTTVGlobal:
-            folder = cachesDirectory.appendingPathComponent("BTTVGlobalEmotes")
-        case .emoteBTTVChannel(let id):
-            folder = cachesDirectory.appendingPathComponent("BTTVChannelAssets/\(id)")
-        case .emoteFFZGlobal:
-            folder = cachesDirectory.appendingPathComponent("FFZGlobalEmotes")
-        case .emoteFFZChannel(let id):
-            folder = cachesDirectory.appendingPathComponent("FFZChannelAssets/\(id)")
-        case .badgeTwitchGlobal:
-            folder = cachesDirectory.appendingPathComponent("TwitchGlobalAssets")
-        case .badgeTwitchChannel(let id):
-            folder = cachesDirectory.appendingPathComponent("TwitchChannelAssets/\(id)")
+        case .twitch(let dataType):
+            folder = cachesDirectory.appendingPathComponent("TwitchAssets")
+            requestedDataType = dataType
+        case .bttv(let dataType):
+            folder = cachesDirectory.appendingPathComponent("BTTVAssets")
+            requestedDataType = dataType
+        case .ffz(let dataType):
+            folder = cachesDirectory.appendingPathComponent("FFZAssets")
+            requestedDataType = dataType
         }
         
-        if fileManager.fileExists(atPath: folder.path) {
-            print("folder already exists")
-            let contents = try fileManager.contentsOfDirectory(atPath: folder.path)
-            for emote in contents {
-                let emotePath = folder.appendingPathComponent(emote)
+        //print(folder)
+        
+        var emoteToId: [String:String] = [:]
+        if let emoteRegistry = defaults.object(forKey: id) as? [String:String] {
+            print("Registry already exists for \(requestedDataType)")
+            // print(emoteRegistry)
+            for emoteInfo in emoteRegistry {
+                let emotePath = folder.appendingPathComponent("\(emoteInfo.value).png")
                 let emoteData = try Data(contentsOf: emotePath)
-                cache.setObject(NSData(data: emoteData), forKey: NSString(string: emote))
+                cache.setObject(NSData(data: emoteData), forKey: NSString(string: emoteInfo.key))
             }
-        } else if let data = await getAPIData(type, token: token) {
-            try await writeToCacheFolder(type, data: data, folder: folder)
-            defaults.set(ChatManager.emoteToId, forKey: "emoteRegistry")
+            emoteToId = emoteRegistry
+        } else if let data = await getAPIData(type: requestedDataType, token: token) {
+            let registry = try await writeToFolderAndCache(type: requestedDataType, data: data, folder: folder)
+            defaults.set(registry, forKey: id)
+            emoteToId = registry
         } else {
             print("Caching failed!")
         }
-        return true
+        return emoteToId
     }
     
-    static func getAPIData(_ type: APIData, token: String? = nil) async -> Data? {
+    static func getAPIData(type: APIData, token: String? = nil) async -> Data? {
         let endpoint: URL
         let headers: [String:String]?
         
@@ -94,102 +93,87 @@ struct Cache {
         
     }
     
+    static func writeToFolderAndCache(type: APIData, data: Data, folder: URL) async throws -> [String:String] {
+        var registry: [String:String] = [:]
+        
+        switch type {
+        case .emoteTwitchGlobal, .emoteTwitchChannel:
+            let result = try decoder.decode(EmoteDataTwitch.self, from: data)
+            for emote in result.data {
+                if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)  {
+                    writeAndCache(folder: folder, data: emoteData, name: emote.name, id: emote.id)
+                } else {
+                    print("Twitch emote request failed")
+                }
+                registry[emote.name] = emote.id
+            }
+            print(1)
+        case .emoteBTTVGlobal:
+            let result = try decoder.decode([EmoteBTTVGlobal].self, from: data)
+            for emote in result {
+                if let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!) {
+                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: emote.id)
+                } else {
+                    print("BTTV global emote request failed")
+                }
+                registry[emote.code] = emote.id
+            }
+            print(2)
+        case .emoteBTTVChannel:
+            let result = try decoder.decode(EmoteBTTVChannel.self, from: data)
+            for emote in result.channelEmotes {
+                if let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!) {
+                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: emote.id)
+                } else {
+                    print("BTTV channel emote request failed")
+                }
+                registry[emote.code] = emote.id
+            }
+            for emote in result.sharedEmotes {
+                if let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!) {
+                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: emote.id)
+                } else {
+                    print("BTTV shared emote request failed")
+                }
+                registry[emote.code] = emote.id
+            }
+            print(3)
+        case .emoteFFZGlobal, .emoteFFZChannel:
+            let result = try decoder.decode([EmotesFFZ].self, from: data)
+            for emote in result {
+                if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!) {
+                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: String(emote.id))
+                } else {
+                    print("FFZ emote request failed")
+                }
+                registry[emote.code] = String(emote.id)
+            }
+            print(4)
+        case .badgeTwitchGlobal:
+            break
+        case .badgeTwitchChannel:
+            break
+        }
+        return registry
+    }
+    
     private static func writeAndCache(folder: URL, data: Data, name: String, id: String) {
         do {
             try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
             let filePath = folder.appendingPathComponent("\(id).png")
             try data.write(to: filePath, options: .atomic)
             
-            Cache.cache.setObject(NSData(data: data), forKey: NSString(string: "\(id).png"))
-            
-            ChatManager.emoteToId[name] = id
+            cache.setObject(NSData(data: data), forKey: NSString(string: name))
         } catch {
             print("Failed to write and cache")
         }
     }
-        
-    
-    static func writeToCacheFolder(_ type: APIData, data: Data, folder: URL) async throws {
-        switch type {
-        case .emoteTwitchGlobal:
-            let result = try decoder.decode(EmoteDataTwitch.self, from: data)
-            for emote in result.data {
-                let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)
-                if let emoteData = emoteData {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.name, id: emote.id)
-                } else {
-                    print("Twitch emote request failed")
-                }
-            }
-            print(1)
-        case .emoteTwitchChannel:
-            let result = try decoder.decode(EmoteDataTwitch.self, from: data)
-            for emote in result.data {
-                if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)  {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.name, id: emote.id)
-                } else {
-                    print("Twitch channel emote request failed")
-                }
-            }
-            print(2)
-        case .emoteBTTVGlobal:
-            let result = try decoder.decode([EmoteBTTV].self, from: data)
-            for emote in result {
-                let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
-                if let emoteData = emoteData {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: emote.id)
-                } else {
-                    print("BTTV GLOBAL FAILED")
-                }
-            }
-            print(3)
-        case .emoteBTTVChannel:
-            let result = try decoder.decode(ChannelEmotesBTTV.self, from: data)
-            for emote in result.channelEmotes {
-                let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
-                if let emoteData = emoteData {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: emote.id)
-                } else {
-                    print("BTTV CHANNEL EMOTE FAILED")
-                }
-            }
-            for emote in result.sharedEmotes {
-                let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!)
-                if let emoteData = emoteData {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: emote.id)
-                } else {
-                    print("BTTV SHARED EMOTE FAILED")
-                }
-            }
-            print(4)
-        case .emoteFFZGlobal:
-            let result = try decoder.decode([EmotesFFZ].self, from: data)
-            for emote in result {
-                let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!)
-                if let emoteData = emoteData {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: String(emote.id))
-                } else {
-                    print("FFZ GLOBAL EMOTE FAILED")
-                }
-            }
-            print(5)
-        case .emoteFFZChannel:
-            let result = try decoder.decode([EmotesFFZ].self, from: data)
-            for emote in result {
-                let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!)
-                if let emoteData = emoteData {
-                    writeAndCache(folder: folder, data: emoteData, name: emote.code, id: String(emote.id))
-                } else {
-                    print("FFZ CHANNEL EMOTE FAILED")
-                }
-            }
-            print(6)
-        case .badgeTwitchGlobal:
-            return
-        case .badgeTwitchChannel:
-            return
-        }
-    }
+}
+
+enum Category {
+    case twitch(dataType: APIData)
+    case bttv(dataType: APIData)
+    case ffz(dataType: APIData)
 }
 
 enum APIData {

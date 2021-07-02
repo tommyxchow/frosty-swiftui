@@ -24,7 +24,7 @@ import Foundation
 struct ChatManager {
     static let fileManager = FileManager.default
     static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-    static var emoteToId: [String:String] = UserDefaults.standard.object(forKey: "emoteRegistry") as? [String:String] ?? [String:String]()
+    static var emoteToId: [String:String] = [:]
     
     static func clearCache() {
         let folders = ["TwitchGlobalAssets", "TwitchChannelAssets", "BTTVGlobalEmotes", "BTTVChannelAssets", "FFZGlobalEmotes", "FFZChannelAssets"]
@@ -36,17 +36,21 @@ struct ChatManager {
                 print("Folder does not exist")
             }
         }
-        UserDefaults.standard.removeObject(forKey: "emoteRegistry")
+        if let bundleID = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleID)
+        }
     }
     
     static func getGlobalEmotes(token: String) async {
         do {
-            async let one = Cache.cacheContents(type: .emoteTwitchGlobal, token: token)
-            async let two = Cache.cacheContents(type: .emoteBTTVGlobal)
-            async let three = Cache.cacheContents(type: .emoteFFZGlobal)
+            async let one = Cache.cacheContents(type: .twitch(dataType: .emoteTwitchGlobal), token: token, id: "twitchGlobal")
+            async let two = Cache.cacheContents(type: .bttv(dataType: .emoteBTTVGlobal), id: "bttvGlobal")
+            async let three = Cache.cacheContents(type: .ffz(dataType: .emoteFFZGlobal), id: "ffzGlobal")
             
             let result = try await [one, two, three]
-            print(result)
+            for registry in result {
+                emoteToId.merge(registry) {(_,new) in new}
+            }
         } catch {
             print("Failed to get global emotes, ", error.localizedDescription)
         }
@@ -54,12 +58,15 @@ struct ChatManager {
     
     static func getChannelEmotes(token: String, id: String) async {
         do {
-            async let one = Cache.cacheContents(type: .emoteTwitchChannel(id: id), token: token)
-            async let two = Cache.cacheContents(type: .emoteBTTVChannel(id: id))
-            async let three = Cache.cacheContents(type: .emoteFFZChannel(id: id))
+            async let one = Cache.cacheContents(type: .twitch(dataType: .emoteTwitchChannel(id: id)), token: token, id: "twitch_\(id)")
+            async let two = Cache.cacheContents(type: .bttv(dataType: .emoteBTTVChannel(id: id)), id: "bttv_\(id)")
+            async let three = Cache.cacheContents(type: .ffz(dataType: .emoteFFZChannel(id: id)), id: "ffz_\(id)")
             
             let result = try await [one, two, three]
             print(result)
+            for registry in result {
+                emoteToId.merge(registry) {(_,new) in new}
+            }
         } catch {
             print("Failed to get channel emotes, ", error.localizedDescription)
         }
