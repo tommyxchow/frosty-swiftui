@@ -24,7 +24,7 @@ struct SettingsView: View {
                 })
                     .controlProminence(.increased)
                 Button(action: {
-                    ChatManager.clearCache()
+                    Cache.clearCache()
                 }, label: {
                     Text("Clear Cache")
                 })

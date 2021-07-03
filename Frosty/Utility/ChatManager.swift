@@ -22,35 +22,15 @@ import Foundation
 // fixed: Forgot to add the await for global emotes in viewmodel
 
 struct ChatManager {
-    static let fileManager = FileManager.default
-    static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-    static var emoteToId: [String:String] = [:]
-    
-    static func clearCache() {
-        let folders = ["TwitchGlobalAssets", "TwitchChannelAssets", "BTTVGlobalEmotes", "BTTVChannelAssets", "FFZGlobalEmotes", "FFZChannelAssets"]
-        for folder in folders {
-            let path = cachesDirectory.appendingPathComponent(folder)
-            do {
-                try fileManager.removeItem(at: path)
-            } catch {
-                print("Folder does not exist")
-            }
-        }
-        if let bundleID = Bundle.main.bundleIdentifier {
-            UserDefaults.standard.removePersistentDomain(forName: bundleID)
-        }
-    }
     
     static func getGlobalEmotes(token: String) async {
         do {
-            async let one = Cache.cacheContents(type: .twitch(dataType: .emoteTwitchGlobal), token: token, id: "twitchGlobal")
-            async let two = Cache.cacheContents(type: .bttv(dataType: .emoteBTTVGlobal), id: "bttvGlobal")
-            async let three = Cache.cacheContents(type: .ffz(dataType: .emoteFFZGlobal), id: "ffzGlobal")
+            async let twitchGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteTwitchGlobal, token: token, registryId: "twitchGlobalEmotes")
+            async let bttvGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteBTTVGlobal, registryId: "bttvGlobalEmotes")
+            async let ffzGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteFFZGlobal, registryId: "ffzGlobalEmotes")
+            async let twitchGlobalBadges: () = Cache.cacheContents(requestedDataType: .badgeTwitchGlobal, token: token, registryId: "twitchGlobalBadges")
             
-            let result = try await [one, two, three]
-            for registry in result {
-                emoteToId.merge(registry) {(_,new) in new}
-            }
+            _ = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
         } catch {
             print("Failed to get global emotes, ", error.localizedDescription)
         }
@@ -58,15 +38,12 @@ struct ChatManager {
     
     static func getChannelEmotes(token: String, id: String) async {
         do {
-            async let one = Cache.cacheContents(type: .twitch(dataType: .emoteTwitchChannel(id: id)), token: token, id: "twitch_\(id)")
-            async let two = Cache.cacheContents(type: .bttv(dataType: .emoteBTTVChannel(id: id)), id: "bttv_\(id)")
-            async let three = Cache.cacheContents(type: .ffz(dataType: .emoteFFZChannel(id: id)), id: "ffz_\(id)")
+            async let twitchChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteTwitchChannel(id: id), token: token, registryId: "twitchChannelEmotes_\(id)")
+            async let bttvChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteBTTVChannel(id: id), registryId: "bttvChannelEmotes_\(id)")
+            async let ffzChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteFFZChannel(id: id), registryId: "ffzChannelEmotes_\(id)")
+            async let twitchChannelBadges: () = Cache.cacheContents(requestedDataType: .badgeTwitchChannel(id: id), token: token, registryId: "twitchChannelBadges_\(id)")
             
-            let result = try await [one, two, three]
-            print(result)
-            for registry in result {
-                emoteToId.merge(registry) {(_,new) in new}
-            }
+            _ = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
         } catch {
             print("Failed to get channel emotes, ", error.localizedDescription)
         }
@@ -74,6 +51,7 @@ struct ChatManager {
     
     // Badges
     func parseUserTags(_ mappings: [String:String]) -> String? {
+        print(mappings)
         if mappings["@badge-info"] == nil {
 //            let turbo = mappings["turbo"]
 //            let badges = mappings["badges"]

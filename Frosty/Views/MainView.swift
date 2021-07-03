@@ -9,23 +9,17 @@ import SwiftUI
 
 struct MainView: View {
     @State private var isPresented = false
+    @State var search: String = ""
     
     var body: some View {
         NavigationView {
             StreamerListView()
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            isPresented = true
-                        }, label: {
-                            Label("Settings", systemImage: "gearshape")
-                        })
-                    }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: {
                             isPresented = true
                         }, label: {
-                            Label("Settings", systemImage: "magnifyingglass")
+                            Label("Settings", systemImage: "gearshape")
                         })
                     }
                 }
@@ -46,6 +40,7 @@ struct MainView: View {
                             }
                     }
                 })
+                .searchable(text: $search, placement: .navigationBarDrawer)
         }
     }
 }

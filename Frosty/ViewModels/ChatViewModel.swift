@@ -46,7 +46,6 @@ class ChatViewModel: ObservableObject {
         // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
         await ChatManager.getGlobalEmotes(token: token)
         await ChatManager.getChannelEmotes(token: token, id: streamer.userId)
-        print(ChatManager.emoteToId)
         
         func recieve() {
             if !chatting {
@@ -67,6 +66,8 @@ class ChatViewModel: ObservableObject {
                 switch result {
                 case .failure(let error):
                     print(error)
+                    let errorMessage = Message(name: "Error", message: "Failed to connect to chat.", tags: [:])
+                    self.messages.append(errorMessage)
                 case .success(let response):
                     switch response {
                     case .data(let data):
@@ -77,7 +78,7 @@ class ChatViewModel: ObservableObject {
                                 if let parsed = parseMessage(string) {
                                     var newList = messages
                                     newList.append(parsed)
-                                    if newList.count > 50 {
+                                    if newList.count > 80 {
                                         print("Removing Messages")
                                         newList.removeFirst(10)
                                     }
@@ -111,7 +112,10 @@ class ChatViewModel: ObservableObject {
         }
         
         let messageSplit = message.split(separator: " ", maxSplits: 3)
-        // print(messageSplit[1], whole)
+        
+        print(messageSplit[1], whole)
+        print(mapping)
+        
         if messageSplit[1] == "PRIVMSG" {
             let start = messageSplit[0].index(after: messageSplit[0].startIndex)
             let end = messageSplit[0].index(before: messageSplit[0].firstIndex(of: "!")!)
@@ -144,9 +148,20 @@ class ChatViewModel: ObservableObject {
         var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
+        var result = Text("")
+        
+        if let badges = message.tags["badges"] {
+            for badge in badges.components(separatedBy: ",") {
+                if let cachedVersion = Cache.cache.object(forKey: NSString(string: badge)) {
+                    let badgeData = Data(referencing: cachedVersion)
+                    result = result + Text(Image(uiImage: UIImage(data: badgeData)!)) + Text(" ")
+                }
+            }
+        }
+        
         let hexColor = hexStringToUIColor(hex: message.tags["color"]!)
         
-        var result = Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor))
+        result = result + Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor))
         
         var hits: [String:Data] = [:]
         for word in split {
