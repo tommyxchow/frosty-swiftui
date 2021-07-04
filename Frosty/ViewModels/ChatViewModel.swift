@@ -19,6 +19,11 @@ class ChatViewModel: ObservableObject {
     private let websocket = session.webSocketTask(with: websocketURL)
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
+        
+        // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
+        await ChatManager.getGlobalAssets(token: token)
+        await ChatManager.getChannelAssets(token: token, id: streamer.userId)
+        
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
         let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer.userLogin)")
@@ -43,11 +48,7 @@ class ChatViewModel: ObservableObject {
             }
         }
         
-        // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
-        await ChatManager.getGlobalEmotes(token: token)
-        await ChatManager.getChannelEmotes(token: token, id: streamer.userId)
-        
-        func recieve() {
+        func receive() {
             if !chatting {
                 print("END CHAT")
                 websocket.cancel(with: .goingAway, reason: nil)
@@ -67,33 +68,43 @@ class ChatViewModel: ObservableObject {
                 case .failure(let error):
                     print(error)
                     let errorMessage = Message(name: "Error", message: "Failed to connect to chat.", tags: [:])
-                    self.messages.append(errorMessage)
+                    DispatchQueue.main.async {
+                        self.messages.append(errorMessage)
+                    }
                 case .success(let response):
                     switch response {
                     case .data(let data):
                         print("WS DATA ", data)
                     case .string(let string):
+                        print(string)
+                        if string[string.startIndex] == "P" {
+                            let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
+                            self.websocket.send(message) { error in
+                                if let error = error {
+                                    print("Failed to send PONG: \(error)")
+                                }
+                            }
+                        }
                         if string[string.startIndex] == "@" {
-                            DispatchQueue.main.async { [self] in
-                                if let parsed = parseMessage(string) {
-                                    var newList = messages
+                            DispatchQueue.main.async {
+                                if let parsed = self.parseMessage(string) {
+                                    var newList = self.messages
                                     newList.append(parsed)
                                     if newList.count > 80 {
-                                        print("Removing Messages")
                                         newList.removeFirst(10)
                                     }
-                                    messages = newList
+                                    self.messages = newList
                                 }
                             }
                         }
                     @unknown default:
                         print("ERROR")
                     }
-                    recieve()
+                    receive()
                 }
             }
         }
-        recieve()
+        receive()
     }
     
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
@@ -113,8 +124,8 @@ class ChatViewModel: ObservableObject {
         
         let messageSplit = message.split(separator: " ", maxSplits: 3)
         
-        print(messageSplit[1], whole)
-        print(mapping)
+//        print(messageSplit[1], whole)
+//        print(mapping)
         
         if messageSplit[1] == "PRIVMSG" {
             let start = messageSplit[0].index(after: messageSplit[0].startIndex)
@@ -136,10 +147,10 @@ class ChatViewModel: ObservableObject {
             if let error = error {
                 print("Ping failed: \(error.localizedDescription)")
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
-                print("SENDING PING...")
-                self.sendPing()
-            }
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
+//                print("SENDING PING...")
+//                self.sendPing()
+//            }
         }
     }
     
@@ -159,7 +170,11 @@ class ChatViewModel: ObservableObject {
             }
         }
         
-        let hexColor = hexStringToUIColor(hex: message.tags["color"]!)
+        var hexColor = hexStringToUIColor(hex: "#737373")
+        
+        if let color = message.tags["color"] {
+            hexColor = hexStringToUIColor(hex: color)
+        }
         
         result = result + Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor))
         

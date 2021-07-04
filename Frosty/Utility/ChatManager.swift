@@ -23,7 +23,7 @@ import Foundation
 
 struct ChatManager {
     
-    static func getGlobalEmotes(token: String) async {
+    static func getGlobalAssets(token: String) async {
         do {
             async let twitchGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteTwitchGlobal, token: token, registryId: "twitchGlobalEmotes")
             async let bttvGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteBTTVGlobal, registryId: "bttvGlobalEmotes")
@@ -32,11 +32,11 @@ struct ChatManager {
             
             _ = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
         } catch {
-            print("Failed to get global emotes, ", error.localizedDescription)
+            print("Failed to get global assets: ", error.localizedDescription)
         }
     }
     
-    static func getChannelEmotes(token: String, id: String) async {
+    static func getChannelAssets(token: String, id: String) async {
         do {
             async let twitchChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteTwitchChannel(id: id), token: token, registryId: "twitchChannelEmotes_\(id)")
             async let bttvChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteBTTVChannel(id: id), registryId: "bttvChannelEmotes_\(id)")
@@ -45,7 +45,7 @@ struct ChatManager {
             
             _ = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
         } catch {
-            print("Failed to get channel emotes, ", error.localizedDescription)
+            print("Failed to get channel assets: ", error.localizedDescription)
         }
     }
     
@@ -62,38 +62,6 @@ struct ChatManager {
             return color
         }
         return nil
-    }
-    
-    enum Badge {
-        case global
-        case channel
-    }
-    
-    static func getBadges(badgeType: Badge, token: String, id: String? = nil) async -> [Badges]? {
-        var endpoint: String
-        
-        switch badgeType {
-        case .global:
-            endpoint = "https://api.twitch.tv/helix/chat/badges/global"
-        case .channel:
-            endpoint = "https://api.twitch.tv/helix/chat/badges?broadcaster_id=\(id!)"
-        }
-        
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let headers = ["Authorization":"Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi" ]
-        
-        if let data = await Request.perform(.GET, to: URL(string: endpoint)!, headers: headers) {
-            do {
-                let result = try decoder.decode(BadgeData.self, from: data)
-                return result.data
-            } catch {
-                print("Badge failed ", error.localizedDescription)
-                return nil
-            }
-        } else {
-            return nil
-        }
     }
 
 }
