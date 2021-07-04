@@ -17,7 +17,6 @@ struct ChatView: View {
         ScrollViewReader { scrollView in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10.0) {
-                    Text("Loading emotes and connecting to chat...")
                     ForEach(viewModel.messages, id: \.self) { message in
                         if let triple = message {
                             MessageView(message: triple, viewModel: viewModel)

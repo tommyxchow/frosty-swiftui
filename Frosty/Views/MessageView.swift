@@ -11,7 +11,7 @@ struct MessageView: View {
     let message: Message
     @ObservedObject var viewModel: ChatViewModel
     var body: some View {
-        viewModel.emotify(message)
+        viewModel.beautify(message)
     }
 }
 

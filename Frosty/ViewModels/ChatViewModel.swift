@@ -12,13 +12,13 @@ import SwiftUI
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [Message] = []
+    @Published var messages: [Message] = [Message(name: "STATUS", message: "Connecting to chat...", tags: ["color":"#00FF00"])]
     static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
     static private let session = URLSession.shared
     var chatting: Bool = false
     private let websocket = session.webSocketTask(with: websocketURL)
     
-    func start(token: String, user: String, streamer: StreamerInfo) async {
+    @MainActor func start(token: String, user: String, streamer: StreamerInfo) async {
         // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
         
         print("Starting chat!")
@@ -49,12 +49,15 @@ class ChatViewModel: ObservableObject {
             }
         }
         
+        messages.append(Message(name: "STATUS", message: "Connected!", tags: ["color":"#00FF00"]))
+        messages.append(Message(name: "STATUS", message: "Welcome to \(streamer.userName)'s chat!", tags: ["color":"#00FF00"]))
+        
         func receive() {
             websocket.receive { result in
                 switch result {
                 case .failure(let error):
                     print(error)
-                    let errorMessage = Message(name: "Error", message: "Failed to connect to chat.", tags: [:])
+                    let errorMessage = Message(name: "ERROR", message: "Failed to connect to chat.", tags: ["color":"#FF0000"])
                     DispatchQueue.main.async {
                         self.messages.append(errorMessage)
                     }
@@ -138,20 +141,11 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    func sendPing() {
-        websocket.sendPing { error in
-            if let error = error {
-                print("Ping failed: \(error.localizedDescription)")
-            }
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
-//                print("SENDING PING...")
-//                self.sendPing()
-//            }
+    func beautify(_ message: Message) -> Text {
+        if message.name == "STATUS" {
+            return Text(message.message)
         }
-    }
-    
-    // FIXME: Most colors (name) come up as grey?
-    func emotify(_ message: Message) -> Text {
+        
         var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
