@@ -23,24 +23,27 @@ struct MainView: View {
                         })
                     }
                 }
-                .sheet(isPresented: $isPresented, content: {
-                    NavigationView {
-                        SettingsView()
-                            .onAppear {
-                                print("Settings")
-                            }
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarLeading) {
-                                    Button(action: {
-                                        isPresented = false
-                                    }, label: {
-                                        Text("Dismiss")
-                                    })
-                                }
-                            }
+        }
+        .sheet(isPresented: $isPresented, content: {
+            NavigationView {
+                SettingsView()
+                    .onAppear {
+                        print("Settings")
                     }
-                })
-                .searchable(text: $search, placement: .navigationBarDrawer)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                isPresented = false
+                            }, label: {
+                                Text("Dismiss")
+                            })
+                        }
+                    }
+            }
+        })
+        .searchable(text: $search)
+        .onSubmit(of: .search) {
+            print("Test")
         }
     }
 }

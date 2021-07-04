@@ -7,8 +7,7 @@
 
 import Foundation
 
-struct Message: Identifiable, Hashable {
-    let id = UUID()
+struct Message: Hashable {
     let name: String
     let message: String
     let tags: Dictionary<String, String>

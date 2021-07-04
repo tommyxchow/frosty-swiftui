@@ -19,8 +19,9 @@ class ChatViewModel: ObservableObject {
     private let websocket = session.webSocketTask(with: websocketURL)
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
-        
         // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
+        
+        print("Starting chat!")
         await ChatManager.getGlobalAssets(token: token)
         await ChatManager.getChannelAssets(token: token, id: streamer.userId)
         
@@ -49,20 +50,6 @@ class ChatViewModel: ObservableObject {
         }
         
         func receive() {
-            if !chatting {
-                print("END CHAT")
-                websocket.cancel(with: .goingAway, reason: nil)
-//                websocket.send(PART) { error in
-//                    if let error = error {
-//                        print(error.localizedDescription)
-//                        return
-//                    }
-//                }
-                DispatchQueue.main.async {
-                    self.messages.removeAll()
-                }
-                return
-            }
             websocket.receive { result in
                 switch result {
                 case .failure(let error):
@@ -100,11 +87,20 @@ class ChatViewModel: ObservableObject {
                     @unknown default:
                         print("ERROR")
                     }
-                    receive()
+                    if self.chatting {
+                        receive()
+                    }
                 }
             }
         }
         receive()
+    }
+    
+    func end() {
+        print("Ending chat")
+        websocket.cancel(with: .goingAway, reason: nil)
+        messages.removeAll()
+        Cache.cache.removeAllObjects()
     }
     
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?

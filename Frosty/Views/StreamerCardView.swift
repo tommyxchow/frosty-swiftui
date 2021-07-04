@@ -12,14 +12,13 @@ struct StreamerCardView: View {
     var body: some View {
         ZStack {
             HStack {
-                AsyncImage(url: URL(string: streamer.thumbnailUrl)!) { image in
-                    image.resizable()
-                } placeholder: {
-                    ProgressView()
+                if let thumbnail = streamer.thumbnail {
+                    Image(uiImage: UIImage(data: thumbnail)!)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 150)
+                        .cornerRadius(10.0)
                 }
-                .scaledToFit()
-                .frame(width: 150)
-                .cornerRadius(10.0)
                 Spacer()
                 VStack(alignment: .leading, spacing: 5.0) {
                     Text(streamer.userName)
@@ -33,13 +32,6 @@ struct StreamerCardView: View {
                     Text("\(streamer.viewerCount) viewers")
                         .font(.footnote)
                 }
-//                if let thumbnail = streamer.thumbnail {
-//                    Image(uiImage: UIImage(data: thumbnail)!)
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: 150)
-//                        .cornerRadius(10.0)
-//                }
             }
         }
         .padding(5.0)

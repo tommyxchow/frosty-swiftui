@@ -51,8 +51,14 @@ class StreamerListViewModel: ObservableObject {
     
     func loadThumbnails() {
         for i in streamers.indices {
-            let url = streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "")
-            streamers[i].thumbnailUrl = url
+            DispatchQueue.main.async {
+                let url = self.streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "")
+                async {
+                    if let thumbnailData = await Request.perform(.GET, to: URL(string: url)!) {
+                        self.streamers[i].thumbnail = thumbnailData
+                    }
+                }
+            }
         }
     }
 }
