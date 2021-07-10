@@ -62,7 +62,7 @@ struct Cache {
         
         switch type {
         case .emoteTwitchGlobal:
-            endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=0")!
+            endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
             headers = ["Authorization":"Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         case .emoteTwitchChannel(let id):
             endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=\(id)")!

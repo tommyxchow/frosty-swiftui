@@ -17,6 +17,7 @@ struct ChatView: View {
         ScrollViewReader { scrollView in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10.0) {
+                    Text("Loading emotes and connecting to chat...")
                     ForEach(viewModel.messages, id: \.self) { message in
                         if let triple = message {
                             MessageView(message: triple, viewModel: viewModel)
@@ -38,15 +39,16 @@ struct ChatView: View {
         .onDisappear {
             viewModel.end()
         }
-        .onChange(of: scenePhase) { newPhase in
-            if newPhase == .active {
-                async {
-                    await ChatManager.getGlobalAssets(token: authHandler.userToken ?? "")
-                    await ChatManager.getChannelAssets(token: authHandler.userToken ?? "", id: streamer.userId)
-                }
-            }
-            if newPhase == .background, newPhase == .inactive {
-                viewModel.chatting = false
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    viewModel.end()
+                    async {
+                        await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
+                    }
+                }, label: {
+                    Text("Refresh")
+                })
             }
         }
     }

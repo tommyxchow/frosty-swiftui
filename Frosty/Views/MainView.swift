@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MainView: View {
     @State private var isPresented = false
-    @State var search: String = ""
     
     var body: some View {
         NavigationView {
@@ -41,10 +40,6 @@ struct MainView: View {
                     }
             }
         })
-        .searchable(text: $search)
-        .onSubmit(of: .search) {
-            print("Test")
-        }
     }
 }
 

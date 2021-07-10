@@ -18,7 +18,7 @@ class ChatViewModel: ObservableObject {
     var chatting: Bool = false
     private let websocket = session.webSocketTask(with: websocketURL)
     
-    @MainActor func start(token: String, user: String, streamer: StreamerInfo) async {
+    func start(token: String, user: String, streamer: StreamerInfo) async {
         // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
         
         print("Starting chat!")
@@ -49,54 +49,57 @@ class ChatViewModel: ObservableObject {
             }
         }
         
-        messages.append(Message(name: "STATUS", message: "Connected!", tags: ["color":"#00FF00"]))
-        messages.append(Message(name: "STATUS", message: "Welcome to \(streamer.userName)'s chat!", tags: ["color":"#00FF00"]))
+        DispatchQueue.main.async {
+            self.messages.append(Message(name: "STATUS", message: "Connected!", tags: ["color":"#00FF00"]))
+            self.messages.append(Message(name: "STATUS", message: "Welcome to \(streamer.userName)'s chat!", tags: ["color":"#00FF00"]))
+        }
         
-        func receive() {
-            websocket.receive { result in
-                switch result {
-                case .failure(let error):
-                    print(error)
-                    let errorMessage = Message(name: "ERROR", message: "Failed to connect to chat.", tags: ["color":"#FF0000"])
-                    DispatchQueue.main.async {
-                        self.messages.append(errorMessage)
-                    }
-                case .success(let response):
-                    switch response {
-                    case .data(let data):
-                        print("WS DATA ", data)
-                    case .string(let string):
-                        print(string)
-                        if string[string.startIndex] == "P" {
-                            let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
-                            self.websocket.send(message) { error in
-                                if let error = error {
-                                    print("Failed to send PONG: \(error)")
-                                }
+        receive()
+    }
+    
+    func receive() {
+        websocket.receive { result in
+            switch result {
+            case .failure(let error):
+                print(error)
+                let errorMessage = Message(name: "ERROR", message: "Failed to connect to chat.", tags: ["color":"#FF0000"])
+                DispatchQueue.main.async {
+                    self.messages.append(errorMessage)
+                }
+            case .success(let response):
+                switch response {
+                case .data(let data):
+                    print("WS DATA ", data)
+                case .string(let string):
+                    //print(string)
+                    if string[string.startIndex] == "P" {
+                        let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
+                        self.websocket.send(message) { error in
+                            if let error = error {
+                                print("Failed to send PONG: \(error)")
                             }
                         }
-                        if string[string.startIndex] == "@" {
-                            DispatchQueue.main.async {
-                                if let parsed = self.parseMessage(string) {
-                                    var newList = self.messages
-                                    newList.append(parsed)
-                                    if newList.count > 80 {
-                                        newList.removeFirst(10)
-                                    }
-                                    self.messages = newList
+                    }
+                    if string[string.startIndex] == "@" {
+                        DispatchQueue.main.async {
+                            if let parsed = self.parseMessage(string) {
+                                var newList = self.messages
+                                newList.append(parsed)
+                                if newList.count > 80 {
+                                    newList.removeFirst(10)
                                 }
+                                self.messages = newList
                             }
                         }
-                    @unknown default:
-                        print("ERROR")
                     }
-                    if self.chatting {
-                        receive()
-                    }
+                @unknown default:
+                    print("ERROR")
+                }
+                if self.chatting {
+                    self.receive()
                 }
             }
         }
-        receive()
     }
     
     func end() {

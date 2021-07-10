@@ -11,7 +11,6 @@ struct StreamerListView: View {
     @EnvironmentObject var auth: Authentication
     @StateObject private var streamerListVM = StreamerListViewModel()
     @State private var firstTime = true
-    @State private var search = ""
     
     var body: some View {
         List(streamerListVM.streamers, id: \.userName) { streamer in
@@ -32,6 +31,13 @@ struct StreamerListView: View {
         }
         .refreshable {
             await streamerListVM.update(auth: auth)
+        }
+        .searchable(text: $streamerListVM.search) {
+            List {
+                ForEach(streamerListVM.filteredStreamers, id: \.userName) { streamer in
+                    Text(streamer.userName)
+                }
+            }
         }
     }
 }

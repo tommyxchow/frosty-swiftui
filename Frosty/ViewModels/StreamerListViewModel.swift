@@ -6,9 +6,18 @@
 //
 
 import Foundation
+import SwiftUI
 
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []
+    @Published var search = ""
+    var filteredStreamers: [StreamerInfo] {
+        if search.isEmpty {
+            return streamers
+        } else {
+            return streamers.filter { $0.userLogin.contains(search.lowercased()) }
+        }
+    }
     
     func update(auth: Authentication) async {
         if let token = auth.userToken {
@@ -35,7 +44,7 @@ class StreamerListViewModel: ObservableObject {
     
     func updateTopStreamers(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams")!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?first=100")!, headers: headers) {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
