@@ -25,10 +25,10 @@ struct ChatManager {
     
     static func getGlobalAssets(token: String) async {
         do {
-            async let twitchGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteTwitchGlobal, token: token, registryId: "twitchGlobalEmotes")
-            async let bttvGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteBTTVGlobal, registryId: "bttvGlobalEmotes")
-            async let ffzGlobalEmotes: () = Cache.cacheContents(requestedDataType: .emoteFFZGlobal, registryId: "ffzGlobalEmotes")
-            async let twitchGlobalBadges: () = Cache.cacheContents(requestedDataType: .badgeTwitchGlobal, token: token, registryId: "twitchGlobalBadges")
+            async let twitchGlobalEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteTwitchGlobal, token: token, registryId: "twitchGlobalEmotes")
+            async let bttvGlobalEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteBTTVGlobal, registryId: "bttvGlobalEmotes")
+            async let ffzGlobalEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteFFZGlobal, registryId: "ffzGlobalEmotes")
+            async let twitchGlobalBadges: () = CacheManager.cacheContents(requestedDataType: .badgeTwitchGlobal, token: token, registryId: "twitchGlobalBadges")
             
             _ = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
         } catch {
@@ -38,10 +38,10 @@ struct ChatManager {
     
     static func getChannelAssets(token: String, id: String) async {
         do {
-            async let twitchChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteTwitchChannel(id: id), token: token, registryId: "twitchChannelEmotes_\(id)")
-            async let bttvChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteBTTVChannel(id: id), registryId: "bttvChannelEmotes_\(id)")
-            async let ffzChannelEmotes: () = Cache.cacheContents(requestedDataType: .emoteFFZChannel(id: id), registryId: "ffzChannelEmotes_\(id)")
-            async let twitchChannelBadges: () = Cache.cacheContents(requestedDataType: .badgeTwitchChannel(id: id), token: token, registryId: "twitchChannelBadges_\(id)")
+            async let twitchChannelEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteTwitchChannel(id: id), token: token, registryId: "twitchChannelEmotes_\(id)")
+            async let bttvChannelEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteBTTVChannel(id: id), registryId: "bttvChannelEmotes_\(id)")
+            async let ffzChannelEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteFFZChannel(id: id), registryId: "ffzChannelEmotes_\(id)")
+            async let twitchChannelBadges: () = CacheManager.cacheContents(requestedDataType: .badgeTwitchChannel(id: id), token: token, registryId: "twitchChannelBadges_\(id)")
             
             _ = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
         } catch {

@@ -106,7 +106,7 @@ class ChatViewModel: ObservableObject {
         print("Ending chat")
         websocket.cancel(with: .goingAway, reason: nil)
         messages.removeAll()
-        Cache.cache.removeAllObjects()
+        CacheManager.cache.removeAllObjects()
     }
     
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
@@ -156,7 +156,7 @@ class ChatViewModel: ObservableObject {
         
         if let badges = message.tags["badges"] {
             for badge in badges.components(separatedBy: ",") {
-                if let cachedVersion = Cache.cache.object(forKey: NSString(string: badge)) {
+                if let cachedVersion = CacheManager.cache.object(forKey: NSString(string: badge)) {
                     let badgeData = Data(referencing: cachedVersion)
                     result = result + Text(Image(uiImage: UIImage(data: badgeData)!)) + Text(" ")
                 }
@@ -175,7 +175,7 @@ class ChatViewModel: ObservableObject {
         for word in split {
             if let emoteData = hits[word] {
                 result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-            } else if let cachedVersion = Cache.cache.object(forKey: NSString(string: word)) {
+            } else if let cachedVersion = CacheManager.cache.object(forKey: NSString(string: word)) {
                 let emoteData = Data(referencing: cachedVersion)
                 result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
                 hits[word] = emoteData

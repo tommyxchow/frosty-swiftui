@@ -1,5 +1,5 @@
 //
-//  Cache.swift
+//  CacheManager.swift
 //  Frosty
 //
 //  Created by Tommy Chow on 6/19/21.
@@ -9,7 +9,7 @@ import Foundation
 
 // TODO: Some channels might have identical BTTV/FFZ channel emotes, figure out a way to reuse those instead of caching individual folders per user
 
-struct Cache {
+struct CacheManager {
     static private let fileManager = FileManager.default
     static private let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
     static let cache = NSCache<NSString, NSData>()
@@ -44,7 +44,7 @@ struct Cache {
             print("Registry already exists for \(requestedDataType)")
             // print(emoteRegistry)
             for item in registry {
-                let itemPath = folder.appendingPathComponent("\(item.value).png")
+                let itemPath = folder.appendingPathComponent(item.value)
                 let itemData = try Data(contentsOf: itemPath)
                 cache.setObject(NSData(data: itemData), forKey: NSString(string: item.key))
             }
@@ -103,52 +103,52 @@ struct Cache {
             let result = try decoder.decode(EmoteDataTwitch.self, from: data)
             for emote in result.data {
                 if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.url_1x)!)  {
-                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.name, fileName: emote.id)
+                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.name, fileName: emote.id + ".png")
                 } else {
                     print("Twitch emote request failed")
                 }
-                registry[emote.name] = emote.id
+                registry[emote.name] = emote.id + ".png"
             }
             print("Cached Twitch emotes")
         case .emoteBTTVGlobal:
             let result = try decoder.decode([EmoteBTTVGlobal].self, from: data)
             for emote in result {
                 if let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!) {
-                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: emote.id)
+                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: "\(emote.id).\(emote.imageType)")
                 } else {
                     print("BTTV global emote request failed")
                 }
-                registry[emote.code] = emote.id
+                registry[emote.code] = "\(emote.id).\(emote.imageType)"
             }
             print("Cached BTTV global emotes")
         case .emoteBTTVChannel:
             let result = try decoder.decode(EmoteBTTVChannel.self, from: data)
             for emote in result.channelEmotes {
                 if let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!) {
-                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: emote.id)
+                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: "\(emote.id).\(emote.imageType)")
                 } else {
                     print("BTTV channel emote request failed")
                 }
-                registry[emote.code] = emote.id
+                registry[emote.code] = "\(emote.id).\(emote.imageType)"
             }
             for emote in result.sharedEmotes {
                 if let emoteData = await Request.perform(.GET, to: URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!) {
-                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: emote.id)
+                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: "\(emote.id).\(emote.imageType)")
                 } else {
                     print("BTTV shared emote request failed")
                 }
-                registry[emote.code] = emote.id
+                registry[emote.code] = "\(emote.id).\(emote.imageType)"
             }
             print("Cached BTTV channel emotes")
         case .emoteFFZGlobal, .emoteFFZChannel:
             let result = try decoder.decode([EmotesFFZ].self, from: data)
             for emote in result {
                 if let emoteData = await Request.perform(.GET, to: URL(string: emote.images.emote1x)!) {
-                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: String(emote.id))
+                    writeAndCache(folder: folder, data: emoteData, cacheName: emote.code, fileName: "\(emote.id).\(emote.imageType)")
                 } else {
                     print("FFZ emote request failed")
                 }
-                registry[emote.code] = String(emote.id)
+                registry[emote.code] = "\(emote.id).\(emote.imageType)"
             }
             print("Cached FFZ emotes")
         case .badgeTwitchGlobal, .badgeTwitchChannel:
@@ -160,9 +160,9 @@ struct Cache {
                 
                 for badgeVersion in badge.versions {
                     if let badgeData = await Request.perform(.GET, to: URL(string: badgeVersion.imageUrl1X)!) {
-                        writeAndCache(folder: folder, data: badgeData, cacheName: "\(badge.setId)/\(badgeVersion.id)", fileName: "\(badge.setId)@\(badgeVersion.id)")
+                        writeAndCache(folder: folder, data: badgeData, cacheName: "\(badge.setId)/\(badgeVersion.id)", fileName: "\(badge.setId)@\(badgeVersion.id).png")
                     }
-                    registry["\(badge.setId)/\(badgeVersion.id)"] = "\(badge.setId)@\(badgeVersion.id)"
+                    registry["\(badge.setId)/\(badgeVersion.id)"] = "\(badge.setId)@\(badgeVersion.id).png"
                 }
             }
             print("Cached Twitch badges")
@@ -173,7 +173,7 @@ struct Cache {
     private static func writeAndCache(folder: URL, data: Data, cacheName: String, fileName: String) {
         do {
             try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
-            let filePath = folder.appendingPathComponent("\(fileName).png")
+            let filePath = folder.appendingPathComponent(fileName)
             try data.write(to: filePath, options: .atomic)
             
             cache.setObject(NSData(data: data), forKey: NSString(string: cacheName))

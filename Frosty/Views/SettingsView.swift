@@ -24,7 +24,7 @@ struct SettingsView: View {
                 })
                     .controlProminence(.increased)
                 Button(action: {
-                    Cache.clearCache()
+                    CacheManager.clearCache()
                 }, label: {
                     Text("Clear Cache")
                 })

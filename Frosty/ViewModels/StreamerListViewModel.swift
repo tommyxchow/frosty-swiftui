@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []

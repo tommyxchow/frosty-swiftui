@@ -16,7 +16,7 @@
 		C606733626645B6500B1C46C /* StreamerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733526645B6500B1C46C /* StreamerListView.swift */; };
 		C606733826654DB500B1C46C /* VideoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733726654DB400B1C46C /* VideoChatView.swift */; };
 		C606733A2665732100B1C46C /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60673392665732100B1C46C /* ChatView.swift */; };
-		C60D0B37267E58C9006246F1 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60D0B36267E58C9006246F1 /* Cache.swift */; };
+		C60D0B37267E58C9006246F1 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60D0B36267E58C9006246F1 /* CacheManager.swift */; };
 		C625AE04268B632800194105 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = C625AE03268B632800194105 /* Video.swift */; };
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
 		C6363A57266D80C200C47A7E /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A56266D80C200C47A7E /* TestView.swift */; };
@@ -48,7 +48,7 @@
 		C606733526645B6500B1C46C /* StreamerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListView.swift; sourceTree = "<group>"; };
 		C606733726654DB400B1C46C /* VideoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoChatView.swift; sourceTree = "<group>"; };
 		C60673392665732100B1C46C /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
-		C60D0B36267E58C9006246F1 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		C60D0B36267E58C9006246F1 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		C625AE03268B632800194105 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		C6363A54266D40E000C47A7E /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		C6363A56266D80C200C47A7E /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
@@ -154,7 +154,7 @@
 			children = (
 				C6F48B10267A214700471B73 /* ChatManager.swift */,
 				C6A6144726698873003508D8 /* Request.swift */,
-				C60D0B36267E58C9006246F1 /* Cache.swift */,
+				C60D0B36267E58C9006246F1 /* CacheManager.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -240,7 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C60D0B37267E58C9006246F1 /* Cache.swift in Sources */,
+				C60D0B37267E58C9006246F1 /* CacheManager.swift in Sources */,
 				C6363A57266D80C200C47A7E /* TestView.swift in Sources */,
 				C606733626645B6500B1C46C /* StreamerListView.swift in Sources */,
 				C606732226641A3E00B1C46C /* MainView.swift in Sources */,

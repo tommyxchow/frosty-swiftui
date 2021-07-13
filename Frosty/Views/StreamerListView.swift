@@ -22,7 +22,10 @@ struct StreamerListView: View {
         .listStyle(.grouped)
         .navigationTitle("Live")
         .task {
-            await streamerListVM.update(auth: auth)
+            if firstTime {
+                await streamerListVM.update(auth: auth)
+                firstTime = false
+            }
         }
         .onChange(of: auth.user) { value in
             async {
