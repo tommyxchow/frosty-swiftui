@@ -19,7 +19,6 @@
 		C60D0B37267E58C9006246F1 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60D0B36267E58C9006246F1 /* CacheManager.swift */; };
 		C625AE04268B632800194105 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = C625AE03268B632800194105 /* Video.swift */; };
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
-		C6363A57266D80C200C47A7E /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A56266D80C200C47A7E /* TestView.swift */; };
 		C6363A5A2670153B00C47A7E /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A592670153A00C47A7E /* LoginViewModel.swift */; };
 		C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A5B2670289A00C47A7E /* SettingsView.swift */; };
 		C64C277E2670A5A700719BCF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64C277D2670A5A700719BCF /* Authentication.swift */; };
@@ -51,7 +50,6 @@
 		C60D0B36267E58C9006246F1 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		C625AE03268B632800194105 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		C6363A54266D40E000C47A7E /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
-		C6363A56266D80C200C47A7E /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		C6363A592670153A00C47A7E /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		C6363A5B2670289A00C47A7E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C64C277D2670A5A700719BCF /* Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
