@@ -11,31 +11,43 @@ struct ChatView: View {
     let streamer: StreamerInfo
     @EnvironmentObject private var authHandler: Authentication
     @StateObject private var viewModel: ChatViewModel = ChatViewModel()
+    
     var body: some View {
         ScrollViewReader { scrollView in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10.0) {
                     ForEach(viewModel.messages, id: \.self) { message in
                         if let triple = message {
-                            viewModel.emoteMessage(triple)
+                            MessageView(message: triple, viewModel: viewModel)
                         }
                     }
                     .font(.footnote)
                 }
-                .onChange(of: viewModel.messages, perform: { value in
-                    scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
-                })
+                .onChange(of: viewModel.messages) { value in
+                    if viewModel.messages.count > 0 {
+                        scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                    }
+                }
             }
         }
         .padding([.bottom, .horizontal], 5.0)
-        .onAppear {
-            print("START")
-            viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer.userLogin)
+        .task {
+            await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
         }
         .onDisappear {
-            print("DISAPPEAR")
-            viewModel.chatting = false
-            print(viewModel.chatting)
+            viewModel.end()
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    viewModel.end()
+                    async {
+                        await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
+                    }
+                }, label: {
+                    Text("Refresh")
+                })
+            }
         }
     }
 }

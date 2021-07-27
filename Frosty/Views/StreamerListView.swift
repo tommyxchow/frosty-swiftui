@@ -13,41 +13,34 @@ struct StreamerListView: View {
     @State private var firstTime = true
     
     var body: some View {
-        if let token = auth.userToken {
+        List(streamerListVM.streamers, id: \.userName) { streamer in
+            NavigationLink(destination: VideoChatView(streamer: streamer)) {
+                StreamerCardView(streamer: streamer)
+            }
+            .listRowSeparator(.hidden)
+        }
+        .listStyle(.grouped)
+        .navigationTitle("Live")
+        .task {
+            if firstTime {
+                await streamerListVM.update(auth: auth)
+                firstTime = false
+            }
+        }
+        .onChange(of: auth.user) { value in
+            async {
+                await streamerListVM.update(auth: auth)
+            }
+        }
+        .refreshable {
+            await streamerListVM.update(auth: auth)
+        }
+        .searchable(text: $streamerListVM.search) {
             List {
-                ForEach(streamerListVM.streamers, id: \.userName) { streamer in
-                    NavigationLink(destination: VideoChatView(streamer: streamer)) {
-                        StreamerCardView(streamer: streamer)
-                    }
+                ForEach(streamerListVM.filteredStreamers, id: \.userName) { streamer in
+                    Text(streamer.userName)
                 }
             }
-            .listStyle(GroupedListStyle())
-            .navigationTitle("Live")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
-                    }, label: {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    })
-                }
-            }
-            .onChange(of: auth.user) { value in
-                auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
-            }
-            .onAppear {
-                if firstTime {
-                    print("REFRESHING")
-                    auth.isLoggedIn ? streamerListVM.updateFollowedStreamers(id: auth.user!.id, token: token) : streamerListVM.updateTopStreamers(token: token)
-                    firstTime.toggle()
-                }
-            }
-        } else {
-            Text("Getting token...")
-                .onAppear {
-                    print("GETTING TOKEN")
-                    auth.getDefaultToken()
-                }
         }
     }
 }

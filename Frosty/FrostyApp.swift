@@ -13,10 +13,11 @@ struct FrostyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                MainView()
-                    .environmentObject(authHandler)
-            }
+            MainView()
+                .environmentObject(authHandler)
+                .task {
+                    await ChatManager.getGlobalAssets(token: authHandler.userToken!)
+                }
         }
     }
 }

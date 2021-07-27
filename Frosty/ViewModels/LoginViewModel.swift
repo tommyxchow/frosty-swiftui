@@ -8,7 +8,12 @@
 import Foundation
 import AuthenticationServices
 
-class LoginViewModel: NSObject, ObservableObject {   
+class LoginViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
+    
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return ASPresentationAnchor()
+    }
+    
     func login(auth: Authentication) {
         var newLoginUrl = URLComponents()
         newLoginUrl.scheme = "https"
@@ -33,19 +38,14 @@ class LoginViewModel: NSObject, ObservableObject {
             
             auth.userToken = token!
             auth.isLoggedIn = true
-            auth.getUserInfo()
-                        
+            async {
+                await auth.getUserInfo()
+            }
         }
         session.presentationContextProvider = self
-        // session.prefersEphemeralWebBrowserSession = true
+        session.prefersEphemeralWebBrowserSession = true
         if !session.start() {
             print("fail")
         }
-    }
-}
-
-extension LoginViewModel: ASWebAuthenticationPresentationContextProviding {
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return ASPresentationAnchor()
     }
 }

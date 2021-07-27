@@ -15,7 +15,7 @@ struct Request {
         case POST = "POST"
     }
     
-    static func perform(_ method: HTTPMethod, to url: URL, headers: [String:String]? = nil, completionHandler: @escaping (Data) -> Void) {
+    static func perform(_ method: HTTPMethod, to url: URL, headers: [String:String]? = nil) async -> Data? {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
                         
@@ -24,20 +24,19 @@ struct Request {
                 request.setValue(header.value, forHTTPHeaderField: header.key)
             }
         }
-        
-        let requestTask = session.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("ERROR: REQUEST FAILED, ", error.localizedDescription)
-                return
-            }
+                
+        do {
+            let (data, response) = try await session.data(for: request)
+            
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 print("ERROR: NON 200-LEVEL RESPONSE")
-                return
+                return nil
             }
-            if let data = data {
-                completionHandler(data)
-            }
+            
+            return data
+        } catch {
+            print("Request failed to \(url)")
+            return nil
         }
-        requestTask.resume()
     }
 }

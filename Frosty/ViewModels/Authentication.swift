@@ -15,55 +15,26 @@ class Authentication: ObservableObject {
     @Published var userToken: String? = ""
     @Published var isLoggedIn: Bool = false
     @Published var user: User?
+    private let decoder = JSONDecoder()
     
-    
-    func getUserInfo() {
+    @MainActor
+    func getUserInfo() async {
         let url = "https://api.twitch.tv/helix/users"
         let headers = ["Authorization" : "Bearer \(userToken!)", "Client-Id" : clientID]
         
-        Request.perform(.GET, to: URL(string: url)!, headers: headers) { data in
-            let decoder = JSONDecoder()
+        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             print(String(data: data, encoding: .utf8)!)
             
             if let response = try? decoder.decode(UserData.self, from: data) {
-                DispatchQueue.main.async {
-                    self.user = response.data[0]
-                }
+                user = response.data[0]
             } else {
                 print("Failed to get user info")
             }
         }
     }
     
-    func validate() {
-        guard let userToken = userToken else {
-            print("Missing user token!")
-            return
-        }
-        
-        var validateURL = URLComponents()
-        validateURL.scheme = "https"
-        validateURL.host = "id.twitch.tv"
-        validateURL.path = "/oauth2/validate"
-            
-        let headers = ["Authorization" : userToken]
-        
-        Request.perform(.GET, to: validateURL.url!, headers: headers) { data in
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-
-            if let response = try? decoder.decode(ValidateResponse.self, from: data) {
-                print(response)
-                
-            } else {
-                print("Failed to decode validate response")
-                self.tokenIsValid = false
-            }
-        }
-    }
-    
-    func getDefaultToken() {
+    func getDefaultToken() async {
         var newLoginUrl = URLComponents()
         newLoginUrl.scheme = "https"
         newLoginUrl.host = "id.twitch.tv"
@@ -75,21 +46,43 @@ class Authentication: ObservableObject {
         
         newLoginUrl.queryItems = [clientQuery, redirectQuery, responseQuery]
         
-        Request.perform(.POST, to: newLoginUrl.url!) { data in
-            let decoder = JSONDecoder()
+        if let data = await Request.perform(.POST, to: newLoginUrl.url!) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             print(String(data: data, encoding: .utf8)!)
             
             if let result = try? decoder.decode(DefaultAccess.self, from: data) {
-                DispatchQueue.main.async {
-                    self.userToken = result.accessToken
-                }
+                userToken = result.accessToken
              } else {
                 print("Failed to decode default token")
             }
         }
     }
     
+//    func validate() async {
+//        guard let userToken = userToken else {
+//            print("Missing user token!")
+//            return
+//        }
+//
+//        var validateURL = URLComponents()
+//        validateURL.scheme = "https"
+//        validateURL.host = "id.twitch.tv"
+//        validateURL.path = "/oauth2/validate"
+//
+//        let headers = ["Authorization" : userToken]
+//
+//        if let data = await Request.perform(.GET, to: validateURL.url!, headers: headers) {
+//            decoder.keyDecodingStrategy = .convertFromSnakeCase
+//
+//            if let response = try? decoder.decode(ValidateResponse.self, from: data) {
+//                print(response)
+//
+//            } else {
+//                print("Failed to decode validate response")
+//                self.tokenIsValid = false
+//            }
+//        }
+//    }
 }
 
 private struct ValidateResponse: Decodable {
