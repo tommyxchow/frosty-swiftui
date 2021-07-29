@@ -13,17 +13,25 @@ import SwiftUI
 
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = [Message(name: "STATUS", message: "Connecting to chat...", tags: ["color":"#00FF00"])]
-    static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
-    static private let session = URLSession.shared
+    private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
     var chatting: Bool = false
-    private let websocket = session.webSocketTask(with: websocketURL)
+    var assetToUrl: [String:URL] = [:]
+
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
         // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
         
+        async let globalAssets: [String:URL] = ChatManager.getGlobalAssets(token: token)
+        async let channelAssets: [String:URL] = ChatManager.getChannelAssets(token: token, id: streamer.userId)
+        
+        let assetsToUrl = await [globalAssets, channelAssets]
+        
+        for registry in assetsToUrl {
+            assetToUrl.merge(registry) {(_,new) in new}
+        }
+        
+        print(assetToUrl)
         print("Starting chat!")
-        await ChatManager.getGlobalAssets(token: token)
-        await ChatManager.getChannelAssets(token: token, id: streamer.userId)
         
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
@@ -85,7 +93,7 @@ class ChatViewModel: ObservableObject {
                             if let parsed = self.parseMessage(string) {
                                 var newList = self.messages
                                 newList.append(parsed)
-                                if newList.count > 80 {
+                                if newList.count > 30 {
                                     newList.removeFirst(10)
                                 }
                                 self.messages = newList
@@ -106,7 +114,6 @@ class ChatViewModel: ObservableObject {
         print("Ending chat")
         websocket.cancel(with: .goingAway, reason: nil)
         messages.removeAll()
-        CacheManager.cache.removeAllObjects()
     }
     
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
@@ -144,11 +151,12 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    func beautify(_ message: Message) -> Text {
-        if message.name == "STATUS" {
-            return Text(message.message)
-        }
-        
+    func beautify(_ message: Message) -> [String] {
+//        if message.name == "STATUS" {
+//            return Text(message.message)
+//        }
+        var testReg: [String] = []
+
         var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
@@ -156,12 +164,14 @@ class ChatViewModel: ObservableObject {
         
         if let badges = message.tags["badges"] {
             for badge in badges.components(separatedBy: ",") {
-                if let cachedVersion = CacheManager.cache.object(forKey: NSString(string: badge)) {
-                    let badgeData = Data(referencing: cachedVersion)
-                    result = result + Text(Image(uiImage: UIImage(data: badgeData)!)) + Text(" ")
+                if let url = assetToUrl[badge] {
+                    testReg.append("}"+url.absoluteString)
                 }
             }
         }
+        
+        testReg.append(message.name)
+        testReg.append(": ")
         
         var hexColor = hexStringToUIColor(hex: "#737373")
         
@@ -169,21 +179,18 @@ class ChatViewModel: ObservableObject {
             hexColor = hexStringToUIColor(hex: color)
         }
         
-        result = result + Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor))
+        result = result + Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor)) + Text(" ")
         
-        var hits: [String:Data] = [:]
         for word in split {
-            if let emoteData = hits[word] {
-                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-            } else if let cachedVersion = CacheManager.cache.object(forKey: NSString(string: word)) {
-                let emoteData = Data(referencing: cachedVersion)
-                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-                hits[word] = emoteData
+            if let url = assetToUrl[word] {
+                testReg.append("}"+url.absoluteString)
             } else {
+                testReg.append(word + " ")
                 result = result + Text(" ") + Text(word)
             }
         }
-        return result
+        //print(testReg)
+        return testReg
     }
     
     func hexStringToUIColor (hex:String) -> UIColor {

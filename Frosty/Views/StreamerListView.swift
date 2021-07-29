@@ -28,7 +28,7 @@ struct StreamerListView: View {
             }
         }
         .onChange(of: auth.user) { value in
-            async {
+            Task {
                 await streamerListVM.update(auth: auth)
             }
         }

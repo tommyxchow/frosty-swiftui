@@ -6,6 +6,10 @@
 //
 
 import Foundation
+import SDWebImage
+import SDWebImageSwiftUI
+import SwiftUI
+import NukeUI
 
 // TODO: Account for interruptions on connection (user leaves while emotes are being fetched)
 
@@ -22,31 +26,45 @@ import Foundation
 // fixed: Forgot to add the await for global emotes in viewmodel
 
 struct ChatManager {
+    static var emoteToImage: [String:WebImage] = [:]
+    static var dictionary: [String:Text] = [:]
     
-    static func getGlobalAssets(token: String) async {
+    
+    static func getGlobalAssets(token: String) async -> [String:URL] {
+        var finalRegisty: [String:URL] = [:]
+
         do {
-            async let twitchGlobalEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteTwitchGlobal, token: token, registryId: "twitchGlobalEmotes")
-            async let bttvGlobalEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteBTTVGlobal, registryId: "bttvGlobalEmotes")
-            async let ffzGlobalEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteFFZGlobal, registryId: "ffzGlobalEmotes")
-            async let twitchGlobalBadges: () = CacheManager.cacheContents(requestedDataType: .badgeTwitchGlobal, token: token, registryId: "twitchGlobalBadges")
+            async let twitchGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteTwitchGlobal, token: token)
+            async let bttvGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteBTTVGlobal)
+            async let ffzGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteFFZGlobal)
+            async let twitchGlobalBadges = Request.assetToUrl(requestedDataType: .badgeTwitchGlobal, token: token)
             
-            _ = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
+            let registries = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
+            for registry in registries {
+                finalRegisty.merge(registry) {(_,new) in new}
+            }
         } catch {
             print("Failed to get global assets: ", error.localizedDescription)
         }
+        return finalRegisty
     }
     
-    static func getChannelAssets(token: String, id: String) async {
+    static func getChannelAssets(token: String, id: String) async -> [String:URL] {
+        var finalRegisty: [String:URL] = [:]
         do {
-            async let twitchChannelEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteTwitchChannel(id: id), token: token, registryId: "twitchChannelEmotes_\(id)")
-            async let bttvChannelEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteBTTVChannel(id: id), registryId: "bttvChannelEmotes_\(id)")
-            async let ffzChannelEmotes: () = CacheManager.cacheContents(requestedDataType: .emoteFFZChannel(id: id), registryId: "ffzChannelEmotes_\(id)")
-            async let twitchChannelBadges: () = CacheManager.cacheContents(requestedDataType: .badgeTwitchChannel(id: id), token: token, registryId: "twitchChannelBadges_\(id)")
+            async let twitchChannelEmotes = Request.assetToUrl(requestedDataType: .emoteTwitchChannel(id: id), token: token)
+            async let bttvChannelEmotes = Request.assetToUrl(requestedDataType: .emoteBTTVChannel(id: id))
+            async let ffzChannelEmotes = Request.assetToUrl(requestedDataType: .emoteFFZChannel(id: id))
+            async let twitchChannelBadges = Request.assetToUrl(requestedDataType: .badgeTwitchChannel(id: id), token: token)
             
-            _ = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
+            let registries = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
+            for registry in registries {
+                finalRegisty.merge(registry) {(_,new) in new}
+            }
         } catch {
             print("Failed to get channel assets: ", error.localizedDescription)
         }
+        return finalRegisty
     }
     
     // Badges

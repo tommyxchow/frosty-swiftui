@@ -6,19 +6,24 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
+import Kingfisher
+
 
 struct ChatView: View {
     let streamer: StreamerInfo
     @EnvironmentObject private var authHandler: Authentication
     @StateObject private var viewModel: ChatViewModel = ChatViewModel()
     
+    @State var gif = KFAnimatedImage(URL(string: "https://cdn.betterttv.net/emote/5ad22a7096065b6c6bddf7f3/2x")!)
+    
     var body: some View {
         ScrollViewReader { scrollView in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10.0) {
+                LazyVStack(alignment: .leading, spacing: 5.0) {
                     ForEach(viewModel.messages, id: \.self) { message in
                         if let triple = message {
-                            MessageView(message: triple, viewModel: viewModel)
+                            MessageView(viewModel: viewModel, message: viewModel.beautify(triple))
                         }
                     }
                     .font(.footnote)
@@ -41,7 +46,7 @@ struct ChatView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     viewModel.end()
-                    async {
+                    Task {
                         await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
                     }
                 }, label: {

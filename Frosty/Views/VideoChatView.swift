@@ -11,8 +11,7 @@ struct VideoChatView: View {
     let streamer: StreamerInfo
     var body: some View {
         VStack {
-//            VideoView()
-//            Spacer()
+            VideoView(streamer: streamer)
             ChatView(streamer: streamer)
         }
         .navigationTitle(streamer.userName)

@@ -38,7 +38,7 @@ class LoginViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentatio
             
             auth.userToken = token!
             auth.isLoggedIn = true
-            async {
+            Task {
                 await auth.getUserInfo()
             }
         }

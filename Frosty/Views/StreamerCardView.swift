@@ -6,19 +6,18 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct StreamerCardView: View {
     let streamer: StreamerInfo
     var body: some View {
         ZStack {
             HStack {
-                if let thumbnail = streamer.thumbnail {
-                    Image(uiImage: UIImage(data: thumbnail)!)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 150)
-                        .cornerRadius(10.0)
-                }
+                WebImage(url: URL(string: streamer.thumbnailUrl)!)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 150)
+                    .cornerRadius(10.0)
                 Spacer()
                 VStack(alignment: .leading, spacing: 5.0) {
                     Text(streamer.userName)
