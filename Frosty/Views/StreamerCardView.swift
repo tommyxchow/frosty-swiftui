@@ -6,17 +6,14 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
+import NukeUI
 
 struct StreamerCardView: View {
     let streamer: StreamerInfo
     var body: some View {
         ZStack {
             HStack {
-                WebImage(url: URL(string: streamer.thumbnailUrl)!)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150)
+                LazyImage(source: URL(string: streamer.thumbnailUrl)!, resizingMode: .aspectFit)
                     .cornerRadius(10.0)
                 Spacer()
                 VStack(alignment: .leading, spacing: 5.0) {

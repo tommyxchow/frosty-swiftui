@@ -12,7 +12,7 @@ struct VideoView: View {
     let streamer: StreamerInfo
     
     var body: some View {
-        WebView(url: URL(string: "https://player.twitch.tv/?channel=\(streamer.userLogin)&enableExtensions=true&muted=false&parent=example.com")!)
+        WebView(url: URL(string: "https://player.twitch.tv/?channel=\(streamer.userLogin)&muted=false&parent=example.com")!)
             .aspectRatio(1.77777777778, contentMode: .fit)
     }
 }

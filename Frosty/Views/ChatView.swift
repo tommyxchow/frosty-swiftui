@@ -6,35 +6,37 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
-import Kingfisher
-
 
 struct ChatView: View {
     let streamer: StreamerInfo
     @EnvironmentObject private var authHandler: Authentication
     @StateObject private var viewModel: ChatViewModel = ChatViewModel()
-    
-    @State var gif = KFAnimatedImage(URL(string: "https://cdn.betterttv.net/emote/5ad22a7096065b6c6bddf7f3/2x")!)
+    @State private var autoScroll = true
     
     var body: some View {
         ScrollViewReader { scrollView in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 5.0) {
-                    ForEach(viewModel.messages, id: \.self) { message in
-                        if let triple = message {
-                            MessageView(viewModel: viewModel, message: viewModel.beautify(triple))
+            GeometryReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10.0) {
+                        ForEach(viewModel.messages, id: \.self) { message in
+                            if let triple = message {
+                                MessageView(viewModel: viewModel, message: viewModel.beautify(triple), size: proxy.size)
+                            }
                         }
                     }
-                    .font(.footnote)
-                }
-                .onChange(of: viewModel.messages) { value in
-                    if viewModel.messages.count > 0 {
-                        scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                    .onChange(of: viewModel.messages) { value in
+                        if viewModel.messages.count > 0, autoScroll {
+                            scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                        }
                     }
                 }
             }
         }
+        .simultaneousGesture(DragGesture().onChanged({ value in
+            if value.translation.height > 0 {
+                autoScroll = false
+            }
+        }))
         .padding([.bottom, .horizontal], 5.0)
         .task {
             await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
@@ -45,12 +47,9 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    viewModel.end()
-                    Task {
-                        await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
-                    }
+                    autoScroll = true
                 }, label: {
-                    Text("Refresh")
+                    Text("Auto Scroll")
                 })
             }
         }

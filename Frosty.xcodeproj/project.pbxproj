@@ -20,11 +20,10 @@
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
 		C6363A5A2670153B00C47A7E /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A592670153A00C47A7E /* LoginViewModel.swift */; };
 		C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A5B2670289A00C47A7E /* SettingsView.swift */; };
-		C641896626B305CF0038133C /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = C641896526B305CF0038133C /* Kingfisher */; };
 		C641896926B305EE0038133C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C641896826B305EE0038133C /* SDWebImageSwiftUI */; };
-		C641896C26B3148F0038133C /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = C641896B26B3148F0038133C /* FlexLayout */; };
-		C641896E26B3148F0038133C /* FlexLayoutYoga in Frameworks */ = {isa = PBXBuildFile; productRef = C641896D26B3148F0038133C /* FlexLayoutYoga */; };
-		C641897026B3148F0038133C /* FlexLayoutYogaKit in Frameworks */ = {isa = PBXBuildFile; productRef = C641896F26B3148F0038133C /* FlexLayoutYogaKit */; };
+		C64B44FB26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin in Frameworks */ = {isa = PBXBuildFile; productRef = C64B44FA26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin */; };
+		C64B450126B62A5A00A7BBB9 /* NukeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = C64B450026B62A5A00A7BBB9 /* NukeBuilder */; };
+		C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C64B450326B6502400A7BBB9 /* NukeUI */; };
 		C64C277E2670A5A700719BCF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64C277D2670A5A700719BCF /* Authentication.swift */; };
 		C672E005266CA9D200737AD6 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C672E004266CA9D200737AD6 /* README.md */; };
 		C6A6144226697B32003508D8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144126697B32003508D8 /* User.swift */; };
@@ -32,6 +31,11 @@
 		C6A6144826698873003508D8 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144726698873003508D8 /* Request.swift */; };
 		C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144D266C44DC003508D8 /* ChatViewModel.swift */; };
 		C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */; };
+		C6E9091026B4DCFB00E87164 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E9090F26B4DCFB00E87164 /* TestView.swift */; };
+		C6E9091226B50B1900E87164 /* TestView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E9091126B50B1900E87164 /* TestView2.swift */; };
+		C6ED086B26B3715B008ABAF2 /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086A26B3715B008ABAF2 /* FlexLayout */; };
+		C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */; };
+		C6ED086F26B3715B008ABAF2 /* FlexLayoutYogaKit in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */; };
 		C6F09CB2267CCA4C001451FE /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB1267CCA4C001451FE /* Badges.swift */; };
 		C6F09CB4267E19DA001451FE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB3267E19DA001451FE /* Message.swift */; };
 		C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B0C2678A33300471B73 /* Emotes.swift */; };
@@ -62,6 +66,8 @@
 		C6A6144726698873003508D8 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		C6A6144D266C44DC003508D8 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLoggedInView.swift; sourceTree = "<group>"; };
+		C6E9090F26B4DCFB00E87164 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
+		C6E9091126B50B1900E87164 /* TestView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView2.swift; sourceTree = "<group>"; };
 		C6F09CB1267CCA4C001451FE /* Badges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		C6F09CB3267E19DA001451FE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		C6F48B0C2678A33300471B73 /* Emotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emotes.swift; sourceTree = "<group>"; };
@@ -74,11 +80,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C641896C26B3148F0038133C /* FlexLayout in Frameworks */,
-				C641897026B3148F0038133C /* FlexLayoutYogaKit in Frameworks */,
+				C64B44FB26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin in Frameworks */,
+				C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */,
+				C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */,
+				C64B450126B62A5A00A7BBB9 /* NukeBuilder in Frameworks */,
 				C641896926B305EE0038133C /* SDWebImageSwiftUI in Frameworks */,
-				C641896626B305CF0038133C /* Kingfisher in Frameworks */,
-				C641896E26B3148F0038133C /* FlexLayoutYoga in Frameworks */,
+				C6ED086F26B3715B008ABAF2 /* FlexLayoutYogaKit in Frameworks */,
+				C6ED086B26B3715B008ABAF2 /* FlexLayout in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,7 +158,8 @@
 				C6363A54266D40E000C47A7E /* VideoView.swift */,
 				C60673392665732100B1C46C /* ChatView.swift */,
 				C6F48B0E2678B81D00471B73 /* MessageView.swift */,
-				C6363A56266D80C200C47A7E /* TestView.swift */,
+				C6E9090F26B4DCFB00E87164 /* TestView.swift */,
+				C6E9091126B50B1900E87164 /* TestView2.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -192,11 +201,13 @@
 			);
 			name = Frosty;
 			packageProductDependencies = (
-				C641896526B305CF0038133C /* Kingfisher */,
 				C641896826B305EE0038133C /* SDWebImageSwiftUI */,
-				C641896B26B3148F0038133C /* FlexLayout */,
-				C641896D26B3148F0038133C /* FlexLayoutYoga */,
-				C641896F26B3148F0038133C /* FlexLayoutYogaKit */,
+				C6ED086A26B3715B008ABAF2 /* FlexLayout */,
+				C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */,
+				C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */,
+				C64B44FA26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin */,
+				C64B450026B62A5A00A7BBB9 /* NukeBuilder */,
+				C64B450326B6502400A7BBB9 /* NukeUI */,
 			);
 			productName = Frosty;
 			productReference = C606731C26641A3E00B1C46C /* Frosty.app */;
@@ -226,9 +237,11 @@
 			);
 			mainGroup = C606731326641A3E00B1C46C;
 			packageReferences = (
-				C641896426B305CF0038133C /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				C641896726B305EE0038133C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				C641896A26B3148F0038133C /* XCRemoteSwiftPackageReference "FlexLayout" */,
+				C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */,
+				C64B44F926B6238E00A7BBB9 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */,
+				C64B44FF26B62A5A00A7BBB9 /* XCRemoteSwiftPackageReference "NukeBuilder" */,
+				C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */,
 			);
 			productRefGroup = C606731D26641A3E00B1C46C /* Products */;
 			projectDirPath = "";
@@ -257,7 +270,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C6363A57266D80C200C47A7E /* TestView.swift in Sources */,
 				C606733626645B6500B1C46C /* StreamerListView.swift in Sources */,
 				C606732226641A3E00B1C46C /* MainView.swift in Sources */,
 				C606733826654DB500B1C46C /* VideoChatView.swift in Sources */,
@@ -277,9 +289,11 @@
 				C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */,
 				C6F09CB4267E19DA001451FE /* Message.swift in Sources */,
 				C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */,
+				C6E9091026B4DCFB00E87164 /* TestView.swift in Sources */,
 				C60673302664373B00B1C46C /* Streamer.swift in Sources */,
 				C6A6144226697B32003508D8 /* User.swift in Sources */,
 				C6363A55266D40E000C47A7E /* VideoView.swift in Sources */,
+				C6E9091226B50B1900E87164 /* TestView2.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,14 +489,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C641896426B305CF0038133C /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		C641896726B305EE0038133C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
@@ -491,7 +497,31 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		C641896A26B3148F0038133C /* XCRemoteSwiftPackageReference "FlexLayout" */ = {
+		C64B44F926B6238E00A7BBB9 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke-FLAnimatedImage-Plugin.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		C64B44FF26B62A5A00A7BBB9 /* XCRemoteSwiftPackageReference "NukeBuilder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/NukeBuilder.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
+		C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/NukeUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.6;
+			};
+		};
+		C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/layoutBox/FlexLayout.git";
 			requirement = {
@@ -502,29 +532,39 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C641896526B305CF0038133C /* Kingfisher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C641896426B305CF0038133C /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
-		};
 		C641896826B305EE0038133C /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C641896726B305EE0038133C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
 		};
-		C641896B26B3148F0038133C /* FlexLayout */ = {
+		C64B44FA26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C641896A26B3148F0038133C /* XCRemoteSwiftPackageReference "FlexLayout" */;
+			package = C64B44F926B6238E00A7BBB9 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */;
+			productName = NukeFLAnimatedImagePlugin;
+		};
+		C64B450026B62A5A00A7BBB9 /* NukeBuilder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C64B44FF26B62A5A00A7BBB9 /* XCRemoteSwiftPackageReference "NukeBuilder" */;
+			productName = NukeBuilder;
+		};
+		C64B450326B6502400A7BBB9 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */;
+			productName = NukeUI;
+		};
+		C6ED086A26B3715B008ABAF2 /* FlexLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */;
 			productName = FlexLayout;
 		};
-		C641896D26B3148F0038133C /* FlexLayoutYoga */ = {
+		C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C641896A26B3148F0038133C /* XCRemoteSwiftPackageReference "FlexLayout" */;
+			package = C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */;
 			productName = FlexLayoutYoga;
 		};
-		C641896F26B3148F0038133C /* FlexLayoutYogaKit */ = {
+		C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C641896A26B3148F0038133C /* XCRemoteSwiftPackageReference "FlexLayout" */;
+			package = C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */;
 			productName = FlexLayoutYogaKit;
 		};
 /* End XCSwiftPackageProductDependency section */

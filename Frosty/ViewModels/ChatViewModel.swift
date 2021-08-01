@@ -7,8 +7,8 @@
 
 import Foundation
 import SwiftUI
+import Nuke
 
-// TODO: Add pinging so rooms last more than 5 min
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 
 class ChatViewModel: ObservableObject {
@@ -19,8 +19,6 @@ class ChatViewModel: ObservableObject {
 
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
-        // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
-        
         async let globalAssets: [String:URL] = ChatManager.getGlobalAssets(token: token)
         async let channelAssets: [String:URL] = ChatManager.getChannelAssets(token: token, id: streamer.userId)
         
@@ -29,8 +27,7 @@ class ChatViewModel: ObservableObject {
         for registry in assetsToUrl {
             assetToUrl.merge(registry) {(_,new) in new}
         }
-        
-        print(assetToUrl)
+                
         print("Starting chat!")
         
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
@@ -93,7 +90,7 @@ class ChatViewModel: ObservableObject {
                             if let parsed = self.parseMessage(string) {
                                 var newList = self.messages
                                 newList.append(parsed)
-                                if newList.count > 30 {
+                                if newList.count > 80 {
                                     newList.removeFirst(10)
                                 }
                                 self.messages = newList
@@ -152,15 +149,12 @@ class ChatViewModel: ObservableObject {
     }
     
     func beautify(_ message: Message) -> [String] {
-//        if message.name == "STATUS" {
-//            return Text(message.message)
-//        }
+
         var testReg: [String] = []
 
         var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
-        var result = Text("")
         
         if let badges = message.tags["badges"] {
             for badge in badges.components(separatedBy: ",") {
@@ -170,26 +164,16 @@ class ChatViewModel: ObservableObject {
             }
         }
         
-        testReg.append(message.name)
-        testReg.append(": ")
-        
-        var hexColor = hexStringToUIColor(hex: "#737373")
-        
-        if let color = message.tags["color"] {
-            hexColor = hexStringToUIColor(hex: color)
-        }
-        
-        result = result + Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor)) + Text(" ")
+        testReg.append(message.name + ": ")
         
         for word in split {
             if let url = assetToUrl[word] {
                 testReg.append("}"+url.absoluteString)
             } else {
                 testReg.append(word + " ")
-                result = result + Text(" ") + Text(word)
             }
         }
-        //print(testReg)
+        // print(testReg)
         return testReg
     }
     

@@ -53,28 +53,28 @@ struct Request {
         case .emoteTwitchGlobal, .emoteTwitchChannel:
             let result = try decoder.decode(EmoteDataTwitch.self, from: data)
             for emote in result.data {
-                registry[emote.name] = URL(string: emote.images.url_1x)!
+                registry[emote.name] = URL(string: emote.images.url_4x)!
             }
             print("Cached Twitch emotes")
         case .emoteBTTVGlobal:
             let result = try decoder.decode([EmoteBTTVGlobal].self, from: data)
             for emote in result {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
             }
             print("Cached BTTV global emotes")
         case .emoteBTTVChannel:
             let result = try decoder.decode(EmoteBTTVChannel.self, from: data)
             for emote in result.channelEmotes {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
             }
             for emote in result.sharedEmotes {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/1x")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
             }
             print("Cached BTTV channel emotes")
         case .emoteFFZGlobal, .emoteFFZChannel:
             let result = try decoder.decode([EmotesFFZ].self, from: data)
             for emote in result {
-                registry[emote.code] = URL(string: emote.images.emote1x)!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/frankerfacez_emote/\(emote.id)/4")!
             }
             print("Cached FFZ emotes")
         case .badgeTwitchGlobal, .badgeTwitchChannel:
@@ -84,7 +84,7 @@ struct Request {
             let result = try decoder.decode(BadgeData.self, from: data)
             for badge in result.data {
                 for badgeVersion in badge.versions {
-                    registry["\(badge.setId)/\(badgeVersion.id)"] = URL(string: badgeVersion.imageUrl1X)!
+                    registry["\(badge.setId)/\(badgeVersion.id)"] = URL(string: badgeVersion.imageUrl4X)!
                 }
             }
             print("Cached Twitch badges")

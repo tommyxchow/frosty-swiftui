@@ -9,21 +9,8 @@ import Foundation
 import SDWebImage
 import SDWebImageSwiftUI
 import SwiftUI
-import NukeUI
-
-// TODO: Account for interruptions on connection (user leaves while emotes are being fetched)
 
 // TODO: Get global sub emotes through the twitch tags
-
-// TODO: Instead of fetching from cache, storing emote data in a dictionary might be more efficient
-
-// TODO: Instead of storing folder per user, store single folders with BTTV/FFZ/Twitch emotes each. This will reduce redundant operations (fetching and decoding emotes that already exists). Would likely reduce loading time due to less decoding. Also, use userdefaults to store a registry per channel
-
-// FIXME: When exiting the channel and rejoining, certain emotes won't return (i.e. PogU or BTTV/FFZ?). Look into caching bugs
-// fixed: Wasn't writing BTTV shared emotes to the cache directory
-
-// FIXME: Twitch global emotes aren't being rendered in chat (i.e. LUL, Kappa, 4Head). Might be something to do with emotify
-// fixed: Forgot to add the await for global emotes in viewmodel
 
 struct ChatManager {
     static var emoteToImage: [String:WebImage] = [:]

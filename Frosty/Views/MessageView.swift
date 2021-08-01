@@ -6,81 +6,67 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
+import FlexLayout
+import Nuke
+import FLAnimatedImage
+import NukeBuilder
 
 struct MessageView: View {
     @ObservedObject var viewModel: ChatViewModel
     let message: [String]
+    let size: CGSize
         
     var body: some View {
-        FlexTest(words: message)
-            .padding(1)
-//        WrappingHStack(id: \.self, alignment: .leading) {
-//            ForEach(message, id: \.self) { item in
-//                if item.starts(with: "}") {
-//                    let url = item.replacingOccurrences(of: "}", with: "")
-//                    if let gif = ChatManager.emoteToImage[url] {
-//                        gif
-//                            .frame(height: 25)
-//                    } else {
-//                        let newImage = WebImage(url: URL(string: url)!)
-//                        newImage
-//                            .frame(height: 25)
-//                            .task {
-//                                ChatManager.emoteToImage[url] = newImage
-//                            }
-//                    }
-//                } else {
-//                    if let text = ChatManager.dictionary[item] {
-//                        text
-//                    } else {
-//                        let newText = Text(item)
-//                        newText
-//                            .task {
-//                                ChatManager.dictionary[item] = newText
-//                            }
-//                    }
-//                }
-//            }
-//        }
+        FlexMessage(words: message, size: size)
     }
 }
 
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageView(viewModel: ChatViewModel(), message: ["test"])
+        MessageView(viewModel: ChatViewModel(), message: ["test"], size: .zero)
     }
 }
 
-class FlexView: UIView {
+class FlexMessageView: UIView {
     private let rootFlexContainer = UIView()
-    var height: CGFloat = 0
+    private var size: CGSize?
+    private var height: CGFloat = 0
     
-    init(words: [String]) {
+    init(words: [String], size: CGSize) {
         super.init(frame: .zero)
+        self.size = size
         addSubview(rootFlexContainer)
-        print(words)
-        print(Array("hello"))
-
-                
-        rootFlexContainer.flex.direction(.row).wrap(.wrap).define { flex in
+        
+        rootFlexContainer.flex.direction(.row).wrap(.wrap).alignItems(.center).define { flex in
             for word in words {
                 if word.starts(with: "}") {
-                    let imageView = UIImageView()
-                    imageView.sd_setImage(with: URL(string: word.replacingOccurrences(of: "}", with: "")))
                     
-                    flex.addItem(imageView)
+                    let url = URL(string: word.replacingOccurrences(of: "}", with: ""))!
+
+                    let imageView = FLAnimatedImageView()
+
+                    let image = ImagePipeline.shared.image(with: url)
+                        .resize(height: 20)
+                                            
+                    image.display(in: imageView)
+                        .placeholder(UIImage(systemName: "square.fill")!)
+                        .load()
+                    
+                    flex.addItem().define { item in
+                        flex.addItem(imageView)
+                    }
+                    
                 } else {
                     let labelView = UILabel()
-                    labelView.text = word
                     labelView.font = UIFont.preferredFont(forTextStyle: .footnote)
-                    labelView.adjustsFontForContentSizeCategory = true
-                    flex.addItem(labelView)
+                    labelView.text = word
+                    flex.addItem().define { item in
+                        flex.addItem(labelView)
+                    }
                 }
             }
         }
-        
-        let lines = ceil(rootFlexContainer.flex.intrinsicSize.width / 390)
+        let lines = ceil(rootFlexContainer.flex.intrinsicSize.width / size.width)
         height = lines * rootFlexContainer.flex.intrinsicSize.height
     }
     
@@ -91,19 +77,22 @@ class FlexView: UIView {
     override func layoutSubviews() {
 
         super.layoutSubviews()
-
-        rootFlexContainer.frame = CGRect(x: 0, y: 0, width: 390, height: height)
-        rootFlexContainer.flex.layout(mode: .adjustHeight)
         
+        rootFlexContainer.frame = CGRect(x: 0, y: 0, width: size!.width, height: 0)
+        rootFlexContainer.flex.layout(mode: .adjustHeight)
+                
     }
     
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: height)
+        return CGSize(width: size!.width, height: height)
     }
+    
+
 }
 
-struct FlexTest: UIViewRepresentable {
+struct FlexMessage: UIViewRepresentable {
     let words: [String]
+    let size: CGSize
         
     typealias UIViewControllerType = UIView
     
@@ -111,10 +100,11 @@ struct FlexTest: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIView {
-        let newView = FlexView(words: words)
-        newView.setContentHuggingPriority(.required, for: .vertical)
+        let newView = FlexMessageView(words: words, size: size)
+        newView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         return newView
     }
     
 }
+
 

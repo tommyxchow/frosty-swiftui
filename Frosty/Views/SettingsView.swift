@@ -22,7 +22,7 @@ struct SettingsView: View {
                 }, label: {
                     Text("Login")
                 })
-                    .controlProminence(.increased)
+                    .buttonStyle(.borderedProminent)
                 Button(action: {
                 }, label: {
                     Text("Clear Cache")
