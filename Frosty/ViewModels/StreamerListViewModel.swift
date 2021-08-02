@@ -10,6 +10,7 @@ import Foundation
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []
     @Published var search = ""
+    let decoder = JSONDecoder()
     var filteredStreamers: [StreamerInfo] {
         if search.isEmpty {
             return streamers
@@ -29,7 +30,6 @@ class StreamerListViewModel: ObservableObject {
     func updateFollowedStreamers(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams/followed?user_id=\(id)")!, headers: headers) {
-            let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             if let result = try? decoder.decode(StreamerData.self, from: data) {
@@ -43,8 +43,7 @@ class StreamerListViewModel: ObservableObject {
     
     func updateTopStreamers(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?first=100")!, headers: headers) {
-            let decoder = JSONDecoder()
+        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?first=50")!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             do {

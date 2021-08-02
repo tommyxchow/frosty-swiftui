@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Nuke
 
 struct SettingsView: View {
     @EnvironmentObject private var authHandler: Authentication
@@ -24,6 +25,7 @@ struct SettingsView: View {
                 })
                     .buttonStyle(.borderedProminent)
                 Button(action: {
+                    ImageCache.shared.removeAll()
                 }, label: {
                     Text("Clear Cache")
                 })

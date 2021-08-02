@@ -10,7 +10,6 @@ import SwiftUI
 struct StreamerListView: View {
     @EnvironmentObject var auth: Authentication
     @StateObject private var streamerListVM = StreamerListViewModel()
-    @State private var firstTime = true
     
     var body: some View {
         List(streamerListVM.streamers, id: \.userName) { streamer in
@@ -22,10 +21,7 @@ struct StreamerListView: View {
         .listStyle(.grouped)
         .navigationTitle("Live")
         .task {
-            if firstTime {
-                await streamerListVM.update(auth: auth)
-                firstTime = false
-            }
+            await streamerListVM.update(auth: auth)
         }
         .onChange(of: auth.user) { value in
             Task {

@@ -6,14 +6,11 @@
 //
 
 import Foundation
-import SDWebImage
-import SDWebImageSwiftUI
 import SwiftUI
 
 // TODO: Get global sub emotes through the twitch tags
 
 struct ChatManager {
-    static var emoteToImage: [String:WebImage] = [:]
     static var dictionary: [String:Text] = [:]
     
     
