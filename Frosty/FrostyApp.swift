@@ -15,9 +15,6 @@ struct FrostyApp: App {
         WindowGroup {
             MainView()
                 .environmentObject(authHandler)
-                .task {
-                    await ChatManager.getGlobalAssets(token: authHandler.userToken!)
-                }
         }
     }
 }

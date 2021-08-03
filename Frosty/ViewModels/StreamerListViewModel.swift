@@ -9,14 +9,7 @@ import Foundation
 
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []
-    @Published var search = ""
-    var filteredStreamers: [StreamerInfo] {
-        if search.isEmpty {
-            return streamers
-        } else {
-            return streamers.filter { $0.userLogin.contains(search.lowercased()) }
-        }
-    }
+    let decoder = JSONDecoder()
     
     func update(auth: Authentication) async {
         if let token = auth.userToken {
@@ -29,7 +22,6 @@ class StreamerListViewModel: ObservableObject {
     func updateFollowedStreamers(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams/followed?user_id=\(id)")!, headers: headers) {
-            let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             if let result = try? decoder.decode(StreamerData.self, from: data) {
@@ -43,8 +35,7 @@ class StreamerListViewModel: ObservableObject {
     
     func updateTopStreamers(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?first=100")!, headers: headers) {
-            let decoder = JSONDecoder()
+        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?first=25")!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             do {
@@ -57,16 +48,25 @@ class StreamerListViewModel: ObservableObject {
         }
     }
     
+    func getStreamer(login: String, token: String) async -> [StreamerInfo] {
+        let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
+        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?user_login=\(login)")!, headers: headers) {
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                let result = try decoder.decode(StreamerData.self, from: data)
+                return result.data
+            } catch {
+                print("Failed to parse top streamers.")
+            }
+        }
+        return []
+    }
+    
     func loadThumbnails() {
         for i in streamers.indices {
-            DispatchQueue.main.async {
-                let url = self.streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "")
-                async {
-                    if let thumbnailData = await Request.perform(.GET, to: URL(string: url)!) {
-                        self.streamers[i].thumbnail = thumbnailData
-                    }
-                }
-            }
+            let url = streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "-1024x576")
+            streamers[i].thumbnailUrl = url
         }
     }
 }

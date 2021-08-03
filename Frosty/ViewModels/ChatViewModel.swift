@@ -7,23 +7,31 @@
 
 import Foundation
 import SwiftUI
+import FlexLayout
+import Nuke
+import FLAnimatedImage
+import Gifu
 
-// TODO: Add pinging so rooms last more than 5 min
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = [Message(name: "STATUS", message: "Connecting to chat...", tags: ["color":"#00FF00"])]
-    static private let websocketURL = URL(string: "wss://irc-ws.chat.twitch.tv:443")!
-    static private let session = URLSession.shared
+    private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
     var chatting: Bool = false
-    private let websocket = session.webSocketTask(with: websocketURL)
+    var assetToUrl: [String:URL] = [:]
+
     
     func start(token: String, user: String, streamer: StreamerInfo) async {
-        // TODO: Make these throw and run concurrently (async let). Perhaps async let and await an array of result?
+        async let globalAssets: [String:URL] = ChatManager.getGlobalAssets(token: token)
+        async let channelAssets: [String:URL] = ChatManager.getChannelAssets(token: token, id: streamer.userId)
         
+        let assetsToUrl = await [globalAssets, channelAssets]
+        
+        for registry in assetsToUrl {
+            assetToUrl.merge(registry) {(_,new) in new}
+        }
+                
         print("Starting chat!")
-        await ChatManager.getGlobalAssets(token: token)
-        await ChatManager.getChannelAssets(token: token, id: streamer.userId)
         
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
@@ -106,7 +114,6 @@ class ChatViewModel: ObservableObject {
         print("Ending chat")
         websocket.cancel(with: .goingAway, reason: nil)
         messages.removeAll()
-        CacheManager.cache.removeAllObjects()
     }
     
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
@@ -144,46 +151,33 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    func beautify(_ message: Message) -> Text {
-        if message.name == "STATUS" {
-            return Text(message.message)
-        }
-        
+    func beautify(_ message: Message) -> [String] {
+
+        var testReg: [String] = []
+
         var split = message.message.components(separatedBy: " ")
         split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
         
-        var result = Text("")
         
         if let badges = message.tags["badges"] {
             for badge in badges.components(separatedBy: ",") {
-                if let cachedVersion = CacheManager.cache.object(forKey: NSString(string: badge)) {
-                    let badgeData = Data(referencing: cachedVersion)
-                    result = result + Text(Image(uiImage: UIImage(data: badgeData)!)) + Text(" ")
+                if let url = assetToUrl[badge] {
+                    testReg.append("}"+url.absoluteString)
                 }
             }
         }
         
-        var hexColor = hexStringToUIColor(hex: "#737373")
+        testReg.append(message.name + ": ")
         
-        if let color = message.tags["color"] {
-            hexColor = hexStringToUIColor(hex: color)
-        }
-        
-        result = result + Text("\(message.name):").bold().foregroundColor(Color(uiColor: hexColor))
-        
-        var hits: [String:Data] = [:]
         for word in split {
-            if let emoteData = hits[word] {
-                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-            } else if let cachedVersion = CacheManager.cache.object(forKey: NSString(string: word)) {
-                let emoteData = Data(referencing: cachedVersion)
-                result = result + Text(" ") + Text(Image(uiImage: UIImage(data: emoteData)!))
-                hits[word] = emoteData
+            if let url = assetToUrl[word] {
+                testReg.append("}"+url.absoluteString)
             } else {
-                result = result + Text(" ") + Text(word)
+                testReg.append(word + " ")
             }
         }
-        return result
+        // print(testReg)
+        return testReg
     }
     
     func hexStringToUIColor (hex:String) -> UIColor {
@@ -206,5 +200,110 @@ class ChatViewModel: ObservableObject {
             blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
             alpha: CGFloat(1.0)
         )
+    }
+}
+
+class FlexMessageView: UIView {
+    private let rootFlexContainer = UIView()
+    private var size: CGSize?
+    private var height: CGFloat = 0
+    
+    init(words: [String], size: CGSize) {
+        super.init(frame: .zero)
+        self.size = size
+        addSubview(rootFlexContainer)
+        
+        var imageOptions = ImageLoadingOptions(
+            placeholder: UIImage(systemName: "circle")!
+        )
+                            
+        imageOptions.processors = [ImageProcessors.Resize(height: 20)]
+        
+        rootFlexContainer.flex.direction(.row).wrap(.wrap).alignItems(.center).define { flex in
+            for word in words {
+                if word.starts(with: "}") {
+                    
+                    let url = URL(string: word.replacingOccurrences(of: "}", with: ""))!
+
+                    let imageView = GIFImageView()
+                    
+                    Nuke.loadImage(with: url, options: imageOptions, into: imageView)
+                    
+                    flex.addItem(imageView)
+                    
+                } else {
+                    let labelView = UILabel()
+                    labelView.font = UIFont.preferredFont(forTextStyle: .footnote)
+                    labelView.text = word
+                    flex.addItem(labelView)
+                    
+                }
+            }
+        }
+        let lines = ceil(rootFlexContainer.flex.intrinsicSize.width / size.width)
+        height = lines * rootFlexContainer.flex.intrinsicSize.height
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+
+        super.layoutSubviews()
+        
+        rootFlexContainer.frame = CGRect(x: 0, y: 0, width: size!.width, height: 0)
+        rootFlexContainer.flex.layout(mode: .adjustHeight)
+                
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: size!.width, height: height)
+    }
+    
+
+}
+
+struct FlexMessage: UIViewRepresentable {
+    let words: [String]
+    let size: CGSize
+        
+    typealias UIViewControllerType = UIView
+    
+    func updateUIView(_ uiView: UIView, context: Context) {
+    }
+    
+    func makeUIView(context: Context) -> UIView {
+        let newView = FlexMessageView(words: words, size: size)
+        newView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        return newView
+    }
+    
+}
+
+
+extension GIFImageView {
+    open override func nuke_display(image: UIImage?, data: Data?) {
+        guard image != nil else {
+            self.image = nil
+            return
+        }
+        if let data = data {
+            // Display poster image immediately
+            self.image = image
+
+            // Prepare FLAnimatedImage object asynchronously (it takes a
+            // noticeable amount of time), and start playback.
+            DispatchQueue.global().async {
+                DispatchQueue.main.async {
+                    // If view is still displaying the same image
+                    if self.image === image {
+                        self.animate(withGIFData: data)
+                    }
+                }
+            }
+        } else {
+            self.image = image
+        }
     }
 }

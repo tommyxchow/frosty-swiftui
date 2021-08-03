@@ -8,15 +8,19 @@
 import SwiftUI
 
 struct MessageView: View {
-    let message: Message
     @ObservedObject var viewModel: ChatViewModel
+    let message: [String]
+    let size: CGSize
+        
     var body: some View {
-        viewModel.beautify(message)
+        FlexMessage(words: message, size: size)
     }
 }
 
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageView(message: Message(name: "Bob", message: "hello", tags: [:]), viewModel: ChatViewModel())
+        MessageView(viewModel: ChatViewModel(), message: ["test"], size: .zero)
     }
 }
+
+

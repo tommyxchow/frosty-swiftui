@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,18 +16,24 @@
 		C606733626645B6500B1C46C /* StreamerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733526645B6500B1C46C /* StreamerListView.swift */; };
 		C606733826654DB500B1C46C /* VideoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733726654DB400B1C46C /* VideoChatView.swift */; };
 		C606733A2665732100B1C46C /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60673392665732100B1C46C /* ChatView.swift */; };
-		C60D0B37267E58C9006246F1 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60D0B36267E58C9006246F1 /* CacheManager.swift */; };
 		C625AE04268B632800194105 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = C625AE03268B632800194105 /* Video.swift */; };
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
 		C6363A5A2670153B00C47A7E /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A592670153A00C47A7E /* LoginViewModel.swift */; };
 		C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A5B2670289A00C47A7E /* SettingsView.swift */; };
+		C64B44FB26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin in Frameworks */ = {isa = PBXBuildFile; productRef = C64B44FA26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin */; };
+		C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C64B450326B6502400A7BBB9 /* NukeUI */; };
 		C64C277E2670A5A700719BCF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64C277D2670A5A700719BCF /* Authentication.swift */; };
+		C65299AC26B8CAB400C854CF /* SwiftyGif in Frameworks */ = {isa = PBXBuildFile; productRef = C65299AB26B8CAB400C854CF /* SwiftyGif */; };
 		C672E005266CA9D200737AD6 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C672E004266CA9D200737AD6 /* README.md */; };
 		C6A6144226697B32003508D8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144126697B32003508D8 /* User.swift */; };
 		C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A61445266987A0003508D8 /* StreamerListViewModel.swift */; };
 		C6A6144826698873003508D8 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144726698873003508D8 /* Request.swift */; };
 		C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144D266C44DC003508D8 /* ChatViewModel.swift */; };
 		C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */; };
+		C6E9091026B4DCFB00E87164 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E9090F26B4DCFB00E87164 /* TestView.swift */; };
+		C6ED086B26B3715B008ABAF2 /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086A26B3715B008ABAF2 /* FlexLayout */; };
+		C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */; };
+		C6ED086F26B3715B008ABAF2 /* FlexLayoutYogaKit in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */; };
 		C6F09CB2267CCA4C001451FE /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB1267CCA4C001451FE /* Badges.swift */; };
 		C6F09CB4267E19DA001451FE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB3267E19DA001451FE /* Message.swift */; };
 		C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B0C2678A33300471B73 /* Emotes.swift */; };
@@ -47,7 +53,6 @@
 		C606733526645B6500B1C46C /* StreamerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListView.swift; sourceTree = "<group>"; };
 		C606733726654DB400B1C46C /* VideoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoChatView.swift; sourceTree = "<group>"; };
 		C60673392665732100B1C46C /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
-		C60D0B36267E58C9006246F1 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		C625AE03268B632800194105 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		C6363A54266D40E000C47A7E /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		C6363A592670153A00C47A7E /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
@@ -59,6 +64,7 @@
 		C6A6144726698873003508D8 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		C6A6144D266C44DC003508D8 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLoggedInView.swift; sourceTree = "<group>"; };
+		C6E9090F26B4DCFB00E87164 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		C6F09CB1267CCA4C001451FE /* Badges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		C6F09CB3267E19DA001451FE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		C6F48B0C2678A33300471B73 /* Emotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emotes.swift; sourceTree = "<group>"; };
@@ -71,6 +77,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C64B44FB26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin in Frameworks */,
+				C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */,
+				C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */,
+				C6ED086F26B3715B008ABAF2 /* FlexLayoutYogaKit in Frameworks */,
+				C6ED086B26B3715B008ABAF2 /* FlexLayout in Frameworks */,
+				C65299AC26B8CAB400C854CF /* SwiftyGif in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,7 +154,7 @@
 				C6363A54266D40E000C47A7E /* VideoView.swift */,
 				C60673392665732100B1C46C /* ChatView.swift */,
 				C6F48B0E2678B81D00471B73 /* MessageView.swift */,
-				C6363A56266D80C200C47A7E /* TestView.swift */,
+				C6E9090F26B4DCFB00E87164 /* TestView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -152,7 +164,6 @@
 			children = (
 				C6F48B10267A214700471B73 /* ChatManager.swift */,
 				C6A6144726698873003508D8 /* Request.swift */,
-				C60D0B36267E58C9006246F1 /* CacheManager.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -184,6 +195,14 @@
 			dependencies = (
 			);
 			name = Frosty;
+			packageProductDependencies = (
+				C6ED086A26B3715B008ABAF2 /* FlexLayout */,
+				C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */,
+				C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */,
+				C64B44FA26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin */,
+				C64B450326B6502400A7BBB9 /* NukeUI */,
+				C65299AB26B8CAB400C854CF /* SwiftyGif */,
+			);
 			productName = Frosty;
 			productReference = C606731C26641A3E00B1C46C /* Frosty.app */;
 			productType = "com.apple.product-type.application";
@@ -211,6 +230,12 @@
 				Base,
 			);
 			mainGroup = C606731326641A3E00B1C46C;
+			packageReferences = (
+				C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */,
+				C64B44F926B6238E00A7BBB9 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */,
+				C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */,
+				C65299AA26B8CAB400C854CF /* XCRemoteSwiftPackageReference "SwiftyGif" */,
+			);
 			productRefGroup = C606731D26641A3E00B1C46C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -238,8 +263,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C60D0B37267E58C9006246F1 /* CacheManager.swift in Sources */,
-				C6363A57266D80C200C47A7E /* TestView.swift in Sources */,
 				C606733626645B6500B1C46C /* StreamerListView.swift in Sources */,
 				C606732226641A3E00B1C46C /* MainView.swift in Sources */,
 				C606733826654DB500B1C46C /* VideoChatView.swift in Sources */,
@@ -259,6 +282,7 @@
 				C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */,
 				C6F09CB4267E19DA001451FE /* Message.swift in Sources */,
 				C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */,
+				C6E9091026B4DCFB00E87164 /* TestView.swift in Sources */,
 				C60673302664373B00B1C46C /* Streamer.swift in Sources */,
 				C6A6144226697B32003508D8 /* User.swift in Sources */,
 				C6363A55266D40E000C47A7E /* VideoView.swift in Sources */,
@@ -313,6 +337,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = "FLEXLAYOUT_SWIFT_PACKAGE=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -322,10 +347,12 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				NEW_SETTING = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = "";
 			};
 			name = Debug;
 		};
@@ -377,9 +404,11 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				NEW_SETTING = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -450,6 +479,74 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C64B44F926B6238E00A7BBB9 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke-FLAnimatedImage-Plugin.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/NukeUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.6;
+			};
+		};
+		C65299AA26B8CAB400C854CF /* XCRemoteSwiftPackageReference "SwiftyGif" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kirualex/SwiftyGif.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/layoutBox/FlexLayout.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C64B44FA26B6238F00A7BBB9 /* NukeFLAnimatedImagePlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C64B44F926B6238E00A7BBB9 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */;
+			productName = NukeFLAnimatedImagePlugin;
+		};
+		C64B450326B6502400A7BBB9 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */;
+			productName = NukeUI;
+		};
+		C65299AB26B8CAB400C854CF /* SwiftyGif */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C65299AA26B8CAB400C854CF /* XCRemoteSwiftPackageReference "SwiftyGif" */;
+			productName = SwiftyGif;
+		};
+		C6ED086A26B3715B008ABAF2 /* FlexLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */;
+			productName = FlexLayout;
+		};
+		C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */;
+			productName = FlexLayoutYoga;
+		};
+		C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */;
+			productName = FlexLayoutYogaKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C606731426641A3E00B1C46C /* Project object */;
 }

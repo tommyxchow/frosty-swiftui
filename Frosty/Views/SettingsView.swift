@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Nuke
 
 struct SettingsView: View {
     @EnvironmentObject private var authHandler: Authentication
@@ -22,9 +23,9 @@ struct SettingsView: View {
                 }, label: {
                     Text("Login")
                 })
-                    .controlProminence(.increased)
+                    .buttonStyle(.borderedProminent)
                 Button(action: {
-                    CacheManager.clearCache()
+                    ImageCache.shared.removeAll()
                 }, label: {
                     Text("Clear Cache")
                 })

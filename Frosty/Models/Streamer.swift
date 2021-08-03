@@ -26,8 +26,6 @@ struct StreamerInfo: Decodable {
     var thumbnailUrl: String
     var tagIds: [String]
     var isMature: Bool
-    
-    var thumbnail: Data?
 }
 
 extension StreamerInfo {
