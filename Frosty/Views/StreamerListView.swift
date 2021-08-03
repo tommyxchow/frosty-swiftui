@@ -14,53 +14,56 @@ struct StreamerListView: View {
     @State private var searchedStreamers: [StreamerInfo] = []
     
     var body: some View {
-        List {
-            ForEach(filteredStreamers, id: \.userName) { streamer in
-                NavigationLink(destination: VideoChatView(streamer: streamer)) {
-                    StreamerCardView(streamer: streamer)
-                }
-                .listRowSeparator(.hidden)
-            }
-            if filteredStreamers.isEmpty {
-                ForEach(searchedStreamers, id:\.userName) { streamer in
+        ScrollViewReader { scrollProxy in
+            List {
+                ForEach(filteredStreamers, id: \.userName) { streamer in
                     NavigationLink(destination: VideoChatView(streamer: streamer)) {
                         StreamerCardView(streamer: streamer)
                     }
                     .listRowSeparator(.hidden)
                 }
+                if streamerListVM.loaded, streamerListVM.cursor != nil, search.isEmpty {
+                    ProgressView()
+                        .task {
+                            await streamerListVM.updateTopStreamers(token: auth.userToken!)
+                        }
+                }
+                if filteredStreamers.isEmpty {
+                    ForEach(searchedStreamers, id:\.userName) { streamer in
+                        NavigationLink(destination: VideoChatView(streamer: streamer)) {
+                            StreamerCardView(streamer: streamer)
+                        }
+                        .listRowSeparator(.hidden)
+                    }
+                }
             }
-        }
-        .listStyle(.grouped)
-        .navigationTitle("Live")
-        .task {
-            await streamerListVM.update(auth: auth)
-        }
-        .onChange(of: auth.user) { value in
-            Task {
+            .listStyle(.grouped)
+            .navigationTitle("Live")
+            .task {
                 await streamerListVM.update(auth: auth)
             }
-        }
-        .refreshable {
-            await streamerListVM.update(auth: auth)
-        }
-        .searchable(text: $search, prompt: "Search")
-        .disableAutocorrection(true)
-        .textInputAutocapitalization(.never)
-        .onSubmit(of: .search) {
-            Task {
-                print("finding streamers")
-                var streamers = await streamerListVM.getStreamer(login: search, token: auth.userToken!)
-                print(streamers)
-                for i in streamers.indices {
-                    let url = streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "-1024x576")
-                    streamers[i].thumbnailUrl = url
+            .onChange(of: auth.user) { value in
+                Task {
+                    await streamerListVM.update(auth: auth)
                 }
-                searchedStreamers = streamers
             }
-        }
-        .onChange(of: search) { newValue in
-            if newValue.isEmpty {
-                searchedStreamers.removeAll()
+            .refreshable {
+                await streamerListVM.update(auth: auth)
+            }
+            .searchable(text: $search, prompt: "Search")
+            .disableAutocorrection(true)
+            .textInputAutocapitalization(.never)
+            .onSubmit(of: .search) {
+                Task {
+                    print("finding streamers")
+                    let streamers = await streamerListVM.getStreamer(login: search, token: auth.userToken!)
+                    searchedStreamers = streamers
+                }
+            }
+            .onChange(of: search) { newValue in
+                if newValue.isEmpty {
+                    searchedStreamers.removeAll()
+                }
             }
         }
     }

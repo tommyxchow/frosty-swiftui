@@ -9,7 +9,9 @@ import Foundation
 
 class StreamerListViewModel: ObservableObject {
     @Published var streamers: [StreamerInfo] = []
-    let decoder = JSONDecoder()
+    private let decoder = JSONDecoder()
+    var loaded = false
+    var cursor: String?
     
     func update(auth: Authentication) async {
         if let token = auth.userToken {
@@ -17,6 +19,7 @@ class StreamerListViewModel: ObservableObject {
         } else {
             await auth.getDefaultToken()
         }
+        loaded = true
     }
     
     func updateFollowedStreamers(id: String, token: String) async {
@@ -25,8 +28,7 @@ class StreamerListViewModel: ObservableObject {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             if let result = try? decoder.decode(StreamerData.self, from: data) {
-                streamers = result.data
-                loadThumbnails()
+                streamers.append(contentsOf: result.data)
             } else {
                 print("Failed to parse followed streamers.")
             }
@@ -35,13 +37,19 @@ class StreamerListViewModel: ObservableObject {
     
     func updateTopStreamers(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?first=25")!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: (cursor == nil) ? "https://api.twitch.tv/helix/streams" : "https://api.twitch.tv/helix/streams?after=\(cursor!)")!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            print(String(data: data, encoding: .utf8)!)
             
             do {
                 let result = try decoder.decode(StreamerData.self, from: data)
-                streamers = result.data
-                loadThumbnails()
+                streamers.append(contentsOf: result.data)
+                if let newCursor = result.pagination.cursor {
+                    cursor = newCursor
+                } else {
+                    cursor = nil
+                }
             } catch {
                 print("Failed to parse top streamers.")
             }
@@ -61,12 +69,5 @@ class StreamerListViewModel: ObservableObject {
             }
         }
         return []
-    }
-    
-    func loadThumbnails() {
-        for i in streamers.indices {
-            let url = streamers[i].thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "-1024x576")
-            streamers[i].thumbnailUrl = url
-        }
     }
 }

@@ -9,23 +9,28 @@ import Foundation
 
 struct StreamerData: Decodable {
     let data: [StreamerInfo]
+    let pagination: Pagination
+}
+
+struct Pagination: Decodable {
+    let cursor: String?
 }
 
 struct StreamerInfo: Decodable {
-    var id: String
-    var userId: String
-    var userLogin: String
-    var userName: String
-    var gameId: String
-    var gameName: String
-    var type: String
-    var title: String
-    var viewerCount: Int
-    var startedAt: String
-    var language: String
+    let id: String
+    let userId: String
+    let userLogin: String
+    let userName: String
+    let gameId: String
+    let gameName: String
+    let type: String
+    let title: String
+    let viewerCount: Int
+    let startedAt: String
+    let language: String
     var thumbnailUrl: String
-    var tagIds: [String]
-    var isMature: Bool
+    let tagIds: [String]
+    let isMature: Bool
 }
 
 extension StreamerInfo {

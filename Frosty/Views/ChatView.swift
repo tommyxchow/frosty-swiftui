@@ -14,19 +14,19 @@ struct ChatView: View {
     @State private var autoScroll = true
     
     var body: some View {
-        GeometryReader { proxy in
-            ScrollViewReader { scrollView in
+        GeometryReader { geoProxy in
+            ScrollViewReader { scrollProxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 10.0) {
                         ForEach(viewModel.messages, id: \.self) { message in
                             if let triple = message {
-                                MessageView(viewModel: viewModel, message: viewModel.beautify(triple), size: proxy.size)
+                                MessageView(viewModel: viewModel, message: viewModel.beautify(triple), size: geoProxy.size)
                             }
                         }
                     }
                     .onChange(of: viewModel.messages) { value in
                         if viewModel.messages.count > 0, autoScroll {
-                            scrollView.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                            scrollProxy.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
                         }
                     }
                 }
