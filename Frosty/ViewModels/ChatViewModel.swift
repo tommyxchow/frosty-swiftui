@@ -225,7 +225,7 @@ class FlexMessageView: UIView {
                     
                     let url = URL(string: word.replacingOccurrences(of: "}", with: ""))!
 
-                    let imageView = FLAnimatedImageView()
+                    let imageView = GIFImageView()
                     
                     Nuke.loadImage(with: url, options: imageOptions, into: imageView)
                     

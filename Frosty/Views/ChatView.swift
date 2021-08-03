@@ -14,8 +14,8 @@ struct ChatView: View {
     @State private var autoScroll = true
     
     var body: some View {
-        ScrollViewReader { scrollView in
-            GeometryReader { proxy in
+        GeometryReader { proxy in
+            ScrollViewReader { scrollView in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 10.0) {
                         ForEach(viewModel.messages, id: \.self) { message in

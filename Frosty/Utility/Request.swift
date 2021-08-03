@@ -52,8 +52,9 @@ struct Request {
         switch requestedDataType {
         case .emoteTwitchGlobal, .emoteTwitchChannel:
             let result = try decoder.decode(EmoteDataTwitch.self, from: data)
+            print(result)
             for emote in result.data {
-                registry[emote.name] = URL(string: emote.images.url_4x)!
+                registry[emote.name] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emote.id)/default/dark/3.0")!
             }
             print("Cached Twitch emotes")
         case .emoteBTTVGlobal:
