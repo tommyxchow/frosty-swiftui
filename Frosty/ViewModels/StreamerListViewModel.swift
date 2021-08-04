@@ -27,12 +27,13 @@ class StreamerListViewModel: ObservableObject {
     
     func updateFollowedStreamers(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        let url = "https://api.twitch.tv/helix/streams/followed?user_id=\(id)"
+        let url = "https://api.twitch.tv/helix/streams/followed?first=10&user_id=\(id)"
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             do {
                 let result = try decoder.decode(StreamerData.self, from: data)
+                print(result)
                 streamers = result.data
                 cursor = result.pagination.cursor
             } catch {
@@ -43,7 +44,7 @@ class StreamerListViewModel: ObservableObject {
     
     func updateTopStreamers(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        let url = "https://api.twitch.tv/helix/streams"
+        let url = "https://api.twitch.tv/helix/streams?first=10"
         
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -58,10 +59,17 @@ class StreamerListViewModel: ObservableObject {
         }
     }
     
-    func getMoreStreamers(token: String) async {
+    func getMoreStreamers(token: String, type: StreamType) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-
-        let url = "https://api.twitch.tv/helix/streams?after=\(cursor!)"
+        
+        let url: String
+        
+        switch type {
+        case .top:
+            url = "https://api.twitch.tv/helix/streams?first=10&after=\(cursor!)"
+        case .followed(let id):
+            url = "https://api.twitch.tv/helix/streams/followed?user_id=\(id)&first=10&after=\(cursor!)"
+        }
         
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -94,4 +102,9 @@ class StreamerListViewModel: ObservableObject {
         }
         return []
     }
+}
+
+enum StreamType {
+    case top
+    case followed(id: String)
 }

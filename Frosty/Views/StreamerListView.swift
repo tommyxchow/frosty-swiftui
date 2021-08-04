@@ -25,7 +25,8 @@ struct StreamerListView: View {
                 if streamerListVM.loaded, streamerListVM.cursor != nil, search.isEmpty {
                     ProgressView()
                         .task {
-                            await streamerListVM.getMoreStreamers(token: auth.userToken!)
+                            let type: StreamType = auth.isLoggedIn ? .followed(id: auth.user!.id) : .top
+                            await streamerListVM.getMoreStreamers(token: auth.userToken!, type: type)
                         }
                 }
                 if filteredStreamers.isEmpty {
@@ -38,7 +39,7 @@ struct StreamerListView: View {
                 }
             }
             .listStyle(.grouped)
-            .navigationTitle("top streams")
+            .navigationTitle(auth.isLoggedIn ? "Followed Streams" : "Top Streams")
             .searchable(text: $search, prompt: "Search")
             .disableAutocorrection(true)
             .textInputAutocapitalization(.never)
