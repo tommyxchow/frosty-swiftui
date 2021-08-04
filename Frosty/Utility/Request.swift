@@ -52,17 +52,14 @@ struct Request {
         switch requestedDataType {
         case .emoteTwitchGlobal, .emoteTwitchChannel:
             let result = try decoder.decode(EmoteDataTwitch.self, from: data)
-            print(result)
             for emote in result.data {
                 registry[emote.name] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emote.id)/default/dark/3.0")!
             }
-            print("Cached Twitch emotes")
         case .emoteBTTVGlobal:
             let result = try decoder.decode([EmoteBTTVGlobal].self, from: data)
             for emote in result {
                 registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
             }
-            print("Cached BTTV global emotes")
         case .emoteBTTVChannel:
             let result = try decoder.decode(EmoteBTTVChannel.self, from: data)
             for emote in result.channelEmotes {
@@ -71,13 +68,11 @@ struct Request {
             for emote in result.sharedEmotes {
                 registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
             }
-            print("Cached BTTV channel emotes")
         case .emoteFFZGlobal, .emoteFFZChannel:
             let result = try decoder.decode([EmotesFFZ].self, from: data)
             for emote in result {
                 registry[emote.code] = URL(string: "https://cdn.betterttv.net/frankerfacez_emote/\(emote.id)/4")!
             }
-            print("Cached FFZ emotes")
         case .badgeTwitchGlobal, .badgeTwitchChannel:
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -88,7 +83,6 @@ struct Request {
                     registry["\(badge.setId)/\(badgeVersion.id)"] = URL(string: badgeVersion.imageUrl4X)!
                 }
             }
-            print("Cached Twitch badges")
         }
         return registry
     }

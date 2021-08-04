@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 import FlexLayout
 import Nuke
-import FLAnimatedImage
 import Gifu
 
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
@@ -288,6 +287,7 @@ extension GIFImageView {
             self.image = nil
             return
         }
+        prepareForReuse()
         if let data = data {
             // Display poster image immediately
             self.image = image

@@ -15,9 +15,12 @@ class StreamerListViewModel: ObservableObject {
     
     func update(auth: Authentication) async {
         if let token = auth.userToken {
+            print("Token already got")
             auth.isLoggedIn ? await updateFollowedStreamers(id: auth.user!.id, token: token) : await updateTopStreamers(token: token)
         } else {
+            print("Getting default token")
             await auth.getDefaultToken()
+            await updateTopStreamers(token: auth.userToken!)
         }
         loaded = true
     }

@@ -10,7 +10,9 @@ import SwiftUI
 struct SettingsLoggedInView: View {
     let user: User
     var body: some View {
-        Text("Logged in as \(user.displayName)")
+        VStack {
+            Text("Logged in as \(user.displayName)")
+        }
     }
 }
 

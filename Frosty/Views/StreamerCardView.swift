@@ -14,7 +14,7 @@ struct StreamerCardView: View {
         ZStack {
             HStack {
                 LazyImage(source: URL(string: streamer.thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "-1024x576"))!, resizingMode: .aspectFit)
-                    .cornerRadius(10.0)
+                    .cornerRadius(20.0)
                 Spacer()
                 VStack(alignment: .leading, spacing: 5.0) {
                     Text(streamer.userName)

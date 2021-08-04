@@ -10,7 +10,6 @@ import Nuke
 
 struct SettingsView: View {
     @EnvironmentObject private var authHandler: Authentication
-    @StateObject private var loginVM: LoginViewModel = LoginViewModel()
     
     var body: some View {
         if let user = authHandler.user, authHandler.isLoggedIn {
@@ -19,7 +18,7 @@ struct SettingsView: View {
             VStack {
                 Text("You are not logged in")
                 Button(action: {
-                    loginVM.login(auth: authHandler)
+                    authHandler.login(auth: authHandler)
                 }, label: {
                     Text("Login")
                 })

@@ -38,7 +38,13 @@ struct StreamerListView: View {
                 }
             }
             .listStyle(.grouped)
-            .navigationTitle("Live")
+            .navigationTitle("top streams")
+            .searchable(text: $search, prompt: "Search")
+            .disableAutocorrection(true)
+            .textInputAutocapitalization(.never)
+            .refreshable {
+                await streamerListVM.update(auth: auth)
+            }
             .task {
                 await streamerListVM.update(auth: auth)
             }
@@ -47,22 +53,17 @@ struct StreamerListView: View {
                     await streamerListVM.update(auth: auth)
                 }
             }
-            .refreshable {
-                await streamerListVM.update(auth: auth)
+            .onChange(of: search) { newValue in
+                if newValue.isEmpty {
+                    searchedStreamers.removeAll()
+                }
             }
-            .searchable(text: $search, prompt: "Search")
-            .disableAutocorrection(true)
-            .textInputAutocapitalization(.never)
             .onSubmit(of: .search) {
                 Task {
                     print("finding streamers")
                     let streamers = await streamerListVM.getStreamer(login: search, token: auth.userToken!)
                     searchedStreamers = streamers
-                }
-            }
-            .onChange(of: search) { newValue in
-                if newValue.isEmpty {
-                    searchedStreamers.removeAll()
+                    print(streamers)
                 }
             }
         }
