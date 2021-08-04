@@ -25,7 +25,7 @@ struct StreamerListView: View {
                 if streamerListVM.loaded, streamerListVM.cursor != nil, search.isEmpty {
                     ProgressView()
                         .task {
-                            await streamerListVM.updateTopStreamers(token: auth.userToken!)
+                            await streamerListVM.getMoreStreamers(token: auth.userToken!)
                         }
                 }
                 if filteredStreamers.isEmpty {

@@ -24,12 +24,15 @@ class StreamerListViewModel: ObservableObject {
     
     func updateFollowedStreamers(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams/followed?user_id=\(id)")!, headers: headers) {
+        let url = "https://api.twitch.tv/helix/streams/followed?user_id=\(id)"
+        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
-            if let result = try? decoder.decode(StreamerData.self, from: data) {
-                streamers.append(contentsOf: result.data)
-            } else {
+            do {
+                let result = try decoder.decode(StreamerData.self, from: data)
+                streamers = result.data
+                cursor = result.pagination.cursor
+            } catch {
                 print("Failed to parse followed streamers.")
             }
         }
@@ -37,11 +40,29 @@ class StreamerListViewModel: ObservableObject {
     
     func updateTopStreamers(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: (cursor == nil) ? "https://api.twitch.tv/helix/streams" : "https://api.twitch.tv/helix/streams?after=\(cursor!)")!, headers: headers) {
+        let url = "https://api.twitch.tv/helix/streams"
+        
+        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-            
-            print(String(data: data, encoding: .utf8)!)
-            
+                        
+            do {
+                let result = try decoder.decode(StreamerData.self, from: data)
+                streamers = result.data
+                cursor = result.pagination.cursor
+            } catch {
+                print("Failed to parse top streamers.")
+            }
+        }
+    }
+    
+    func getMoreStreamers(token: String) async {
+        let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
+
+        let url = "https://api.twitch.tv/helix/streams?after=\(cursor!)"
+        
+        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+                        
             do {
                 let result = try decoder.decode(StreamerData.self, from: data)
                 streamers.append(contentsOf: result.data)
