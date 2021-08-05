@@ -6,31 +6,36 @@
 //
 
 import SwiftUI
+import NukeUI
 import Nuke
 
 struct SettingsView: View {
     @EnvironmentObject private var authHandler: Authentication
     
     var body: some View {
-        if let user = authHandler.user, authHandler.isLoggedIn {
-            SettingsLoggedInView(user: user)
-        } else {
-            VStack {
-                Text("You are not logged in")
-                Button(action: {
-                    authHandler.login(auth: authHandler)
-                }, label: {
-                    Text("Login")
-                })
-                    .buttonStyle(.borderedProminent)
-                Button(action: {
-                    ImageCache.shared.removeAll()
-                }, label: {
-                    Text("Clear Cache")
-                })
+        List {
+            Section("Current User") {
+                if let user = authHandler.user, authHandler.isLoggedIn {
+                    HStack {
+                        LazyImage(source: user.profileImageUrl, resizingMode: .aspectFit)
+                            .frame(width: 30)
+                        Text(user.displayName)
+                    }
+                    Button("Log Out") {
+                    }
+                } else {
+                    Button("Login") {
+                        authHandler.login(auth: authHandler)
+                    }
+                }
             }
-            .buttonStyle(.bordered)
+            Section("Settings") {
+                Button("Clear Image Cache") {
+                    ImageCache.shared.removeAll()
+                }
+            }
         }
+        .navigationTitle("Settings")
     }
 }
 
@@ -40,3 +45,5 @@ struct SettingsView_Previews: PreviewProvider {
             .environmentObject(Authentication())
     }
 }
+
+// User(id: "888", login: "Clamfucius", displayName: "Clamfucius", type: "", broadcasterType: "", description: "", profileImageUrl: "https://static-cdn.jtvnw.net/user-default-pictures-uv/ead5c8b2-a4c9-4724-b1dd-9f00b46cbd3d-profile_image-300x300.png", offlineImageUrl: "", viewCount: 888, createdAt: "")

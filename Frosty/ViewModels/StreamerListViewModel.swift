@@ -12,6 +12,7 @@ class StreamerListViewModel: ObservableObject {
     @Published var searchedStreamers = [StreamerInfo]()
     @Published var search = ""
     @Published var currentlyDisplaying: StreamType = .top
+    @Published var alertIsPresented = false
     
     private let decoder = JSONDecoder()
     

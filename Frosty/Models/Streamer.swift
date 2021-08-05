@@ -16,7 +16,7 @@ struct Pagination: Decodable {
     let cursor: String?
 }
 
-struct StreamerInfo: Decodable {
+struct StreamerInfo: Decodable, Hashable {
     let id: String
     let userId: String
     let userLogin: String

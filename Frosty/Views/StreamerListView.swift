@@ -35,7 +35,7 @@ struct StreamerListView: View {
                     .listRowSeparator(.hidden)
                 }
             }
-            .listStyle(.grouped)
+            .listStyle(.inset)
             .navigationTitle(viewModel.navigationTitle)
             .searchable(text: $viewModel.search, prompt: "Search")
             .disableAutocorrection(true)
@@ -45,11 +45,6 @@ struct StreamerListView: View {
             }
             .task {
                 await viewModel.update(auth: auth)
-            }
-            .onChange(of: auth.user) { value in
-                Task {
-                    await viewModel.update(auth: auth)
-                }
             }
             .onChange(of: viewModel.search) { newValue in
                 if newValue.isEmpty {
@@ -62,6 +57,30 @@ struct StreamerListView: View {
                     let streamers = await viewModel.getStreamer(login: viewModel.search, token: auth.userToken!)
                     viewModel.searchedStreamers = streamers
                     print(streamers)
+                }
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Spacer()
+                    Button("Top") {
+                        viewModel.currentlyDisplaying = .top
+                        Task {
+                            await viewModel.update(auth: auth)
+                        }
+                    }
+                    Button("Followed") {
+                        if let user = auth.user {
+                            viewModel.currentlyDisplaying = .followed(id: user.id)
+                            Task {
+                                await viewModel.update(auth: auth)
+                            }
+                        } else {
+                            print("Not logged in")
+                        }
+                    }
+                    Button("Games") {
+                        
+                    }
                 }
             }
         }

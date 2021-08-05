@@ -21,6 +21,7 @@
 		C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A5B2670289A00C47A7E /* SettingsView.swift */; };
 		C63E426F26BB002900A3E743 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = C63E426E26BB002900A3E743 /* KeychainAccess */; };
 		C63E427226BB299E00A3E743 /* SwiftUIX in Frameworks */ = {isa = PBXBuildFile; productRef = C63E427126BB299E00A3E743 /* SwiftUIX */; };
+		C63E427526BB599500A3E743 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C63E427426BB599500A3E743 /* Introspect */; };
 		C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C64B450326B6502400A7BBB9 /* NukeUI */; };
 		C64C277E2670A5A700719BCF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64C277D2670A5A700719BCF /* Authentication.swift */; };
 		C65299AC26B8CAB400C854CF /* SwiftyGif in Frameworks */ = {isa = PBXBuildFile; productRef = C65299AB26B8CAB400C854CF /* SwiftyGif */; };
@@ -29,7 +30,6 @@
 		C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A61445266987A0003508D8 /* StreamerListViewModel.swift */; };
 		C6A6144826698873003508D8 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144726698873003508D8 /* Request.swift */; };
 		C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A6144D266C44DC003508D8 /* ChatViewModel.swift */; };
-		C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */; };
 		C6E9091026B4DCFB00E87164 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E9090F26B4DCFB00E87164 /* TestView.swift */; };
 		C6ED086B26B3715B008ABAF2 /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086A26B3715B008ABAF2 /* FlexLayout */; };
 		C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */ = {isa = PBXBuildFile; productRef = C6ED086C26B3715B008ABAF2 /* FlexLayoutYoga */; };
@@ -62,7 +62,6 @@
 		C6A61445266987A0003508D8 /* StreamerListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListViewModel.swift; sourceTree = "<group>"; };
 		C6A6144726698873003508D8 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		C6A6144D266C44DC003508D8 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
-		C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLoggedInView.swift; sourceTree = "<group>"; };
 		C6E9090F26B4DCFB00E87164 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		C6F09CB1267CCA4C001451FE /* Badges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		C6F09CB3267E19DA001451FE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
@@ -81,6 +80,7 @@
 				C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */,
 				C63E426F26BB002900A3E743 /* KeychainAccess in Frameworks */,
 				C6ED086F26B3715B008ABAF2 /* FlexLayoutYogaKit in Frameworks */,
+				C63E427526BB599500A3E743 /* Introspect in Frameworks */,
 				C6ED086B26B3715B008ABAF2 /* FlexLayout in Frameworks */,
 				C65299AC26B8CAB400C854CF /* SwiftyGif in Frameworks */,
 			);
@@ -149,7 +149,6 @@
 				C606733526645B6500B1C46C /* StreamerListView.swift */,
 				C606733326644D8A00B1C46C /* StreamerCardView.swift */,
 				C6363A5B2670289A00C47A7E /* SettingsView.swift */,
-				C6D57D4326713D7400071C77 /* SettingsLoggedInView.swift */,
 				C606733726654DB400B1C46C /* VideoChatView.swift */,
 				C6363A54266D40E000C47A7E /* VideoView.swift */,
 				C60673392665732100B1C46C /* ChatView.swift */,
@@ -202,6 +201,7 @@
 				C65299AB26B8CAB400C854CF /* SwiftyGif */,
 				C63E426E26BB002900A3E743 /* KeychainAccess */,
 				C63E427126BB299E00A3E743 /* SwiftUIX */,
+				C63E427426BB599500A3E743 /* Introspect */,
 			);
 			productName = Frosty;
 			productReference = C606731C26641A3E00B1C46C /* Frosty.app */;
@@ -236,6 +236,7 @@
 				C65299AA26B8CAB400C854CF /* XCRemoteSwiftPackageReference "SwiftyGif" */,
 				C63E426D26BB002900A3E743 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				C63E427026BB299E00A3E743 /* XCRemoteSwiftPackageReference "SwiftUIX" */,
+				C63E427326BB599500A3E743 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			productRefGroup = C606731D26641A3E00B1C46C /* Products */;
 			projectDirPath = "";
@@ -273,7 +274,6 @@
 				C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */,
 				C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */,
 				C6F09CB2267CCA4C001451FE /* Badges.swift in Sources */,
-				C6D57D4426713D7400071C77 /* SettingsLoggedInView.swift in Sources */,
 				C6F48B11267A214700471B73 /* ChatManager.swift in Sources */,
 				C625AE04268B632800194105 /* Video.swift in Sources */,
 				C64C277E2670A5A700719BCF /* Authentication.swift in Sources */,
@@ -497,6 +497,14 @@
 				minimumVersion = 0.0.8;
 			};
 		};
+		C63E427326BB599500A3E743 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.3;
+			};
+		};
 		C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/NukeUI.git";
@@ -533,6 +541,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C63E427026BB299E00A3E743 /* XCRemoteSwiftPackageReference "SwiftUIX" */;
 			productName = SwiftUIX;
+		};
+		C63E427426BB599500A3E743 /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C63E427326BB599500A3E743 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
 		};
 		C64B450326B6502400A7BBB9 /* NukeUI */ = {
 			isa = XCSwiftPackageProductDependency;

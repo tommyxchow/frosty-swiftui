@@ -14,32 +14,13 @@ struct MainView: View {
         NavigationView {
             StreamerListView()
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            isPresented = true
-                        }, label: {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        NavigationLink(destination: SettingsView()) {
                             Label("Settings", systemImage: "gearshape")
-                        })
+                        }
                     }
                 }
         }
-        .sheet(isPresented: $isPresented, content: {
-            NavigationView {
-                SettingsView()
-                    .onAppear {
-                        print("Settings")
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button(action: {
-                                isPresented = false
-                            }, label: {
-                                Text("Dismiss")
-                            })
-                        }
-                    }
-            }
-        })
     }
 }
 
