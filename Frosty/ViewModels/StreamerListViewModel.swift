@@ -8,15 +8,40 @@
 import Foundation
 
 class StreamerListViewModel: ObservableObject {
-    @Published var streamers: [StreamerInfo] = []
+    @Published var streamers = [StreamerInfo]()
+    @Published var searchedStreamers = [StreamerInfo]()
+    @Published var search = ""
+    @Published var currentlyDisplaying: StreamType = .top
+    
     private let decoder = JSONDecoder()
+    
     var loaded = false
     var cursor: String?
+    var navigationTitle: String {
+        switch currentlyDisplaying {
+        case .top:
+            return "Top Streams"
+        case .followed:
+            return "Followed Streams"
+        }
+    }
+    var filteredStreamers: [StreamerInfo] {
+        if search.isEmpty {
+            return streamers
+        } else {
+            return streamers.filter { $0.userLogin.contains(search.lowercased()) }
+        }
+    }
     
     func update(auth: Authentication) async {
         if let token = auth.userToken {
             print("Token already got")
-            auth.isLoggedIn ? await updateFollowedStreamers(id: auth.user!.id, token: token) : await updateTopStreamers(token: token)
+            switch currentlyDisplaying {
+            case .top:
+                await updateTopStreamers(token: token)
+            case .followed(let id):
+                await updateFollowedStreamers(id: id, token: token)
+            }
         } else {
             print("Getting default token")
             await auth.getDefaultToken()

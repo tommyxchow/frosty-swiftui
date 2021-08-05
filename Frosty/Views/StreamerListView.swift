@@ -9,72 +9,61 @@ import SwiftUI
 
 struct StreamerListView: View {
     @EnvironmentObject private var auth: Authentication
-    @StateObject private var streamerListVM = StreamerListViewModel()
-    @State private var search = ""
-    @State private var searchedStreamers: [StreamerInfo] = []
+    @StateObject private var viewModel = StreamerListViewModel()
     
     var body: some View {
         ScrollViewReader { scrollProxy in
             List {
-                ForEach(filteredStreamers, id: \.userName) { streamer in
+                ForEach(viewModel.filteredStreamers, id: \.userName) { streamer in
                     NavigationLink(destination: VideoChatView(streamer: streamer)) {
                         StreamerCardView(streamer: streamer)
                     }
-                    .listRowSeparator(.hidden)
                 }
-                if streamerListVM.loaded, streamerListVM.cursor != nil, search.isEmpty {
+                .listRowSeparator(.hidden)
+                if viewModel.loaded, viewModel.cursor != nil, viewModel.search.isEmpty {
                     ProgressView()
                         .task {
-                            let type: StreamType = auth.isLoggedIn ? .followed(id: auth.user!.id) : .top
-                            await streamerListVM.getMoreStreamers(token: auth.userToken!, type: type)
+                            await viewModel.getMoreStreamers(token: auth.userToken!, type: viewModel.currentlyDisplaying)
                         }
                 }
-                if filteredStreamers.isEmpty {
-                    ForEach(searchedStreamers, id:\.userName) { streamer in
+                if viewModel.filteredStreamers.isEmpty {
+                    ForEach(viewModel.searchedStreamers, id:\.userName) { streamer in
                         NavigationLink(destination: VideoChatView(streamer: streamer)) {
                             StreamerCardView(streamer: streamer)
                         }
-                        .listRowSeparator(.hidden)
                     }
+                    .listRowSeparator(.hidden)
                 }
             }
             .listStyle(.grouped)
-            .navigationTitle(auth.isLoggedIn ? "Followed Streams" : "Top Streams")
-            .searchable(text: $search, prompt: "Search")
+            .navigationTitle(viewModel.navigationTitle)
+            .searchable(text: $viewModel.search, prompt: "Search")
             .disableAutocorrection(true)
             .textInputAutocapitalization(.never)
             .refreshable {
-                await streamerListVM.update(auth: auth)
+                await viewModel.update(auth: auth)
             }
             .task {
-                await streamerListVM.update(auth: auth)
+                await viewModel.update(auth: auth)
             }
             .onChange(of: auth.user) { value in
                 Task {
-                    await streamerListVM.update(auth: auth)
+                    await viewModel.update(auth: auth)
                 }
             }
-            .onChange(of: search) { newValue in
+            .onChange(of: viewModel.search) { newValue in
                 if newValue.isEmpty {
-                    searchedStreamers.removeAll()
+                    viewModel.searchedStreamers.removeAll()
                 }
             }
             .onSubmit(of: .search) {
                 Task {
                     print("finding streamers")
-                    let streamers = await streamerListVM.getStreamer(login: search, token: auth.userToken!)
-                    searchedStreamers = streamers
+                    let streamers = await viewModel.getStreamer(login: viewModel.search, token: auth.userToken!)
+                    viewModel.searchedStreamers = streamers
                     print(streamers)
                 }
             }
-        }
-    }
-    
-    var filteredStreamers: [StreamerInfo] {
-        if search.isEmpty {
-            return streamerListVM.streamers
-        } else {
-            return streamerListVM.streamers.filter { $0.userLogin.contains(search.lowercased()) }
         }
     }
 }

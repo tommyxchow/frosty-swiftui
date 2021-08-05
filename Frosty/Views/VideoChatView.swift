@@ -21,6 +21,7 @@ struct VideoChatView: View {
                 text: $text
             )
                 .focused($isFocused)
+                .padding(5)
         }
         .navigationTitle(streamer.userName)
         .navigationBarTitleDisplayMode(.inline)
