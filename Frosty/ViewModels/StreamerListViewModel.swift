@@ -21,9 +21,9 @@ class StreamerListViewModel: ObservableObject {
     var navigationTitle: String {
         switch currentlyDisplaying {
         case .top:
-            return "Top Streams"
+            return "Top"
         case .followed:
-            return "Followed Streams"
+            return "Followed"
         }
     }
     var filteredStreamers: [StreamerInfo] {
@@ -59,7 +59,6 @@ class StreamerListViewModel: ObservableObject {
             
             do {
                 let result = try decoder.decode(StreamerData.self, from: data)
-                print(result)
                 streamers = result.data
                 cursor = result.pagination.cursor
             } catch {

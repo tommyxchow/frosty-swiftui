@@ -43,7 +43,7 @@ class ChatViewModel: ObservableObject {
         
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
-        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName)")
+        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName.lowercased())")
         let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
         let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
         let END = URLSessionWebSocketTask.Message.string("CAP END")
@@ -145,7 +145,7 @@ class ChatViewModel: ObservableObject {
         let message = String(whole[whole.index(after: divider)...])
 
         let tagSplit = tags.components(separatedBy: ";")
-        var mapping: [String:String] = [:]
+        var mapping = [String:String]()
         for item in tagSplit {
             let split = item.components(separatedBy: "=")
             if split.count > 1 {
@@ -295,6 +295,7 @@ class FlexMessageView: UIView {
                     let labelView = UILabel()
                     labelView.font = UIFont.preferredFont(forTextStyle: .footnote)
                     labelView.text = word
+                    labelView.numberOfLines = 0
                     flex.addItem(labelView)
                     
                 }

@@ -13,7 +13,7 @@ struct VideoView: View {
     
     var body: some View {
         WebView(url: URL(string: "https://player.twitch.tv/?channel=\(channelName)&muted=false&parent=example.com")!)
-            .aspectRatio(1.77777777778, contentMode: .fit)
+            .aspectRatio(16 / 9, contentMode: .fit)
     }
 }
 

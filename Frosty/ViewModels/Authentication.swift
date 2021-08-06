@@ -36,6 +36,21 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
         }
     }
     
+    func clearTokens() {
+        print("removing tokens")
+        do {
+            try keychain.remove("userToken")
+        } catch {
+            print("No user token in keychain")
+        }
+        
+        do {
+            try keychain.remove("defaultToken")
+        } catch {
+            print("No default token in keychain")
+        }
+    }
+    
     func getUserInfo() async {
         let url = "https://api.twitch.tv/helix/users"
         let headers = ["Authorization" : "Bearer \(userToken!)", "Client-Id" : clientID]

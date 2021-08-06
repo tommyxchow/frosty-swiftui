@@ -35,6 +35,11 @@ struct SettingsView: View {
                     ImageCache.shared.removeAll()
                 }
             }
+            Section("Debug") {
+                Button("Clear Tokens") {
+                    authHandler.clearTokens()
+                }
+            }
         }
         .navigationTitle("Settings")
     }
