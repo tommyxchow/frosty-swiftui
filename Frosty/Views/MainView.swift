@@ -8,18 +8,9 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var isPresented = false
-    
     var body: some View {
         NavigationView {
             StreamerListView()
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        NavigationLink(destination: SettingsView()) {
-                            Label("Settings", systemImage: "gearshape")
-                        }
-                    }
-                }
         }
     }
 }

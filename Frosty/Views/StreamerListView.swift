@@ -44,7 +44,8 @@ struct StreamerListView: View {
             }
             .listStyle(.inset)
             .navigationTitle(viewModel.navigationTitle)
-            .searchable(text: $viewModel.search)
+            .animation(.default, value: viewModel.streamers)
+            .searchable(text: $viewModel.search, placement: .navigationBarDrawer(displayMode: .always))
             .disableAutocorrection(true)
             .textInputAutocapitalization(.never)
             .refreshable {
@@ -87,6 +88,9 @@ struct StreamerListView: View {
                     }
                     Button("Games") {
                         
+                    }
+                    NavigationLink(destination: SettingsView()) {
+                        Label("Settings", systemImage: "gearshape")
                     }
                 }
             }
