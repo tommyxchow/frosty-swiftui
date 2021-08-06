@@ -8,38 +8,49 @@
 import SwiftUI
 
 struct ChatView: View {
-    let streamer: StreamerInfo
+    let channelName: String
     @EnvironmentObject private var authHandler: Authentication
     @StateObject private var viewModel: ChatViewModel = ChatViewModel()
     @State private var autoScroll = true
-    
+    @FocusState private var isFocused: Bool
+    @State var text = ""
+
+
     var body: some View {
         GeometryReader { geoProxy in
             ScrollViewReader { scrollProxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 10.0) {
-                        ForEach(viewModel.messages, id: \.self) { message in
-                            if let triple = message {
-                                MessageView(viewModel: viewModel, message: viewModel.beautify(triple), size: geoProxy.size)
+                VStack {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 10.0) {
+                            ForEach(viewModel.messages, id: \.self) { message in
+                                if let triple = message {
+                                    MessageView(viewModel: viewModel, message: viewModel.beautify(triple), size: geoProxy.size)
+                                }
+                            }
+                        }
+                        .onChange(of: viewModel.messages) { value in
+                            if viewModel.messages.count > 0, autoScroll {
+                                scrollProxy.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
                             }
                         }
                     }
-                    .onChange(of: viewModel.messages) { value in
-                        if viewModel.messages.count > 0, autoScroll {
-                            scrollProxy.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
-                        }
+                    if let user = authHandler.user {
+                        ChatBoxView(isFocused: _isFocused, viewModel: viewModel, user: user, channelName: channelName)
                     }
                 }
             }
+        }
+        .padding([.bottom, .horizontal], 5.0)
+        .onTapGesture {
+            isFocused = false
         }
         .simultaneousGesture(DragGesture().onChanged({ value in
             if value.translation.height > 0 {
                 autoScroll = false
             }
         }))
-        .padding([.bottom, .horizontal], 5.0)
         .task {
-            await viewModel.start(token: authHandler.userToken ?? "", user: authHandler.user?.login ?? "justinfan888", streamer: streamer)
+            await viewModel.start(token: authHandler.userToken!, user: authHandler.user?.login ?? "justinfan888", channelName: channelName)
         }
         .onDisappear {
             viewModel.end()
@@ -58,7 +69,7 @@ struct ChatView: View {
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(streamer: StreamerInfo.data[0])
+        ChatView(channelName: StreamerInfo.data[0].userLogin)
             .environmentObject(Authentication())
     }
 }

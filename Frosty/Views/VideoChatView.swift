@@ -8,34 +8,22 @@
 import SwiftUI
 
 struct VideoChatView: View {
-    let streamer: StreamerInfo
-    @State var text = ""
-    @FocusState private var isFocused: Bool
+    let channelName: String
     
     var body: some View {
         VStack(spacing: 0) {
-            VideoView(streamer: streamer)
-            ChatView(streamer: streamer)
-            TextField(
-                "Send messsage",
-                text: $text
-            )
-                .focused($isFocused)
-                .padding(5)
+            VideoView(channelName: channelName)
+            ChatView(channelName: channelName)
         }
-        .navigationTitle(streamer.userName)
+        .navigationTitle(channelName)
         .navigationBarTitleDisplayMode(.inline)
-        .textFieldStyle(.roundedBorder)
-        .onTapGesture {
-            isFocused = false
-        }
     }
 }
 
 struct VideoChatView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            VideoChatView(streamer: StreamerInfo.data[0])
+            VideoChatView(channelName: StreamerInfo.data[0].userName)
                 .environmentObject(Authentication())
         }
     }

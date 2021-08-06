@@ -14,30 +14,37 @@ struct StreamerListView: View {
     var body: some View {
         ScrollViewReader { scrollProxy in
             List {
-                ForEach(viewModel.filteredStreamers, id: \.userName) { streamer in
-                    NavigationLink(destination: VideoChatView(streamer: streamer)) {
-                        StreamerCardView(streamer: streamer)
-                    }
-                }
-                .listRowSeparator(.hidden)
-                if viewModel.loaded, viewModel.cursor != nil, viewModel.search.isEmpty {
-                    ProgressView()
-                        .task {
-                            await viewModel.getMoreStreamers(token: auth.userToken!, type: viewModel.currentlyDisplaying)
-                        }
-                }
-                if viewModel.filteredStreamers.isEmpty {
-                    ForEach(viewModel.searchedStreamers, id:\.userName) { streamer in
-                        NavigationLink(destination: VideoChatView(streamer: streamer)) {
+                Group {
+                    ForEach(viewModel.filteredStreamers, id: \.userName) { streamer in
+                        NavigationLink(destination: VideoChatView(channelName: streamer.userName)) {
                             StreamerCardView(streamer: streamer)
                         }
                     }
-                    .listRowSeparator(.hidden)
+                    if viewModel.loaded, viewModel.cursor != nil, viewModel.search.isEmpty {
+                        ProgressView()
+                            .task {
+                                await viewModel.getMoreStreamers(token: auth.userToken!, type: viewModel.currentlyDisplaying)
+                            }
+                    }
+                    if viewModel.filteredStreamers.isEmpty {
+                        if viewModel.loaded, viewModel.searchedStreamers.isEmpty {
+                            NavigationLink(destination: VideoChatView(channelName: viewModel.search)) {
+                                Text("Go to \(viewModel.search)")
+                            }
+                        } else {
+                            ForEach(viewModel.searchedStreamers, id:\.userName) { streamer in
+                                NavigationLink(destination: VideoChatView(channelName: streamer.userName)) {
+                                    StreamerCardView(streamer: streamer)
+                                }
+                            }
+                        }
+                    }
                 }
+                .listRowSeparator(.hidden)
             }
             .listStyle(.inset)
             .navigationTitle(viewModel.navigationTitle)
-            .searchable(text: $viewModel.search, prompt: "Search")
+            .searchable(text: $viewModel.search)
             .disableAutocorrection(true)
             .textInputAutocapitalization(.never)
             .refreshable {

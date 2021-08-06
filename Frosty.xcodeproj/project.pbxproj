@@ -16,6 +16,7 @@
 		C606733626645B6500B1C46C /* StreamerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733526645B6500B1C46C /* StreamerListView.swift */; };
 		C606733826654DB500B1C46C /* VideoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C606733726654DB400B1C46C /* VideoChatView.swift */; };
 		C606733A2665732100B1C46C /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60673392665732100B1C46C /* ChatView.swift */; };
+		C607AA6426BCB7BE00C546C0 /* ChatBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C607AA6326BCB7BE00C546C0 /* ChatBoxView.swift */; };
 		C625AE04268B632800194105 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = C625AE03268B632800194105 /* Video.swift */; };
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
 		C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A5B2670289A00C47A7E /* SettingsView.swift */; };
@@ -38,7 +39,6 @@
 		C6F09CB4267E19DA001451FE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F09CB3267E19DA001451FE /* Message.swift */; };
 		C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B0C2678A33300471B73 /* Emotes.swift */; };
 		C6F48B0F2678B81D00471B73 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B0E2678B81D00471B73 /* MessageView.swift */; };
-		C6F48B11267A214700471B73 /* ChatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F48B10267A214700471B73 /* ChatManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +53,7 @@
 		C606733526645B6500B1C46C /* StreamerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamerListView.swift; sourceTree = "<group>"; };
 		C606733726654DB400B1C46C /* VideoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoChatView.swift; sourceTree = "<group>"; };
 		C60673392665732100B1C46C /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		C607AA6326BCB7BE00C546C0 /* ChatBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBoxView.swift; sourceTree = "<group>"; };
 		C625AE03268B632800194105 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		C6363A54266D40E000C47A7E /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		C6363A5B2670289A00C47A7E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -67,7 +68,6 @@
 		C6F09CB3267E19DA001451FE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		C6F48B0C2678A33300471B73 /* Emotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emotes.swift; sourceTree = "<group>"; };
 		C6F48B0E2678B81D00471B73 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
-		C6F48B10267A214700471B73 /* ChatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +152,7 @@
 				C606733726654DB400B1C46C /* VideoChatView.swift */,
 				C6363A54266D40E000C47A7E /* VideoView.swift */,
 				C60673392665732100B1C46C /* ChatView.swift */,
+				C607AA6326BCB7BE00C546C0 /* ChatBoxView.swift */,
 				C6F48B0E2678B81D00471B73 /* MessageView.swift */,
 				C6E9090F26B4DCFB00E87164 /* TestView.swift */,
 			);
@@ -161,7 +162,6 @@
 		C60D0B35267E56AC006246F1 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
-				C6F48B10267A214700471B73 /* ChatManager.swift */,
 				C6A6144726698873003508D8 /* Request.swift */,
 			);
 			path = Utility;
@@ -274,11 +274,11 @@
 				C6A61446266987A0003508D8 /* StreamerListViewModel.swift in Sources */,
 				C6F48B0D2678A33300471B73 /* Emotes.swift in Sources */,
 				C6F09CB2267CCA4C001451FE /* Badges.swift in Sources */,
-				C6F48B11267A214700471B73 /* ChatManager.swift in Sources */,
 				C625AE04268B632800194105 /* Video.swift in Sources */,
 				C64C277E2670A5A700719BCF /* Authentication.swift in Sources */,
 				C6F48B0F2678B81D00471B73 /* MessageView.swift in Sources */,
 				C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */,
+				C607AA6426BCB7BE00C546C0 /* ChatBoxView.swift in Sources */,
 				C6A6144E266C44DC003508D8 /* ChatViewModel.swift in Sources */,
 				C6F09CB4267E19DA001451FE /* Message.swift in Sources */,
 				C606732026641A3E00B1C46C /* FrostyApp.swift in Sources */,

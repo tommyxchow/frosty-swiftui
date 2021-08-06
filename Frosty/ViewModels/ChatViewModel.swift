@@ -15,14 +15,23 @@ import Gifu
 
 class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = [Message(name: "STATUS", message: "Connecting to chat...", tags: ["color":"#00FF00"])]
+    @Published var chatBoxMessage: String = ""
+    
     private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
+    
     var chatting: Bool = false
     var assetToUrl: [String:URL] = [:]
 
     
-    func start(token: String, user: String, streamer: StreamerInfo) async {
-        async let globalAssets: [String:URL] = ChatManager.getGlobalAssets(token: token)
-        async let channelAssets: [String:URL] = ChatManager.getChannelAssets(token: token, id: streamer.userId)
+    func start(token: String, user: String, channelName: String) async {
+        let streamer: [User] = await Request.getUser(login: channelName, token: token)
+        
+        if streamer.isEmpty {
+            return
+        }
+        
+        async let globalAssets: [String:URL] = getGlobalAssets(token: token)
+        async let channelAssets: [String:URL] = getChannelAssets(token: token, id: streamer.first!.id)
         
         let assetsToUrl = await [globalAssets, channelAssets]
         
@@ -34,7 +43,7 @@ class ChatViewModel: ObservableObject {
         
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
-        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(streamer.userLogin)")
+        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName)")
         let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
         let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
         let END = URLSessionWebSocketTask.Message.string("CAP END")
@@ -58,7 +67,7 @@ class ChatViewModel: ObservableObject {
         
         DispatchQueue.main.async {
             self.messages.append(Message(name: "STATUS", message: "Connected!", tags: ["color":"#00FF00"]))
-            self.messages.append(Message(name: "STATUS", message: "Welcome to \(streamer.userName)'s chat!", tags: ["color":"#00FF00"]))
+            self.messages.append(Message(name: "STATUS", message: "Welcome to \(channelName)'s chat!", tags: ["color":"#00FF00"]))
         }
         
         receive()
@@ -78,7 +87,7 @@ class ChatViewModel: ObservableObject {
                 case .data(let data):
                     print("WS DATA ", data)
                 case .string(let string):
-                    //print(string)
+                    print(string)
                     if string[string.startIndex] == "P" {
                         let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
                         self.websocket.send(message) { error in
@@ -107,6 +116,20 @@ class ChatViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func sendMessage(message: String, userName: String, channelName: String) {
+        chatBoxMessage.removeAll()
+        let webSocketMessage = URLSessionWebSocketTask.Message.string("PRIVMSG #\(channelName) :\(message)")
+        
+        websocket.send(webSocketMessage) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                return
+            }
+        }
+        
+        messages.append(Message(name: userName, message: message, tags: [:]))
     }
     
     func end() {
@@ -179,6 +202,43 @@ class ChatViewModel: ObservableObject {
         return testReg
     }
     
+    func getGlobalAssets(token: String) async -> [String:URL] {
+        var finalRegisty: [String:URL] = [:]
+
+        do {
+            async let twitchGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteTwitchGlobal, token: token)
+            async let bttvGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteBTTVGlobal)
+            async let ffzGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteFFZGlobal)
+            async let twitchGlobalBadges = Request.assetToUrl(requestedDataType: .badgeTwitchGlobal, token: token)
+            
+            let registries = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
+            for registry in registries {
+                finalRegisty.merge(registry) {(_,new) in new}
+            }
+        } catch {
+            print("Failed to get global assets: ", error.localizedDescription)
+        }
+        return finalRegisty
+    }
+    
+    func getChannelAssets(token: String, id: String) async -> [String:URL] {
+        var finalRegisty: [String:URL] = [:]
+        do {
+            async let twitchChannelEmotes = Request.assetToUrl(requestedDataType: .emoteTwitchChannel(id: id), token: token)
+            async let bttvChannelEmotes = Request.assetToUrl(requestedDataType: .emoteBTTVChannel(id: id))
+            async let ffzChannelEmotes = Request.assetToUrl(requestedDataType: .emoteFFZChannel(id: id))
+            async let twitchChannelBadges = Request.assetToUrl(requestedDataType: .badgeTwitchChannel(id: id), token: token)
+            
+            let registries = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
+            for registry in registries {
+                finalRegisty.merge(registry) {(_,new) in new}
+            }
+        } catch {
+            print("Failed to get channel assets: ", error.localizedDescription)
+        }
+        return finalRegisty
+    }
+    
     func hexStringToUIColor (hex:String) -> UIColor {
         var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
@@ -222,6 +282,7 @@ class FlexMessageView: UIView {
             for word in words {
                 if word.starts(with: "}") {
                     
+                    print(word)
                     let url = URL(string: word.replacingOccurrences(of: "}", with: ""))!
 
                     let imageView = GIFImageView()

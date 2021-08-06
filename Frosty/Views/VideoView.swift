@@ -9,17 +9,17 @@ import SwiftUI
 import WebKit
 
 struct VideoView: View {
-    let streamer: StreamerInfo
+    let channelName: String
     
     var body: some View {
-        WebView(url: URL(string: "https://player.twitch.tv/?channel=\(streamer.userLogin)&muted=false&parent=example.com")!)
+        WebView(url: URL(string: "https://player.twitch.tv/?channel=\(channelName)&muted=false&parent=example.com")!)
             .aspectRatio(1.77777777778, contentMode: .fit)
     }
 }
 
 struct VideoView_Previews: PreviewProvider {
     static var previews: some View {
-        VideoView(streamer: StreamerInfo.data.first!)
+        VideoView(channelName: StreamerInfo.data.first!.userLogin)
     }
 }
 

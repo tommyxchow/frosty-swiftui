@@ -123,7 +123,22 @@ struct Request {
         } else {
             return nil
         }
-        
+    }
+    
+    static func getUser(login: String, token: String) async -> [User] {
+        let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
+        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/users?login=\(login)")!, headers: headers) {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                let result = try decoder.decode(UserData.self, from: data)
+                return result.data
+            } catch {
+                print("Failed to parse user.")
+            }
+        }
+        return []
     }
 }
 

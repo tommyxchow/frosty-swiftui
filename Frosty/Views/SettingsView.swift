@@ -22,14 +22,15 @@ struct SettingsView: View {
                         Text(user.displayName)
                     }
                     Button("Log Out") {
+                        authHandler.logout()
                     }
                 } else {
                     Button("Login") {
-                        authHandler.login(auth: authHandler)
+                        authHandler.login()
                     }
                 }
             }
-            Section("Settings") {
+            Section("Cache") {
                 Button("Clear Image Cache") {
                     ImageCache.shared.removeAll()
                 }
@@ -45,5 +46,3 @@ struct SettingsView_Previews: PreviewProvider {
             .environmentObject(Authentication())
     }
 }
-
-// User(id: "888", login: "Clamfucius", displayName: "Clamfucius", type: "", broadcasterType: "", description: "", profileImageUrl: "https://static-cdn.jtvnw.net/user-default-pictures-uv/ead5c8b2-a4c9-4724-b1dd-9f00b46cbd3d-profile_image-300x300.png", offlineImageUrl: "", viewCount: 888, createdAt: "")

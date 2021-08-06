@@ -22,6 +22,20 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
     let clientID = "k6tnwmfv24ct9pzanhnp2x1yht30oi"
     var tokenIsValid: Bool = false
     
+    override init() {
+        super.init()
+        
+        if let token = keychain["userToken"] {
+            userToken = token
+            isLoggedIn = true
+            Task {
+                await getUserInfo()
+            }
+        } else if let token = keychain["defaultToken"] {
+            userToken = token
+        }
+    }
+    
     func getUserInfo() async {
         let url = "https://api.twitch.tv/helix/users"
         let headers = ["Authorization" : "Bearer \(userToken!)", "Client-Id" : clientID]
@@ -78,12 +92,12 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
         return ASPresentationAnchor()
     }
     
-    func login(auth: Authentication) {
-        if let userToken = keychain["userToken"] {
-            auth.userToken = userToken
-            auth.isLoggedIn = true
+    func login() {
+        if let token = keychain["userToken"] {
+            userToken = token
+            isLoggedIn = true
             Task {
-                await auth.getUserInfo()
+                await getUserInfo()
             }
             return
         }
@@ -93,7 +107,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
         newLoginUrl.host = "id.twitch.tv"
         newLoginUrl.path = "/oauth2/authorize"
         
-        let clientQuery = URLQueryItem(name: "client_id", value: auth.clientID)
+        let clientQuery = URLQueryItem(name: "client_id", value: clientID)
         let redirectQuery = URLQueryItem(name: "redirect_uri", value: "auth://")
         let responseQuery = URLQueryItem(name: "response_type", value: "token")
         let scopesQuery = URLQueryItem(name: "scope", value: "chat:read chat:edit user:read:follows")
@@ -110,16 +124,28 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
             let token = queryItems?.filter({ $0.name == "access_token" }).first?.value
             
             self.keychain["userToken"] = token!
-            auth.userToken = token!
-            auth.isLoggedIn = true
+            self.userToken = token!
+            self.isLoggedIn = true
             Task {
-                await auth.getUserInfo()
+                await self.getUserInfo()
             }
         }
         session.presentationContextProvider = self
         session.prefersEphemeralWebBrowserSession = true
         if !session.start() {
             print("fail")
+        }
+    }
+    
+    func logout() {
+        user = nil
+        userToken = nil
+        isLoggedIn = false
+        
+        do {
+            try keychain.remove("userToken")
+        } catch {
+            print("No values in keychain")
         }
     }
     
