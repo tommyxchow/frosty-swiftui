@@ -13,7 +13,7 @@ struct SettingsView: View {
     @EnvironmentObject private var authHandler: Authentication
     
     var body: some View {
-        List {
+        Form {
             Section("Current User") {
                 if let user = authHandler.user, authHandler.isLoggedIn {
                     HStack {

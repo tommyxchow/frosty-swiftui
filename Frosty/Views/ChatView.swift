@@ -34,8 +34,14 @@ struct ChatView: View {
                             }
                         }
                     }
-                    if let user = authHandler.user {
-                        ChatBoxView(isFocused: _isFocused, viewModel: viewModel, user: user, channelName: channelName)
+                }
+                .overlay(alignment: .bottom) {
+                    if autoScroll == false {
+                        Button("Resume Scroll") {
+                            autoScroll = true
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .buttonBorderShape(.capsule)
                     }
                 }
             }
@@ -56,12 +62,10 @@ struct ChatView: View {
             viewModel.end()
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    autoScroll = true
-                }, label: {
-                    Text("Auto Scroll")
-                })
+            ToolbarItem(placement: .bottomBar) {
+                if let user = authHandler.user {
+                    ChatBoxView(isFocused: _isFocused, viewModel: viewModel, user: user, channelName: channelName)
+                }
             }
         }
     }

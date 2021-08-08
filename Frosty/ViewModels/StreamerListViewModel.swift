@@ -13,7 +13,7 @@ class StreamerListViewModel: ObservableObject {
     @Published var streamers = [StreamerInfo]()
     @Published var searchedStreamers = [StreamerInfo]()
     @Published var search = ""
-    @Published var currentlyDisplaying: StreamType = .top
+    @Published var currentlyDisplaying = Category.top
     @Published var alertIsPresented = false
     
     private let decoder = JSONDecoder()
@@ -23,9 +23,9 @@ class StreamerListViewModel: ObservableObject {
     var navigationTitle: String {
         switch currentlyDisplaying {
         case .top:
-            return "Top"
+            return "Top Channels"
         case .followed:
-            return "Followed"
+            return "Followed Channels"
         }
     }
     var filteredStreamers: [StreamerInfo] {
@@ -86,7 +86,7 @@ class StreamerListViewModel: ObservableObject {
         }
     }
     
-    func getMoreStreamers(token: String, type: StreamType) async {
+    func getMoreStreamers(token: String, type: Category) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         
         let url: String
@@ -131,7 +131,7 @@ class StreamerListViewModel: ObservableObject {
     }
 }
 
-enum StreamType {
+enum Category: Hashable {
     case top
     case followed(id: String)
 }

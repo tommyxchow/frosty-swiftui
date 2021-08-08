@@ -23,6 +23,8 @@ struct ChatBoxView: View {
             Button("Send") {
                 viewModel.sendMessage(message: viewModel.chatBoxMessage, userName: user.displayName, channelName: channelName)
             }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
         }
         .padding(5)
     }

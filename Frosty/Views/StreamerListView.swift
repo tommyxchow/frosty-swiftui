@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// TODO: Add keyboard shortcut that navigates to the searched channel on enter
+
 struct StreamerListView: View {
     @EnvironmentObject private var auth: Authentication
     @StateObject private var viewModel = StreamerListViewModel()
@@ -59,6 +61,11 @@ struct StreamerListView: View {
                     viewModel.searchedStreamers.removeAll()
                 }
             }
+            .onChange(of: viewModel.currentlyDisplaying) { newValue in
+                Task {
+                    await viewModel.update(auth: auth)
+                }
+            }
             .onSubmit(of: .search) {
                 Task {
                     print("finding streamers")
@@ -68,27 +75,17 @@ struct StreamerListView: View {
                 }
             }
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Spacer()
-                    Button("Top") {
-                        viewModel.currentlyDisplaying = .top
-                        Task {
-                            await viewModel.update(auth: auth)
-                        }
-                    }
-                    Button("Followed") {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Picker("Category", selection: $viewModel.currentlyDisplaying) {
+                        Text("Top").tag(Category.top)
                         if let user = auth.user {
-                            viewModel.currentlyDisplaying = .followed(id: user.id)
-                            Task {
-                                await viewModel.update(auth: auth)
-                            }
-                        } else {
-                            print("Not logged in")
+                            Text("Followed").tag(Category.followed(id: user.id))
                         }
+                        Text("Games")
                     }
-                    Button("Games") {
-                        
-                    }
+                    .pickerStyle(.segmented)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsView()) {
                         Label("Settings", systemImage: "gearshape")
                     }

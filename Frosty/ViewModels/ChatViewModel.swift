@@ -146,7 +146,6 @@ class ChatViewModel: ObservableObject {
                 }
             }
                 
-        
         // Split the message up
         // Index 0 is username of sender
         // Index 1 is message/command type
@@ -262,12 +261,12 @@ class FlexMessageView: UIView {
         var badgeImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
-        badgeImageOptions.processors = [ImageProcessors.Resize(height: 50, unit: .pixels, upscale: true)]
+        badgeImageOptions.processors = [ImageProcessors.Resize(height: 20, upscale: true)]
         
         var emoteImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
-        emoteImageOptions.processors = [ImageProcessors.Resize(height: 80, unit: .pixels, upscale: true)]
+        emoteImageOptions.processors = [ImageProcessors.Resize(height: 30, upscale: true)]
         
         let words = message.message.components(separatedBy: " ")
 
