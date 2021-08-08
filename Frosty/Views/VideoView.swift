@@ -19,7 +19,7 @@ struct VideoView: View {
 
 struct VideoView_Previews: PreviewProvider {
     static var previews: some View {
-        VideoView(channelName: StreamerInfo.data.first!.userLogin)
+        VideoView(channelName: Channel.sampleChannels.first!.userLogin)
     }
 }
 

@@ -64,7 +64,7 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 if let user = authHandler.user {
-                    ChatBoxView(isFocused: _isFocused, viewModel: viewModel, user: user, channelName: channelName)
+                    ChatTextFieldView(isFocused: _isFocused, viewModel: viewModel, user: user, channelName: channelName)
                 }
             }
         }
@@ -73,7 +73,7 @@ struct ChatView: View {
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(channelName: StreamerInfo.data[0].userLogin)
+        ChatView(channelName: Channel.sampleChannels[0].userLogin)
             .environmentObject(Authentication())
     }
 }

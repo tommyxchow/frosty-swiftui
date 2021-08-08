@@ -1,5 +1,5 @@
 //
-//  Badges.swift
+//  Badge.swift
 //  Frosty
 //
 //  Created by Tommy Chow on 6/18/21.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct BadgeData: Decodable {
-    let data: [Badges]
+struct Badges: Decodable {
+    let data: [Badge]
 }
 
 struct BadgeImages: Decodable {
@@ -18,7 +18,7 @@ struct BadgeImages: Decodable {
     let imageUrl4X: String
 }
 
-struct Badges: Decodable {
+struct Badge: Decodable {
     let setId: String
     let versions: [BadgeImages]
     

@@ -8,7 +8,7 @@
 import Foundation
 
 // Twitch Emotes
-struct EmoteDataTwitch: Decodable {
+struct EmotesTwitch: Decodable {
     let data: [EmoteTwitch]
 }
 
@@ -44,7 +44,7 @@ struct EmoteBTTVChannel: Decodable {
         let providerId: String
     }
     
-    struct SharedEmoteBTTV: Decodable {
+    struct EmoteBTTVShared: Decodable {
         let id: String
         let code: String
         let imageType: String
@@ -54,7 +54,7 @@ struct EmoteBTTVChannel: Decodable {
     let id: String
     let bots: [String]
     let channelEmotes: [EmoteBTTVGlobal]
-    let sharedEmotes: [SharedEmoteBTTV]
+    let sharedEmotes: [EmoteBTTVShared]
 }
 
 

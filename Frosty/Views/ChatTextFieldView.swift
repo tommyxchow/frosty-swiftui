@@ -1,13 +1,13 @@
 //
-//  ChatBoxView.swift
-//  ChatBoxView
+//  ChatTextFieldView.swift
+//  Frosty
 //
 //  Created by Tommy Chow on 8/5/21.
 //
 
 import SwiftUI
 
-struct ChatBoxView: View {
+struct ChatTextFieldView: View {
     @FocusState var isFocused: Bool
     @ObservedObject var viewModel: ChatViewModel
     let user: User
@@ -32,6 +32,6 @@ struct ChatBoxView: View {
 
 struct ChatBoxView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatBoxView(viewModel: ChatViewModel(), user: User.sampleUser, channelName: "")
+        ChatTextFieldView(viewModel: ChatViewModel(), user: User.sampleUser, channelName: "")
     }
 }

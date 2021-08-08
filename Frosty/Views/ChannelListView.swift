@@ -1,5 +1,5 @@
 //
-//  StreamerListView.swift
+//  ChannelListView.swift
 //  Frosty
 //
 //  Created by Tommy Chow on 5/30/21.
@@ -9,34 +9,34 @@ import SwiftUI
 
 // TODO: Add keyboard shortcut that navigates to the searched channel on enter
 
-struct StreamerListView: View {
+struct ChannelListView: View {
     @EnvironmentObject private var auth: Authentication
-    @StateObject private var viewModel = StreamerListViewModel()
+    @StateObject private var viewModel = ChannelListViewModel()
     
     var body: some View {
         ScrollViewReader { scrollProxy in
             List {
                 Group {
-                    ForEach(viewModel.filteredStreamers, id: \.userName) { streamer in
-                        NavigationLink(destination: VideoChatView(channelName: streamer.userName)) {
-                            StreamerCardView(streamer: streamer)
+                    ForEach(viewModel.filteredChannels, id: \.userName) { channel in
+                        NavigationLink(destination: VideoChatView(channelName: channel.userName)) {
+                            ChannelCardView(channel: channel)
                         }
                     }
                     if viewModel.loaded, viewModel.cursor != nil, viewModel.search.isEmpty {
                         ProgressView()
                             .task {
-                                await viewModel.getMoreStreamers(token: auth.userToken!, type: viewModel.currentlyDisplaying)
+                                await viewModel.getMoreChannels(token: auth.userToken!, type: viewModel.currentlyDisplaying)
                             }
                     }
-                    if viewModel.filteredStreamers.isEmpty {
-                        if viewModel.loaded, viewModel.searchedStreamers.isEmpty {
+                    if viewModel.filteredChannels.isEmpty {
+                        if viewModel.loaded, viewModel.searchedChannels.isEmpty {
                             NavigationLink(destination: VideoChatView(channelName: viewModel.search)) {
                                 Text("Go to \(viewModel.search)")
                             }
                         } else {
-                            ForEach(viewModel.searchedStreamers, id:\.userName) { streamer in
-                                NavigationLink(destination: VideoChatView(channelName: streamer.userName)) {
-                                    StreamerCardView(streamer: streamer)
+                            ForEach(viewModel.searchedChannels, id:\.userName) { channel in
+                                NavigationLink(destination: VideoChatView(channelName: channel.userName)) {
+                                    ChannelCardView(channel: channel)
                                 }
                             }
                         }
@@ -46,7 +46,7 @@ struct StreamerListView: View {
             }
             .listStyle(.inset)
             .navigationTitle(viewModel.navigationTitle)
-            .animation(.default, value: viewModel.streamers)
+            .animation(.default, value: viewModel.channels)
             .searchable(text: $viewModel.search, placement: .navigationBarDrawer(displayMode: .always))
             .disableAutocorrection(true)
             .textInputAutocapitalization(.never)
@@ -58,7 +58,7 @@ struct StreamerListView: View {
             }
             .onChange(of: viewModel.search) { newValue in
                 if newValue.isEmpty {
-                    viewModel.searchedStreamers.removeAll()
+                    viewModel.searchedChannels.removeAll()
                 }
             }
             .onChange(of: viewModel.currentlyDisplaying) { newValue in
@@ -68,10 +68,9 @@ struct StreamerListView: View {
             }
             .onSubmit(of: .search) {
                 Task {
-                    print("finding streamers")
-                    let streamers = await viewModel.getStreamer(login: viewModel.search, token: auth.userToken!)
-                    viewModel.searchedStreamers = streamers
-                    print(streamers)
+                    let channel = await viewModel.getChannel(login: viewModel.search, token: auth.userToken!)
+                    viewModel.searchedChannels = channel
+                    print(channel)
                 }
             }
             .toolbar {
@@ -95,10 +94,10 @@ struct StreamerListView: View {
     }
 }
 
-struct StreamerListView_Previews: PreviewProvider {
+struct ChannelListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            StreamerListView()
+            ChannelListView()
                 .environmentObject(Authentication())
         }
     }

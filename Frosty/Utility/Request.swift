@@ -41,17 +41,17 @@ struct Request {
         }
     }
     
-    static func assetToUrl(requestedDataType: APIData, token: String? = nil) async throws -> [String:URL] {
+    static func assetToUrl(requestedDataType: Asset, token: String? = nil) async throws -> [String:URL] {
         var registry: [String:URL] = [:]
         
-        guard let data = await getAPIData(type: requestedDataType, token: token) else {
+        guard let data = await getAsset(asset: requestedDataType, token: token) else {
             print("Failed to get API data for \(requestedDataType) :(")
             return registry
         }
         
         switch requestedDataType {
         case .emoteTwitchGlobal, .emoteTwitchChannel:
-            let result = try decoder.decode(EmoteDataTwitch.self, from: data)
+            let result = try decoder.decode(EmotesTwitch.self, from: data)
             for emote in result.data {
                 registry[emote.name] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emote.id)/default/dark/3.0")!
             }
@@ -77,7 +77,7 @@ struct Request {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
-            let result = try decoder.decode(BadgeData.self, from: data)
+            let result = try decoder.decode(Badges.self, from: data)
             for badge in result.data {
                 for badgeVersion in badge.versions {
                     registry["\(badge.setId)/\(badgeVersion.id)"] = URL(string: badgeVersion.imageUrl4X)!
@@ -87,11 +87,11 @@ struct Request {
         return registry
     }
     
-    static func getAPIData(type: APIData, token: String? = nil) async -> Data? {
+    static func getAsset(asset: Asset, token: String? = nil) async -> Data? {
         let endpoint: URL
         let headers: [String:String]?
         
-        switch type {
+        switch asset {
         case .emoteTwitchGlobal:
             endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
             headers = ["Authorization":"Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
@@ -132,7 +132,7 @@ struct Request {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             do {
-                let result = try decoder.decode(UserData.self, from: data)
+                let result = try decoder.decode(Users.self, from: data)
                 return result.data
             } catch {
                 print("Failed to parse user.")
@@ -142,7 +142,7 @@ struct Request {
     }
 }
 
-enum APIData {
+enum Asset {
     case emoteTwitchGlobal
     case emoteTwitchChannel(id: String)
     case emoteBTTVGlobal

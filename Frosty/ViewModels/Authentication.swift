@@ -59,7 +59,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             print(String(data: data, encoding: .utf8)!)
             
-            if let response = try? decoder.decode(UserData.self, from: data) {
+            if let response = try? decoder.decode(Users.self, from: data) {
                 DispatchQueue.main.async {
                     self.user = response.data[0]
                 }

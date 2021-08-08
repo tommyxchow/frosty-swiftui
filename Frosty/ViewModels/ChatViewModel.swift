@@ -25,14 +25,14 @@ class ChatViewModel: ObservableObject {
 
     
     func start(token: String, user: String, channelName: String) async {
-        let streamer: [User] = await Request.getUser(login: channelName, token: token)
+        let channel: [User] = await Request.getUser(login: channelName, token: token)
         
-        if streamer.isEmpty {
+        if channel.isEmpty {
             return
         }
         
         async let globalAssets: [String : URL] = getGlobalAssets(token: token)
-        async let channelAssets: [String : URL] = getChannelAssets(token: token, id: streamer.first!.id)
+        async let channelAssets: [String : URL] = getChannelAssets(token: token, id: channel.first!.id)
         
         let assetsToUrl = await [globalAssets, channelAssets]
         
@@ -49,7 +49,7 @@ class ChatViewModel: ObservableObject {
         let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
         let END = URLSessionWebSocketTask.Message.string("CAP END")
         let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
-        // let PART = URLSessionWebSocketTask.Message.string("PART #\(streamer)")
+        // let PART = URLSessionWebSocketTask.Message.string("PART #\(chanelName.lowercased())")
         
         let commands = [CAP, PASS, NICKNAME, COMMAND, TAG, END, JOIN]
         

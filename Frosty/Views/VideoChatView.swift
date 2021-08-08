@@ -23,7 +23,7 @@ struct VideoChatView: View {
 struct VideoChatView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            VideoChatView(channelName: StreamerInfo.data[0].userName)
+            VideoChatView(channelName: Channel.sampleChannels[0].userName)
                 .environmentObject(Authentication())
         }
     }
