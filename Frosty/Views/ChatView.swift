@@ -22,9 +22,9 @@ struct ChatView: View {
                 VStack {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 10.0) {
-                            ForEach(viewModel.messages, id: \.self) { message in
-                                if let triple = message {
-                                    MessageView(viewModel: viewModel, message: viewModel.beautify(triple), size: geoProxy.size)
+                            ForEach(viewModel.messages, id: \.self) { item in
+                                if let message = item {
+                                    MessageView(viewModel: viewModel, message: message, size: geoProxy.size)
                                 }
                             }
                         }

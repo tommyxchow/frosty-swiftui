@@ -14,7 +14,7 @@ import Gifu
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [Message] = [Message(name: "STATUS", message: "Connecting to chat...", tags: ["color":"#00FF00"])]
+    @Published var messages: [Message] = []
     @Published var chatBoxMessage: String = ""
     
     private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
@@ -65,11 +65,6 @@ class ChatViewModel: ObservableObject {
             }
         }
         
-        DispatchQueue.main.async {
-            self.messages.append(Message(name: "STATUS", message: "Connected!", tags: ["color":"#00FF00"]))
-            self.messages.append(Message(name: "STATUS", message: "Welcome to \(channelName)'s chat!", tags: ["color":"#00FF00"]))
-        }
-        
         receive()
     }
     
@@ -78,16 +73,12 @@ class ChatViewModel: ObservableObject {
             switch result {
             case .failure(let error):
                 print(error)
-                let errorMessage = Message(name: "ERROR", message: "Failed to connect to chat.", tags: ["color":"#FF0000"])
-                DispatchQueue.main.async {
-                    self.messages.append(errorMessage)
-                }
             case .success(let response):
                 switch response {
                 case .data(let data):
                     print("WS DATA ", data)
                 case .string(let string):
-                    print(string)
+                    //print(string)
                     if string[string.startIndex] == "P" {
                         let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
                         self.websocket.send(message) { error in
@@ -98,7 +89,7 @@ class ChatViewModel: ObservableObject {
                     }
                     if string[string.startIndex] == "@" {
                         DispatchQueue.main.async {
-                            if let parsed = self.parseMessage(string) {
+                            if let parsed = self.buildMessage(string) {
                                 var newList = self.messages
                                 newList.append(parsed)
                                 if newList.count > 80 {
@@ -129,7 +120,7 @@ class ChatViewModel: ObservableObject {
             }
         }
         
-        messages.append(Message(name: userName, message: message, tags: [:]))
+        messages.append(Message(tags: [:], type: .PRIVMSG, message: message))
     }
     
     func end() {
@@ -139,67 +130,73 @@ class ChatViewModel: ObservableObject {
     }
     
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
-    func parseMessage(_ whole: String) -> Message? {
-        let divider = whole.firstIndex(of: " ")!
-        let tags = String(whole[...whole.index(before: divider)])
-        let message = String(whole[whole.index(after: divider)...])
+    func buildMessage(_ whole: String) -> Message? {
+        let tagAndMessageDivider = whole.firstIndex(of: " ")!
+        let tags = String(whole[...whole.index(before: tagAndMessageDivider)]).unescapeIRCTags()
+        let message = whole[whole.index(after: tagAndMessageDivider)...] //substring 2
+        
+        var mappedTags = [String:String]()
 
-        let tagSplit = tags.components(separatedBy: ";")
-        var mapping = [String:String]()
-        for item in tagSplit {
-            let split = item.components(separatedBy: "=")
-            if split.count > 1 {
-                mapping[split[0]] = split[1]
-            }
-        }
-        
-        let messageSplit = message.split(separator: " ", maxSplits: 3)
-        
-//        print(messageSplit[1], whole)
-//        print(mapping)
-        
-        if messageSplit[1] == "PRIVMSG" {
-            let start = messageSplit[0].index(after: messageSplit[0].startIndex)
-            let end = messageSplit[0].index(before: messageSplit[0].firstIndex(of: "!")!)
-
-            let name = messageSplit[0][start...end]
-            
-            let range = messageSplit.last!.index(after: messageSplit.last!.startIndex)..<messageSplit.last!.endIndex
-            let userMessage = messageSplit.last![range]
-            
-            return Message(name: String(name), message: String(userMessage), tags: mapping)
-        } else {
-            return nil
-        }
-    }
-    
-    func beautify(_ message: Message) -> [String] {
-
-        var testReg: [String] = []
-
-        var split = message.message.components(separatedBy: " ")
-        split[split.endIndex - 1] = split[split.endIndex - 1].replacingOccurrences(of: "\r\n", with: "")
-        
-        
-        if let badges = message.tags["badges"] {
-            for badge in badges.components(separatedBy: ",") {
-                if let url = assetToUrl[badge] {
-                    testReg.append("}"+url.absoluteString)
+        tags.split(separator: ";")
+            .forEach { tag in
+                if tag.last != "=" {
+                    let tagSplit = tag.components(separatedBy: "=")
+                    mappedTags[tagSplit[0]] = tagSplit[1]
                 }
             }
-        }
+                
         
-        testReg.append(message.name + ": ")
+        // Split the message up
+        // Index 0 is username of sender
+        // Index 1 is message/command type
+        // Index 2 is #channel name
+        // Index 3 is the :message
+        let splitMessage = message.split(separator: " ", maxSplits: 3)
+        let username = splitMessage[0]
+        let command = splitMessage[1]
+        // let channel = splitMessage[2].removeFirst()
         
-        for word in split {
-            if let url = assetToUrl[word] {
-                testReg.append("}"+url.absoluteString)
-            } else {
-                testReg.append(word + " ")
+        if command == "PRIVMSG", username != ":jtv!jtv@jtv.tmi.twitch.tv" {
+            let chatMessage = splitMessage[3].dropFirst().dropLast()
+//            print(mappedTags)
+//            print(chatMesssage)
+            if let emoteTags = mappedTags["emotes"] {
+                let emotes = emoteTags.split(separator: "/")
+                emotes.forEach { emote in
+                    // Get the split
+                    let indexBetweenIdAndPositions = emote.firstIndex(of: ":")!
+                    
+                    let range: Substring
+                    // Get the index of the emote in the message
+                    // If there are multiple, get the first one
+                    if let endOfFirstEmotePosition = emote.firstIndex(of: ",") {
+                        // Get the index position of the emote and convert it to int
+                        range = emote[emote.index(after: indexBetweenIdAndPositions)..<endOfFirstEmotePosition]
+                    } else {
+                        range = emote[emote.index(after: indexBetweenIdAndPositions)..<emote.endIndex]
+                    }
+                    
+                    let indexSplit = range.split(separator: "-")
+                    let startIndex = Int(indexSplit[0])!
+                    let endIndex = Int(indexSplit[1])!
+                    
+                    // Convert the int index to index
+                    let start = chatMessage.index(chatMessage.startIndex ,offsetBy: startIndex)
+                    let end = chatMessage.index(start, offsetBy: endIndex-startIndex)
+                    print(chatMessage)
+                    // Slice the word
+                    let emoteWord = String(chatMessage[start...end])
+                    print(emoteWord)
+                    // Get the ID
+                    let emoteId = emote[..<indexBetweenIdAndPositions]
+                    
+                    assetToUrl[emoteWord] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emoteId)/default/dark/3.0")!
+                }
+                // print(chatMessage, emotes)
             }
+            return Message(tags: mappedTags, type: .PRIVMSG, message: String(chatMessage))
         }
-        // print(testReg)
-        return testReg
+        return nil
     }
     
     func getGlobalAssets(token: String) async -> [String:URL] {
@@ -239,26 +236,11 @@ class ChatViewModel: ObservableObject {
         return finalRegisty
     }
     
-    func hexStringToUIColor (hex:String) -> UIColor {
-        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+}
 
-        if (cString.hasPrefix("#")) {
-            cString.remove(at: cString.startIndex)
-        }
-
-        if ((cString.count) != 6) {
-            return UIColor.gray
-        }
-
-        var rgbValue:UInt64 = 0
-        Scanner(string: cString).scanHexInt64(&rgbValue)
-
-        return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-            alpha: CGFloat(1.0)
-        )
+extension String {
+    func unescapeIRCTags() -> String {
+        return self.replacingOccurrences(of: "\\s", with: " ")
     }
 }
 
@@ -267,38 +249,68 @@ class FlexMessageView: UIView {
     private var size: CGSize?
     private var height: CGFloat = 0
     
-    init(words: [String], size: CGSize) {
+    init(message: Message, assetToUrl: [String:URL], size: CGSize) {
         super.init(frame: .zero)
         self.size = size
         addSubview(rootFlexContainer)
         
-        var imageOptions = ImageLoadingOptions(
+        var badgeImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
-                            
-        imageOptions.processors = [ImageProcessors.Resize(height: 20)]
+        badgeImageOptions.processors = [ImageProcessors.Resize(height: 50, unit: .pixels, upscale: true)]
         
-        rootFlexContainer.flex.direction(.row).wrap(.wrap).alignItems(.center).define { flex in
-            for word in words {
-                if word.starts(with: "}") {
-                    
-                    print(word)
-                    let url = URL(string: word.replacingOccurrences(of: "}", with: ""))!
+        var emoteImageOptions = ImageLoadingOptions(
+            placeholder: UIImage(systemName: "circle")!
+        )
+        emoteImageOptions.processors = [ImageProcessors.Resize(height: 80, unit: .pixels, upscale: true)]
+        
+        let words = message.message.components(separatedBy: " ")
 
-                    let imageView = GIFImageView()
-                    
-                    Nuke.loadImage(with: url, options: imageOptions, into: imageView)
-                    
-                    flex.addItem(imageView)
-                    
-                } else {
-                    let labelView = UILabel()
-                    labelView.font = UIFont.preferredFont(forTextStyle: .footnote)
-                    labelView.text = word
-                    labelView.numberOfLines = 0
-                    flex.addItem(labelView)
-                    
+        rootFlexContainer.flex.direction(.row).wrap(.wrap).alignItems(.center).define { flex in
+            
+            // 1. Add chat badges if any.
+            if let badges = message.tags["badges"] {
+                for badge in badges.components(separatedBy: ",") {
+                    if let badgeUrl = assetToUrl[badge] {
+                        let badgeImageView = UIImageView()
+                        Nuke.loadImage(with: badgeUrl, options:badgeImageOptions, into: badgeImageView)
+                        flex.addItem(badgeImageView)
+                    }
                 }
+            }
+            
+            // 2. Add the user's name
+            let nameView = UILabel()
+            nameView.font = UIFont.preferredFont(forTextStyle: .footnote)
+            nameView.font = UIFont.boldSystemFont(ofSize: nameView.font.pointSize)
+            nameView.text = message.tags["display-name"]?.appending(": ")
+            nameView.textColor = hexStringToUIColor(hex: message.tags["color"] ?? "#868686")
+            nameView.numberOfLines = 0
+            flex.addItem(nameView)
+            
+            // 3. Add the message words and emotes if any
+            for word in words {
+                // 3.1. If emote exists, add it
+                if let emoteUrl = assetToUrl[word] {
+                    let emoteImageView = GIFImageView()
+                    Nuke.loadImage(with: emoteUrl, options: emoteImageOptions, into: emoteImageView)
+                    flex.addItem(emoteImageView)
+                
+                // 3.2. If word exists, add it
+                } else {
+                    // Maybe use one UILabel instead of re-creating
+                    let wordView = UILabel()
+                    wordView.font = UIFont.preferredFont(forTextStyle: .footnote)
+                    wordView.text = word
+                    wordView.numberOfLines = 0
+                    flex.addItem(wordView)
+                }
+                // 3.3. Append a space at the end of each image or word
+                let spaceView = UILabel()
+                spaceView.font = UIFont.preferredFont(forTextStyle: .footnote)
+                spaceView.text = " "
+                spaceView.numberOfLines = 0
+                flex.addItem(spaceView)
             }
         }
         let lines = ceil(rootFlexContainer.flex.intrinsicSize.width / size.width)
@@ -322,11 +334,34 @@ class FlexMessageView: UIView {
         return CGSize(width: size!.width, height: height)
     }
     
+    func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+
+        var rgbValue:UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
+
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+    
 
 }
 
 struct FlexMessage: UIViewRepresentable {
-    let words: [String]
+    let message: Message
+    let assetToUrl: [String:URL]
     let size: CGSize
         
     typealias UIViewControllerType = UIView
@@ -335,13 +370,11 @@ struct FlexMessage: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIView {
-        let newView = FlexMessageView(words: words, size: size)
+        let newView = FlexMessageView(message: message, assetToUrl: assetToUrl, size: size)
         newView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         return newView
     }
-    
 }
-
 
 extension GIFImageView {
     open override func nuke_display(image: UIImage?, data: Data?) {

@@ -7,6 +7,8 @@
 
 import Foundation
 
+// TODO: Add recently searched channels as suggestions when searching.
+
 class StreamerListViewModel: ObservableObject {
     @Published var streamers = [StreamerInfo]()
     @Published var searchedStreamers = [StreamerInfo]()
