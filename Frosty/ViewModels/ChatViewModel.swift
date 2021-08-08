@@ -14,13 +14,14 @@ import Gifu
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [Message] = []
+    @Published var messages = [Message]()
     @Published var chatBoxMessage: String = ""
     
     private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
     
     var chatting: Bool = false
-    var assetToUrl: [String:URL] = [:]
+    var assetToUrl = [String : URL]()
+    var emoteIdToWord = [String : String]()
 
     
     func start(token: String, user: String, channelName: String) async {
@@ -30,8 +31,8 @@ class ChatViewModel: ObservableObject {
             return
         }
         
-        async let globalAssets: [String:URL] = getGlobalAssets(token: token)
-        async let channelAssets: [String:URL] = getChannelAssets(token: token, id: streamer.first!.id)
+        async let globalAssets: [String : URL] = getGlobalAssets(token: token)
+        async let channelAssets: [String : URL] = getChannelAssets(token: token, id: streamer.first!.id)
         
         let assetsToUrl = await [globalAssets, channelAssets]
         
@@ -157,44 +158,48 @@ class ChatViewModel: ObservableObject {
         // let channel = splitMessage[2].removeFirst()
         
         if command == "PRIVMSG", username != ":jtv!jtv@jtv.tmi.twitch.tv" {
-            let chatMessage = splitMessage[3].dropFirst().dropLast()
+            let chatMessage = splitMessage[3].dropFirst().dropLast().utf16
 //            print(mappedTags)
 //            print(chatMesssage)
             if let emoteTags = mappedTags["emotes"] {
                 let emotes = emoteTags.split(separator: "/")
-                emotes.forEach { emote in
+                print(emotes)
+                
+                for emoteIdAndPosition in emotes {
                     // Get the split
-                    let indexBetweenIdAndPositions = emote.firstIndex(of: ":")!
+                    let indexBetweenIdAndPositions = emoteIdAndPosition.firstIndex(of: ":")!
                     
-                    let range: Substring
-                    // Get the index of the emote in the message
+                    // Get the ID
+                    let emoteId = String(emoteIdAndPosition[..<indexBetweenIdAndPositions])
+                    
+                    if emoteIdToWord[emoteId] != nil {
+                        continue
+                    }
+                    
+                    // Get the provided range of the emote in the message
                     // If there are multiple, get the first one
-                    if let endOfFirstEmotePosition = emote.firstIndex(of: ",") {
+                    let range: Substring
+                    if let endOfFirstEmotePosition = emoteIdAndPosition.firstIndex(of: ",") {
                         // Get the index position of the emote and convert it to int
-                        range = emote[emote.index(after: indexBetweenIdAndPositions)..<endOfFirstEmotePosition]
+                        range = emoteIdAndPosition[emoteIdAndPosition.index(after: indexBetweenIdAndPositions)..<endOfFirstEmotePosition]
                     } else {
-                        range = emote[emote.index(after: indexBetweenIdAndPositions)..<emote.endIndex]
+                        range = emoteIdAndPosition[emoteIdAndPosition.index(after: indexBetweenIdAndPositions)..<emoteIdAndPosition.endIndex]
                     }
                     
                     let indexSplit = range.split(separator: "-")
                     let startIndex = Int(indexSplit[0])!
                     let endIndex = Int(indexSplit[1])!
                     
-                    // Convert the int index to index
-                    let start = chatMessage.index(chatMessage.startIndex ,offsetBy: startIndex)
-                    let end = chatMessage.index(start, offsetBy: endIndex-startIndex)
-                    print(chatMessage)
                     // Slice the word
-                    let emoteWord = String(chatMessage[start...end])
+                    let emoteWord = String(chatMessage.prefix(endIndex+1).dropFirst(startIndex))!
                     print(emoteWord)
-                    // Get the ID
-                    let emoteId = emote[..<indexBetweenIdAndPositions]
                     
+                    emoteIdToWord[emoteId] = emoteWord
                     assetToUrl[emoteWord] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emoteId)/default/dark/3.0")!
                 }
                 // print(chatMessage, emotes)
             }
-            return Message(tags: mappedTags, type: .PRIVMSG, message: String(chatMessage))
+            return Message(tags: mappedTags, type: .PRIVMSG, message: String(chatMessage)!)
         }
         return nil
     }
