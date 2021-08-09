@@ -8,8 +8,7 @@
 import Foundation
 import SwiftUI
 import Nuke
-import Gifu
-import Kingfisher
+import FLAnimatedImage
 
 class FlexMessageView: UIView {
     private let rootFlexContainer = UIView()
@@ -24,12 +23,12 @@ class FlexMessageView: UIView {
         var badgeImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
-        badgeImageOptions.processors = [ImageProcessors.Resize(height: 20, upscale: true)]
+        badgeImageOptions.processors = [ImageProcessors.Resize(height: 20)]
 
         var emoteImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
-        emoteImageOptions.processors = [ImageProcessors.Resize(height: 30, upscale: true)]
+        emoteImageOptions.processors = [ImageProcessors.Resize(height: 30)]
 
         let words = message.message.components(separatedBy: " ")
 
@@ -46,20 +45,32 @@ class FlexMessageView: UIView {
                 }
             }
 
-            // 2. Add the user's name
+            // 2. Add the user's name and a colon
             let nameView = UILabel()
             nameView.font = UIFont.preferredFont(forTextStyle: .footnote)
             nameView.font = UIFont.boldSystemFont(ofSize: nameView.font.pointSize)
-            nameView.text = message.tags["display-name"]?.appending(": ")
+            nameView.text = message.tags["display-name"]
             nameView.textColor = hexStringToUIColor(hex: message.tags["color"] ?? "#868686")
             nameView.numberOfLines = 0
             flex.addItem(nameView)
 
+            let colonView = UILabel()
+            colonView.font = UIFont.preferredFont(forTextStyle: .footnote)
+            colonView.font = UIFont.boldSystemFont(ofSize: nameView.font.pointSize)
+            colonView.text = ":"
+            flex.addItem(colonView)
+
             // 3. Add the message words and emotes if any
             for word in words {
+                // 3.3. Prepend a space before each image or word
+                let spaceView = UILabel()
+                spaceView.font = UIFont.preferredFont(forTextStyle: .footnote)
+                spaceView.text = " "
+                spaceView.numberOfLines = 0
+                flex.addItem(spaceView)
                 // 3.1. If emote exists, add it
                 if let emoteUrl = assetToUrl[word] {
-                    let emoteImageView = GIFImageView()
+                    let emoteImageView = FLAnimatedImageView()
                     Nuke.loadImage(with: emoteUrl, options: emoteImageOptions, into: emoteImageView)
                     flex.addItem(emoteImageView)
 
@@ -72,12 +83,6 @@ class FlexMessageView: UIView {
                     wordView.numberOfLines = 0
                     flex.addItem(wordView)
                 }
-                // 3.3. Append a space at the end of each image or word
-                let spaceView = UILabel()
-                spaceView.font = UIFont.preferredFont(forTextStyle: .footnote)
-                spaceView.text = " "
-                spaceView.numberOfLines = 0
-                flex.addItem(spaceView)
             }
         }
         let lines = ceil(rootFlexContainer.flex.intrinsicSize.width / size.width)
@@ -138,32 +143,5 @@ struct FlexMessage: UIViewRepresentable {
         let newView = FlexMessageView(message: message, assetToUrl: assetToUrl, size: size)
         newView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         return newView
-    }
-}
-
-extension GIFImageView {
-    open override func nuke_display(image: UIImage?, data: Data?) {
-        guard image != nil else {
-            self.image = nil
-            return
-        }
-        prepareForReuse()
-        if let data = data {
-            // Display poster image immediately
-            self.image = image
-
-            // Prepare FLAnimatedImage object asynchronously (it takes a
-            // noticeable amount of time), and start playback.
-            DispatchQueue.global().async {
-                DispatchQueue.main.async {
-                    // If view is still displaying the same image
-                    if self.image === image {
-                        self.animate(withGIFData: data)
-                    }
-                }
-            }
-        } else {
-            self.image = image
-        }
     }
 }

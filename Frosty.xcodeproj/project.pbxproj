@@ -20,8 +20,9 @@
 		C6363A55266D40E000C47A7E /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A54266D40E000C47A7E /* VideoView.swift */; };
 		C6363A5C2670289B00C47A7E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6363A5B2670289A00C47A7E /* SettingsView.swift */; };
 		C63E426F26BB002900A3E743 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = C63E426E26BB002900A3E743 /* KeychainAccess */; };
-		C644811226C0D84000722FE1 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = C644811126C0D84000722FE1 /* Kingfisher */; };
 		C644811426C0D89D00722FE1 /* ChatFlexMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C644811326C0D89D00722FE1 /* ChatFlexMessageView.swift */; };
+		C644811726C0E00700722FE1 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C644811626C0E00700722FE1 /* SDWebImageSwiftUI */; };
+		C644812026C11F3200722FE1 /* NukeFLAnimatedImagePlugin in Frameworks */ = {isa = PBXBuildFile; productRef = C644811F26C11F3200722FE1 /* NukeFLAnimatedImagePlugin */; };
 		C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = C64B450326B6502400A7BBB9 /* NukeUI */; };
 		C64C277E2670A5A700719BCF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64C277D2670A5A700719BCF /* Authentication.swift */; };
 		C672E005266CA9D200737AD6 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C672E004266CA9D200737AD6 /* README.md */; };
@@ -73,8 +74,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C644811226C0D84000722FE1 /* Kingfisher in Frameworks */,
+				C644811726C0E00700722FE1 /* SDWebImageSwiftUI in Frameworks */,
 				C64B450426B6502400A7BBB9 /* NukeUI in Frameworks */,
+				C644812026C11F3200722FE1 /* NukeFLAnimatedImagePlugin in Frameworks */,
 				C6ED086D26B3715B008ABAF2 /* FlexLayoutYoga in Frameworks */,
 				C63E426F26BB002900A3E743 /* KeychainAccess in Frameworks */,
 				C6ED086F26B3715B008ABAF2 /* FlexLayoutYogaKit in Frameworks */,
@@ -195,7 +197,8 @@
 				C6ED086E26B3715B008ABAF2 /* FlexLayoutYogaKit */,
 				C64B450326B6502400A7BBB9 /* NukeUI */,
 				C63E426E26BB002900A3E743 /* KeychainAccess */,
-				C644811126C0D84000722FE1 /* Kingfisher */,
+				C644811626C0E00700722FE1 /* SDWebImageSwiftUI */,
+				C644811F26C11F3200722FE1 /* NukeFLAnimatedImagePlugin */,
 			);
 			productName = Frosty;
 			productReference = C606731C26641A3E00B1C46C /* Frosty.app */;
@@ -228,7 +231,8 @@
 				C6ED086926B3715B008ABAF2 /* XCRemoteSwiftPackageReference "FlexLayout" */,
 				C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */,
 				C63E426D26BB002900A3E743 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				C644811026C0D84000722FE1 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				C644811526C0E00600722FE1 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				C644811E26C11F3200722FE1 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */,
 			);
 			productRefGroup = C606731D26641A3E00B1C46C /* Products */;
 			projectDirPath = "";
@@ -481,12 +485,20 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		C644811026C0D84000722FE1 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+		C644811526C0E00600722FE1 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		C644811E26C11F3200722FE1 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke-FLAnimatedImage-Plugin.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
 			};
 		};
 		C64B450226B6502400A7BBB9 /* XCRemoteSwiftPackageReference "NukeUI" */ = {
@@ -513,10 +525,15 @@
 			package = C63E426D26BB002900A3E743 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
-		C644811126C0D84000722FE1 /* Kingfisher */ = {
+		C644811626C0E00700722FE1 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C644811026C0D84000722FE1 /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
+			package = C644811526C0E00600722FE1 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+		C644811F26C11F3200722FE1 /* NukeFLAnimatedImagePlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C644811E26C11F3200722FE1 /* XCRemoteSwiftPackageReference "Nuke-FLAnimatedImage-Plugin" */;
+			productName = NukeFLAnimatedImagePlugin;
 		};
 		C64B450326B6502400A7BBB9 /* NukeUI */ = {
 			isa = XCSwiftPackageProductDependency;

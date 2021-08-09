@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+// FIXME: Blank bottom toolbars
+// FIXME: Crashes on intl channels (KR)
+
 struct VideoChatView: View {
     let channelName: String
 
