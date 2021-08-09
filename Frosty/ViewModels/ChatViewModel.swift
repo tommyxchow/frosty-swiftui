@@ -16,11 +16,11 @@ import Gifu
 
 class ChatViewModel: ObservableObject {
     @Published var messages = [Message]()
-    @Published var chatBoxMessage: String = ""
+    @Published var chatBoxMessage = ""
+    @Published var autoScrollEnabled = true
 
     private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
 
-    var chatting: Bool = false
     var assetToUrl = [String: URL]()
     var emoteIdToWord = [String: String]()
 
@@ -44,18 +44,16 @@ class ChatViewModel: ObservableObject {
 
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
-        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName.lowercased())")
+        let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName)")
         let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
         let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
         let END = URLSessionWebSocketTask.Message.string("CAP END")
         let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
-        // let PART = URLSessionWebSocketTask.Message.string("PART #\(chanelName.lowercased())")
+        // let PART = URLSessionWebSocketTask.Message.string("PART #\(chanelName)")
 
         let commands = [CAP, PASS, NICKNAME, COMMAND, TAG, END, JOIN]
 
         websocket.resume()
-
-        chatting = true
 
         for command in commands {
             websocket.send(command) { error in
@@ -84,9 +82,7 @@ class ChatViewModel: ObservableObject {
                 @unknown default:
                     print("ERROR")
                 }
-                if self.chatting {
-                    self.receive()
-                }
+                self.receive()
             }
         }
     }
@@ -105,7 +101,7 @@ class ChatViewModel: ObservableObject {
                 if let parsed = self.buildMessage(response) {
                     var newList = self.messages
                     newList.append(parsed)
-                    if newList.count > 80 {
+                    if newList.count > 80, self.autoScrollEnabled {
                         newList.removeFirst(10)
                     }
                     self.messages = newList

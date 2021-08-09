@@ -18,7 +18,7 @@ struct ChannelListView: View {
             List {
                 Group {
                     ForEach(viewModel.filteredChannels, id: \.userName) { channel in
-                        NavigationLink(destination: VideoChatView(channelName: channel.userName)) {
+                        NavigationLink(destination: VideoChatView(channelName: channel.userLogin)) {
                             ChannelCardView(channel: channel)
                         }
                     }
@@ -38,7 +38,7 @@ struct ChannelListView: View {
                             }
                         } else {
                             ForEach(viewModel.searchedChannels, id: \.userName) { channel in
-                                NavigationLink(destination: VideoChatView(channelName: channel.userName)) {
+                                NavigationLink(destination: VideoChatView(channelName: channel.userLogin)) {
                                     ChannelCardView(channel: channel)
                                 }
                             }
@@ -57,7 +57,9 @@ struct ChannelListView: View {
                 await viewModel.update(auth: auth)
             }
             .task {
-                await viewModel.update(auth: auth)
+                if !viewModel.loaded {
+                    await viewModel.update(auth: auth)
+                }
             }
             .onChange(of: viewModel.search) { newValue in
                 if newValue.isEmpty {
