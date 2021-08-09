@@ -21,5 +21,5 @@ struct BadgeImages: Decodable {
 struct Badge: Decodable {
     let setId: String
     let versions: [BadgeImages]
-    
+
 }

@@ -12,7 +12,7 @@ struct ChatTextFieldView: View {
     @ObservedObject var viewModel: ChatViewModel
     let user: User
     let channelName: String
-    
+
     var body: some View {
         HStack {
             TextField("Send messsage", text: $viewModel.chatBoxMessage)
@@ -21,7 +21,11 @@ struct ChatTextFieldView: View {
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.never)
             Button("Send") {
-                viewModel.sendMessage(message: viewModel.chatBoxMessage, userName: user.displayName, channelName: channelName)
+                viewModel.sendMessage(
+                    message: viewModel.chatBoxMessage,
+                    userName: user.displayName,
+                    channelName: channelName
+                )
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)

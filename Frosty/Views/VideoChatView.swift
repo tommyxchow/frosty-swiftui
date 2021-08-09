@@ -9,7 +9,7 @@ import SwiftUI
 
 struct VideoChatView: View {
     let channelName: String
-    
+
     var body: some View {
         VStack(spacing: 0) {
             VideoView(channelName: channelName)

@@ -15,7 +15,6 @@ struct ChatView: View {
     @FocusState private var isFocused: Bool
     @State var text = ""
 
-
     var body: some View {
         GeometryReader { geoProxy in
             ScrollViewReader { scrollProxy in
@@ -24,13 +23,17 @@ struct ChatView: View {
                         LazyVStack(alignment: .leading, spacing: 10.0) {
                             ForEach(viewModel.messages, id: \.self) { item in
                                 if let message = item {
-                                    MessageView(viewModel: viewModel, message: message, size: geoProxy.size)
+                                    MessageView(
+                                        viewModel: viewModel,
+                                        message: message,
+                                        size: geoProxy.size
+                                    )
                                 }
                             }
                         }
-                        .onChange(of: viewModel.messages) { value in
-                            if viewModel.messages.count > 0, autoScroll {
-                                scrollProxy.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
+                        .onChange(of: viewModel.messages) { messages in
+                            if messages.count > 0, autoScroll {
+                                scrollProxy.scrollTo(messages[messages.endIndex - 1])
                             }
                         }
                     }
@@ -56,7 +59,11 @@ struct ChatView: View {
             }
         }))
         .task {
-            await viewModel.start(token: authHandler.userToken!, user: authHandler.user?.login ?? "justinfan888", channelName: channelName)
+            await viewModel.start(
+                token: authHandler.userToken!,
+                user: authHandler.user?.login ?? "justinfan888",
+                channelName: channelName
+            )
         }
         .onDisappear {
             viewModel.end()
@@ -64,7 +71,11 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 if let user = authHandler.user {
-                    ChatTextFieldView(isFocused: _isFocused, viewModel: viewModel, user: user, channelName: channelName)
+                    ChatTextFieldView(
+                        isFocused: _isFocused,
+                        viewModel: viewModel,
+                        user: user, channelName: channelName
+                    )
                 }
             }
         }

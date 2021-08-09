@@ -8,7 +8,7 @@
 import Foundation
 
 struct Message: Hashable {
-    let tags: Dictionary<String, String>
+    let tags: [String: String]
     let type: IRCCommand
     let message: String
 }

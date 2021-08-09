@@ -11,7 +11,7 @@ import Nuke
 
 struct SettingsView: View {
     @EnvironmentObject private var authHandler: Authentication
-    
+
     var body: some View {
         Form {
             Section("Current User") {

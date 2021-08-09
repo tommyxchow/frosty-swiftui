@@ -12,9 +12,9 @@ import SwiftUI
 struct ChannelListView: View {
     @EnvironmentObject private var auth: Authentication
     @StateObject private var viewModel = ChannelListViewModel()
-    
+
     var body: some View {
-        ScrollViewReader { scrollProxy in
+        ScrollViewReader { _ in
             List {
                 Group {
                     ForEach(viewModel.filteredChannels, id: \.userName) { channel in
@@ -25,7 +25,10 @@ struct ChannelListView: View {
                     if viewModel.loaded, viewModel.cursor != nil, viewModel.search.isEmpty {
                         ProgressView()
                             .task {
-                                await viewModel.getMoreChannels(token: auth.userToken!, type: viewModel.currentlyDisplaying)
+                                await viewModel.getMoreChannels(
+                                    token: auth.userToken!,
+                                    type: viewModel.currentlyDisplaying
+                                )
                             }
                     }
                     if viewModel.filteredChannels.isEmpty {
@@ -34,7 +37,7 @@ struct ChannelListView: View {
                                 Text("Go to \(viewModel.search)")
                             }
                         } else {
-                            ForEach(viewModel.searchedChannels, id:\.userName) { channel in
+                            ForEach(viewModel.searchedChannels, id: \.userName) { channel in
                                 NavigationLink(destination: VideoChatView(channelName: channel.userName)) {
                                     ChannelCardView(channel: channel)
                                 }
@@ -61,7 +64,7 @@ struct ChannelListView: View {
                     viewModel.searchedChannels.removeAll()
                 }
             }
-            .onChange(of: viewModel.currentlyDisplaying) { newValue in
+            .onChange(of: viewModel.currentlyDisplaying) { _ in
                 Task {
                     await viewModel.update(auth: auth)
                 }

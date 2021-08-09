@@ -18,7 +18,7 @@ struct EmoteTwitch: Decodable {
         let url_2x: String
         let url_4x: String
     }
-    
+
     let id: String
     let name: String
     let images: Images
@@ -26,7 +26,6 @@ struct EmoteTwitch: Decodable {
     let emoteType: String?
     let emoteSetId: String?
 }
-
 
 // BTTV Emotes
 struct EmoteBTTVGlobal: Decodable {
@@ -43,20 +42,19 @@ struct EmoteBTTVChannel: Decodable {
         let displayName: String
         let providerId: String
     }
-    
+
     struct EmoteBTTVShared: Decodable {
         let id: String
         let code: String
         let imageType: String
         let user: UserBTTV
     }
-    
+
     let id: String
     let bots: [String]
     let channelEmotes: [EmoteBTTVGlobal]
     let sharedEmotes: [EmoteBTTVShared]
 }
-
 
 // FFZ Emotes
 struct EmotesFFZ: Decodable {
@@ -65,19 +63,19 @@ struct EmotesFFZ: Decodable {
         let name: String
         let displayName: String
     }
-    
+
     struct ImagesFFZ: Decodable {
         let emote1x: String
         let emote2x: String?
         let emote4x: String?
-        
+
         enum CodingKeys: String, CodingKey {
             case emote1x = "1x"
             case emote2x = "2x"
             case emote4x = "4x"
         }
     }
-    
+
     let id: Int
     let user: UserFFZ
     let code: String

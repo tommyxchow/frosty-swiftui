@@ -11,7 +11,7 @@ struct Channels: Decodable {
     struct Pagination: Decodable {
         let cursor: String?
     }
-    
+
     let data: [Channel]
     let pagination: Pagination
 }

@@ -12,36 +12,36 @@ import Nuke
 import Gifu
 
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
+// TODO: Fix this monstrosity of a file
 
 class ChatViewModel: ObservableObject {
     @Published var messages = [Message]()
     @Published var chatBoxMessage: String = ""
-    
-    private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
-    
-    var chatting: Bool = false
-    var assetToUrl = [String : URL]()
-    var emoteIdToWord = [String : String]()
 
-    
+    private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
+
+    var chatting: Bool = false
+    var assetToUrl = [String: URL]()
+    var emoteIdToWord = [String: String]()
+
     func start(token: String, user: String, channelName: String) async {
         let channel: [User] = await Request.getUser(login: channelName, token: token)
-        
+
         if channel.isEmpty {
             return
         }
-        
-        async let globalAssets: [String : URL] = getGlobalAssets(token: token)
-        async let channelAssets: [String : URL] = getChannelAssets(token: token, id: channel.first!.id)
-        
+
+        async let globalAssets: [String: URL] = getGlobalAssets(token: token)
+        async let channelAssets: [String: URL] = getChannelAssets(token: token, id: channel.first!.id)
+
         let assetsToUrl = await [globalAssets, channelAssets]
-        
+
         for registry in assetsToUrl {
-            assetToUrl.merge(registry) {(_,new) in new}
+            assetToUrl.merge(registry) {(_, new) in new}
         }
-                
+
         print("Starting chat!")
-        
+
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
         let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName.lowercased())")
@@ -50,13 +50,13 @@ class ChatViewModel: ObservableObject {
         let END = URLSessionWebSocketTask.Message.string("CAP END")
         let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
         // let PART = URLSessionWebSocketTask.Message.string("PART #\(chanelName.lowercased())")
-        
+
         let commands = [CAP, PASS, NICKNAME, COMMAND, TAG, END, JOIN]
-        
+
         websocket.resume()
-        
+
         chatting = true
-        
+
         for command in commands {
             websocket.send(command) { error in
                 if let error = error {
@@ -65,10 +65,10 @@ class ChatViewModel: ObservableObject {
                 }
             }
         }
-        
+
         receive()
     }
-    
+
     func receive() {
         websocket.receive { result in
             switch result {
@@ -78,28 +78,9 @@ class ChatViewModel: ObservableObject {
                 switch response {
                 case .data(let data):
                     print("WS DATA ", data)
-                case .string(let string):
-                    //print(string)
-                    if string[string.startIndex] == "P" {
-                        let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
-                        self.websocket.send(message) { error in
-                            if let error = error {
-                                print("Failed to send PONG: \(error)")
-                            }
-                        }
-                    }
-                    if string[string.startIndex] == "@" {
-                        DispatchQueue.main.async {
-                            if let parsed = self.buildMessage(string) {
-                                var newList = self.messages
-                                newList.append(parsed)
-                                if newList.count > 80 {
-                                    newList.removeFirst(10)
-                                }
-                                self.messages = newList
-                            }
-                        }
-                    }
+                case .string(let stringResponse):
+                    // print(string)
+                    self.handleWebsocketResponse(response: stringResponse)
                 @unknown default:
                     print("ERROR")
                 }
@@ -109,34 +90,57 @@ class ChatViewModel: ObservableObject {
             }
         }
     }
-    
+
+    func handleWebsocketResponse(response: String) {
+        if response[response.startIndex] == "P" {
+            let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
+            self.websocket.send(message) { error in
+                if let error = error {
+                    print("Failed to send PONG: \(error)")
+                }
+            }
+        }
+        if response[response.startIndex] == "@" {
+            DispatchQueue.main.async {
+                if let parsed = self.buildMessage(response) {
+                    var newList = self.messages
+                    newList.append(parsed)
+                    if newList.count > 80 {
+                        newList.removeFirst(10)
+                    }
+                    self.messages = newList
+                }
+            }
+        }
+    }
+
     func sendMessage(message: String, userName: String, channelName: String) {
         chatBoxMessage.removeAll()
         let webSocketMessage = URLSessionWebSocketTask.Message.string("PRIVMSG #\(channelName) :\(message)")
-        
+
         websocket.send(webSocketMessage) { error in
             if let error = error {
                 print(error.localizedDescription)
                 return
             }
         }
-        
+
         messages.append(Message(tags: [:], type: .PRIVMSG, message: message))
     }
-    
+
     func end() {
         print("Ending chat")
         websocket.cancel(with: .goingAway, reason: nil)
         messages.removeAll()
     }
-    
+
     // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
     func buildMessage(_ whole: String) -> Message? {
         let tagAndMessageDivider = whole.firstIndex(of: " ")!
         let tags = String(whole[...whole.index(before: tagAndMessageDivider)]).unescapeIRCTags()
-        let message = whole[whole.index(after: tagAndMessageDivider)...] //substring 2
-        
-        var mappedTags = [String:String]()
+        let message = whole[whole.index(after: tagAndMessageDivider)...]
+
+        var mappedTags = [String: String]()
 
         tags.split(separator: ";")
             .forEach { tag in
@@ -145,7 +149,7 @@ class ChatViewModel: ObservableObject {
                     mappedTags[tagSplit[0]] = tagSplit[1]
                 }
             }
-                
+
         // Split the message up
         // Index 0 is username of sender
         // Index 1 is message/command type
@@ -155,7 +159,7 @@ class ChatViewModel: ObservableObject {
         let username = splitMessage[0]
         let command = splitMessage[1]
         // let channel = splitMessage[2].removeFirst()
-        
+
         if command == "PRIVMSG", username != ":jtv!jtv@jtv.tmi.twitch.tv" {
             let chatMessage = splitMessage[3].dropFirst().dropLast().utf16
 //            print(mappedTags)
@@ -163,18 +167,18 @@ class ChatViewModel: ObservableObject {
             if let emoteTags = mappedTags["emotes"] {
                 let emotes = emoteTags.split(separator: "/")
                 print(emotes)
-                
+
                 for emoteIdAndPosition in emotes {
                     // Get the split
                     let indexBetweenIdAndPositions = emoteIdAndPosition.firstIndex(of: ":")!
-                    
+
                     // Get the ID
                     let emoteId = String(emoteIdAndPosition[..<indexBetweenIdAndPositions])
-                    
+
                     if emoteIdToWord[emoteId] != nil {
                         continue
                     }
-                    
+
                     // Get the provided range of the emote in the message
                     // If there are multiple, get the first one
                     let range: Substring
@@ -184,15 +188,15 @@ class ChatViewModel: ObservableObject {
                     } else {
                         range = emoteIdAndPosition[emoteIdAndPosition.index(after: indexBetweenIdAndPositions)..<emoteIdAndPosition.endIndex]
                     }
-                    
+
                     let indexSplit = range.split(separator: "-")
                     let startIndex = Int(indexSplit[0])!
                     let endIndex = Int(indexSplit[1])!
-                    
+
                     // Slice the word
                     let emoteWord = String(chatMessage.prefix(endIndex+1).dropFirst(startIndex))!
                     print(emoteWord)
-                    
+
                     emoteIdToWord[emoteId] = emoteWord
                     assetToUrl[emoteWord] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emoteId)/default/dark/3.0")!
                 }
@@ -202,44 +206,44 @@ class ChatViewModel: ObservableObject {
         }
         return nil
     }
-    
-    func getGlobalAssets(token: String) async -> [String:URL] {
-        var finalRegisty: [String:URL] = [:]
+
+    func getGlobalAssets(token: String) async -> [String: URL] {
+        var finalRegisty = [String: URL]()
 
         do {
             async let twitchGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteTwitchGlobal, token: token)
             async let bttvGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteBTTVGlobal)
             async let ffzGlobalEmotes = Request.assetToUrl(requestedDataType: .emoteFFZGlobal)
             async let twitchGlobalBadges = Request.assetToUrl(requestedDataType: .badgeTwitchGlobal, token: token)
-            
+
             let registries = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
             for registry in registries {
-                finalRegisty.merge(registry) {(_,new) in new}
+                finalRegisty.merge(registry) {(_, new) in new}
             }
         } catch {
             print("Failed to get global assets: ", error.localizedDescription)
         }
         return finalRegisty
     }
-    
-    func getChannelAssets(token: String, id: String) async -> [String:URL] {
-        var finalRegisty: [String:URL] = [:]
+
+    func getChannelAssets(token: String, id: String) async -> [String: URL] {
+        var finalRegisty = [String: URL]()
         do {
             async let twitchChannelEmotes = Request.assetToUrl(requestedDataType: .emoteTwitchChannel(id: id), token: token)
             async let bttvChannelEmotes = Request.assetToUrl(requestedDataType: .emoteBTTVChannel(id: id))
             async let ffzChannelEmotes = Request.assetToUrl(requestedDataType: .emoteFFZChannel(id: id))
             async let twitchChannelBadges = Request.assetToUrl(requestedDataType: .badgeTwitchChannel(id: id), token: token)
-            
+
             let registries = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
             for registry in registries {
-                finalRegisty.merge(registry) {(_,new) in new}
+                finalRegisty.merge(registry) {(_, new) in new}
             }
         } catch {
             print("Failed to get channel assets: ", error.localizedDescription)
         }
         return finalRegisty
     }
-    
+
 }
 
 extension String {
@@ -252,37 +256,37 @@ class FlexMessageView: UIView {
     private let rootFlexContainer = UIView()
     private var size: CGSize?
     private var height: CGFloat = 0
-    
-    init(message: Message, assetToUrl: [String:URL], size: CGSize) {
+
+    init(message: Message, assetToUrl: [String: URL], size: CGSize) {
         super.init(frame: .zero)
         self.size = size
         addSubview(rootFlexContainer)
-        
+
         var badgeImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
         badgeImageOptions.processors = [ImageProcessors.Resize(height: 20, upscale: true)]
-        
+
         var emoteImageOptions = ImageLoadingOptions(
             placeholder: UIImage(systemName: "circle")!
         )
         emoteImageOptions.processors = [ImageProcessors.Resize(height: 30, upscale: true)]
-        
+
         let words = message.message.components(separatedBy: " ")
 
         rootFlexContainer.flex.direction(.row).wrap(.wrap).alignItems(.center).define { flex in
-            
+
             // 1. Add chat badges if any.
             if let badges = message.tags["badges"] {
                 for badge in badges.components(separatedBy: ",") {
                     if let badgeUrl = assetToUrl[badge] {
                         let badgeImageView = UIImageView()
-                        Nuke.loadImage(with: badgeUrl, options:badgeImageOptions, into: badgeImageView)
+                        Nuke.loadImage(with: badgeUrl, options: badgeImageOptions, into: badgeImageView)
                         flex.addItem(badgeImageView)
                     }
                 }
             }
-            
+
             // 2. Add the user's name
             let nameView = UILabel()
             nameView.font = UIFont.preferredFont(forTextStyle: .footnote)
@@ -291,7 +295,7 @@ class FlexMessageView: UIView {
             nameView.textColor = hexStringToUIColor(hex: message.tags["color"] ?? "#868686")
             nameView.numberOfLines = 0
             flex.addItem(nameView)
-            
+
             // 3. Add the message words and emotes if any
             for word in words {
                 // 3.1. If emote exists, add it
@@ -299,7 +303,7 @@ class FlexMessageView: UIView {
                     let emoteImageView = GIFImageView()
                     Nuke.loadImage(with: emoteUrl, options: emoteImageOptions, into: emoteImageView)
                     flex.addItem(emoteImageView)
-                
+
                 // 3.2. If word exists, add it
                 } else {
                     // Maybe use one UILabel instead of re-creating
@@ -320,36 +324,36 @@ class FlexMessageView: UIView {
         let lines = ceil(rootFlexContainer.flex.intrinsicSize.width / size.width)
         height = lines * rootFlexContainer.flex.intrinsicSize.height
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func layoutSubviews() {
 
         super.layoutSubviews()
-        
+
         rootFlexContainer.frame = CGRect(x: 0, y: 0, width: size!.width, height: 0)
         rootFlexContainer.flex.layout(mode: .adjustHeight)
-                
+
     }
-    
+
     override var intrinsicContentSize: CGSize {
         return CGSize(width: size!.width, height: height)
     }
-    
-    func hexStringToUIColor (hex:String) -> UIColor {
-        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
-        if (cString.hasPrefix("#")) {
+    func hexStringToUIColor (hex: String) -> UIColor {
+        var cString: String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if cString.hasPrefix("#") {
             cString.remove(at: cString.startIndex)
         }
 
-        if ((cString.count) != 6) {
+        if cString.count != 6 {
             return UIColor.gray
         }
 
-        var rgbValue:UInt64 = 0
+        var rgbValue: UInt64 = 0
         Scanner(string: cString).scanHexInt64(&rgbValue)
 
         return UIColor(
@@ -359,20 +363,18 @@ class FlexMessageView: UIView {
             alpha: CGFloat(1.0)
         )
     }
-    
-
 }
 
 struct FlexMessage: UIViewRepresentable {
     let message: Message
-    let assetToUrl: [String:URL]
+    let assetToUrl: [String: URL]
     let size: CGSize
-        
+
     typealias UIViewControllerType = UIView
-    
+
     func updateUIView(_ uiView: UIView, context: Context) {
     }
-    
+
     func makeUIView(context: Context) -> UIView {
         let newView = FlexMessageView(message: message, assetToUrl: assetToUrl, size: size)
         newView.setContentHuggingPriority(.defaultHigh, for: .vertical)

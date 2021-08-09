@@ -12,7 +12,7 @@ struct Users: Decodable {
 }
 
 struct User: Decodable, Equatable {
-    let id : String
+    let id: String
     let login: String
     let displayName: String
     let type: String

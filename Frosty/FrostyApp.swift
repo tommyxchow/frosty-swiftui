@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct FrostyApp: App {
     @StateObject var authHandler: Authentication = Authentication()
-    
+
     var body: some Scene {
         WindowGroup {
             MainView()

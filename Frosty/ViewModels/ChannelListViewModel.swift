@@ -15,9 +15,9 @@ class ChannelListViewModel: ObservableObject {
     @Published var search = ""
     @Published var currentlyDisplaying = Category.top
     @Published var alertIsPresented = false
-    
+
     private let decoder = JSONDecoder()
-    
+
     var loaded = false
     var cursor: String?
     var navigationTitle: String {
@@ -35,7 +35,7 @@ class ChannelListViewModel: ObservableObject {
             return channels.filter { $0.userLogin.contains(search.lowercased()) }
         }
     }
-    
+
     /// Update the list of channels depending on which category is currently being shown.
     func update(auth: Authentication) async {
         if let token = auth.userToken {
@@ -53,13 +53,13 @@ class ChannelListViewModel: ObservableObject {
         }
         loaded = true
     }
-    
+
     func updateFollowedChannels(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams/followed?first=10&user_id=\(id)"
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-            
+
             do {
                 let result = try decoder.decode(Channels.self, from: data)
                 channels = result.data
@@ -69,14 +69,14 @@ class ChannelListViewModel: ObservableObject {
             }
         }
     }
-    
+
     func updateTopChannels(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams?first=10"
-        
+
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-                        
+
             do {
                 let result = try decoder.decode(Channels.self, from: data)
                 channels = result.data
@@ -86,23 +86,23 @@ class ChannelListViewModel: ObservableObject {
             }
         }
     }
-    
+
     /// Retrieve more channels using pagination.
     func getMoreChannels(token: String, type: Category) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        
+
         let url: String
-        
+
         switch type {
         case .top:
             url = "https://api.twitch.tv/helix/streams?first=10&after=\(cursor!)"
         case .followed(let id):
             url = "https://api.twitch.tv/helix/streams/followed?user_id=\(id)&first=10&after=\(cursor!)"
         }
-        
+
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-                        
+
             do {
                 let result = try decoder.decode(Channels.self, from: data)
                 channels.append(contentsOf: result.data)
@@ -116,13 +116,13 @@ class ChannelListViewModel: ObservableObject {
             }
         }
     }
-    
+
     /// Retrieve a single channel.
     func getChannel(login: String, token: String) async -> [Channel] {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?user_login=\(login)")!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-            
+
             do {
                 let result = try decoder.decode(Channels.self, from: data)
                 return result.data
