@@ -83,7 +83,7 @@ struct ChannelListView: View {
                         if let user = auth.user {
                             Text("Followed").tag(Category.followed(id: user.id))
                         }
-                        Text("Games")
+                        Text("Categories")
                     }
                     .pickerStyle(.segmented)
                 }
