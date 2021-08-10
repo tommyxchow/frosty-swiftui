@@ -10,15 +10,5 @@ import Foundation
 struct Message: Hashable {
     let tags: [String: String]
     let type: IRCCommand
-    let message: String
-}
-
-enum IRCCommand {
-    case CLEARCHAT
-    case CLEARMSG
-    case GLOBALUSERSTATE
-    case PRIVMSG
-    case ROOMSTATE
-    case USERNOTICE
-    case USERSTATE
+    var message: String
 }

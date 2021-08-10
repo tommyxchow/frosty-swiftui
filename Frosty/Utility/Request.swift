@@ -124,7 +124,7 @@ struct Request {
             headers = ["Authorization": "Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         }
 
-        if let data = await Request.perform(.GET, to: endpoint, headers: headers) {
+        if let data = await perform(.GET, to: endpoint, headers: headers) {
             return data
         } else {
             return nil
@@ -133,7 +133,7 @@ struct Request {
 
     static func getUser(login: String, token: String) async -> [User] {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/users?login=\(login)")!, headers: headers) {
+        if let data = await perform(.GET, to: URL(string: "https://api.twitch.tv/helix/users?login=\(login)")!, headers: headers) {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
 
@@ -145,6 +145,43 @@ struct Request {
             }
         }
         return []
+    }
+
+    static func getGlobalAssets(token: String) async -> [String: URL] {
+        var finalRegisty = [String: URL]()
+
+        do {
+            async let twitchGlobalEmotes = assetToUrl(requestedDataType: .emoteTwitchGlobal, token: token)
+            async let bttvGlobalEmotes = assetToUrl(requestedDataType: .emoteBTTVGlobal)
+            async let ffzGlobalEmotes = assetToUrl(requestedDataType: .emoteFFZGlobal)
+            async let twitchGlobalBadges = assetToUrl(requestedDataType: .badgeTwitchGlobal, token: token)
+
+            let registries = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
+            for registry in registries {
+                finalRegisty.merge(registry) {(_, new) in new}
+            }
+        } catch {
+            print("Failed to get global assets: ", error.localizedDescription)
+        }
+        return finalRegisty
+    }
+
+    static func getChannelAssets(token: String, id: String) async -> [String: URL] {
+        var finalRegisty = [String: URL]()
+        do {
+            async let twitchChannelEmotes = assetToUrl(requestedDataType: .emoteTwitchChannel(id: id), token: token)
+            async let bttvChannelEmotes = assetToUrl(requestedDataType: .emoteBTTVChannel(id: id))
+            async let ffzChannelEmotes = assetToUrl(requestedDataType: .emoteFFZChannel(id: id))
+            async let twitchChannelBadges = assetToUrl(requestedDataType: .badgeTwitchChannel(id: id), token: token)
+
+            let registries = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
+            for registry in registries {
+                finalRegisty.merge(registry) {(_, new) in new}
+            }
+        } catch {
+            print("Failed to get channel assets: ", error.localizedDescription)
+        }
+        return finalRegisty
     }
 }
 
