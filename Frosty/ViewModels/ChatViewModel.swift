@@ -5,11 +5,11 @@
 //  Created by Tommy Chow on 6/5/21.
 //
 
-import Foundation
-import SwiftUI
 import FlexLayout
-import Nuke
+import Foundation
 import Gifu
+import Nuke
+import SwiftUI
 
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 // TODO: Fix this monstrosity of a file
@@ -18,7 +18,7 @@ class ChatViewModel: ObservableObject {
     @Published var messages = [Message]()
     @Published var chatBoxMessage = ""
     @Published var autoScrollEnabled = true
-    @Published var roomState: ROOMSTATE = ROOMSTATE()
+    @Published var roomState = ROOMSTATE()
 
     private let websocket = URLSession.shared.webSocketTask(with: URL(string: "wss://irc-ws.chat.twitch.tv:443")!)
 
@@ -39,7 +39,7 @@ class ChatViewModel: ObservableObject {
         let assetsToUrl = await [globalAssets, channelAssets]
 
         for registry in assetsToUrl {
-            assetToUrl.merge(registry) {(_, new) in new}
+            assetToUrl.merge(registry) { _, new in new }
         }
 
         print("Starting chat!")
@@ -111,14 +111,14 @@ class ChatViewModel: ObservableObject {
         // Upon receiving a ping, send back a pong to maintain the connection.
         if response.first == "P" {
             let message = URLSessionWebSocketTask.Message.string("PONG :tmi.twitch.tv")
-            self.websocket.send(message) { error in
+            websocket.send(message) { error in
                 if let error = error {
                     print("Failed to send PONG: \(error)")
                 }
             }
-        // Receiving a twitch IRC message
+            // Receiving a twitch IRC message
         } else if response.first == "@" {
-            if let message = self.parseMessage(response) {
+            if let message = parseMessage(response) {
                 messages += [message]
                 // TODO: Investigate array slicing to potentially improve performance
                 if messages.count > 100, autoScrollEnabled {
@@ -250,10 +250,10 @@ class ChatViewModel: ObservableObject {
 
                 let indexSplit = range.split(separator: "-")
                 let startIndex = Int(indexSplit[0])!
-                let endIndex = Int(indexSplit[1])!
+                let endIndex = Int(indexSplit[1])! + 1
 
                 // Slice the word
-                let emoteWord = String(chatMessage.prefix(endIndex+1).dropFirst(startIndex))!
+                let emoteWord = String(chatMessage.prefix(endIndex).dropFirst(startIndex))!
 
                 emoteIdToWord[emoteId] = emoteWord
                 assetToUrl[emoteWord] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emoteId)/default/dark/3.0")!
@@ -289,6 +289,6 @@ class ChatViewModel: ObservableObject {
 
 extension String {
     func unescapeIRCTags() -> String {
-        return self.replacingOccurrences(of: "\\s", with: " ")
+        return replacingOccurrences(of: "\\s", with: " ")
     }
 }

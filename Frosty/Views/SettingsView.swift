@@ -5,9 +5,9 @@
 //  Created by Tommy Chow on 6/8/21.
 //
 
-import SwiftUI
-import NukeUI
 import Nuke
+import NukeUI
+import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var auth: Authentication

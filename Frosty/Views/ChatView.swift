@@ -51,11 +51,11 @@ struct ChatView: View {
         .onTapGesture {
             isFocused = false
         }
-        .simultaneousGesture(DragGesture().onChanged({ value in
+        .simultaneousGesture(DragGesture().onChanged { value in
             if value.translation.height > 0 {
                 viewModel.autoScrollEnabled = false
             }
-        }))
+        })
         .task {
             await viewModel.start(
                 token: authHandler.userToken!,

@@ -5,10 +5,11 @@
 //  Created by Tommy Chow on 8/8/21.
 //
 
-import Foundation
-import SwiftUI
-import Nuke
 import FLAnimatedImage
+import Foundation
+import Gifu
+import Nuke
+import SwiftUI
 
 class FlexMessageView: UIView {
     private let rootFlexContainer = UIView()
@@ -70,11 +71,11 @@ class FlexMessageView: UIView {
                 flex.addItem(spaceView)
                 // 3.1. If emote exists, add it
                 if let emoteUrl = assetToUrl[word] {
-                    let emoteImageView = FLAnimatedImageView()
+                    let emoteImageView = GIFImageView()
                     Nuke.loadImage(with: emoteUrl, options: emoteImageOptions, into: emoteImageView)
                     flex.addItem(emoteImageView)
 
-                // 3.2. If word exists, add it
+                    // 3.2. If word exists, add it
                 } else {
                     // Maybe use one UILabel instead of re-creating
                     let wordView = UILabel()
@@ -89,24 +90,23 @@ class FlexMessageView: UIView {
         height = lines * rootFlexContainer.flex.intrinsicSize.height
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     override func layoutSubviews() {
-
         super.layoutSubviews()
 
         rootFlexContainer.frame = CGRect(x: 0, y: 0, width: size!.width, height: 0)
         rootFlexContainer.flex.layout(mode: .adjustHeight)
-
     }
 
     override var intrinsicContentSize: CGSize {
         return CGSize(width: size!.width, height: height)
     }
 
-    func hexStringToUIColor (hex: String) -> UIColor {
+    func hexStringToUIColor(hex: String) -> UIColor {
         var cString: String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
         if cString.hasPrefix("#") {
@@ -136,12 +136,39 @@ struct FlexMessage: UIViewRepresentable {
 
     typealias UIViewControllerType = UIView
 
-    func updateUIView(_ uiView: UIView, context: Context) {
-    }
+    func updateUIView(_ uiView: UIView, context: Context) {}
 
     func makeUIView(context: Context) -> UIView {
         let newView = FlexMessageView(message: message, assetToUrl: assetToUrl, size: size)
         newView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         return newView
+    }
+}
+
+extension GIFImageView {
+    override open func nuke_display(image: UIImage?, data: Data?) {
+        guard image != nil else {
+            self.image = nil
+            return
+        }
+        prepareForReuse()
+        setFrameBufferCount(500)
+        if let data = data {
+            // Display poster image immediately
+            self.image = image
+
+            // Prepare FLAnimatedImage object asynchronously (it takes a
+            // noticeable amount of time), and start playback.
+            DispatchQueue.global().async {
+                DispatchQueue.main.async {
+                    // If view is still displaying the same image
+                    if self.image === image {
+                        self.animate(withGIFData: data)
+                    }
+                }
+            }
+        } else {
+            self.image = image
+        }
     }
 }

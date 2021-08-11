@@ -5,8 +5,8 @@
 //  Created by Tommy Chow on 6/9/21.
 //
 
-import Foundation
 import AuthenticationServices
+import Foundation
 import KeychainAccess
 
 class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
@@ -136,7 +136,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
             }
             let fragment = "?" + callbackURL.fragment!
             let queryItems = URLComponents(string: fragment)?.queryItems
-            let token = queryItems?.filter({ $0.name == "access_token" }).first?.value
+            let token = queryItems?.filter { $0.name == "access_token" }.first?.value
 
             self.keychain["userToken"] = token!
             self.userToken = token!

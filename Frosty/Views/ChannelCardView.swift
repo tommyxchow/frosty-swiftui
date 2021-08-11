@@ -5,8 +5,8 @@
 //  Created by Tommy Chow on 5/30/21.
 //
 
-import SwiftUI
 import NukeUI
+import SwiftUI
 
 struct ChannelCardView: View {
     let channel: Channel

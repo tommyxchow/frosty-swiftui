@@ -8,7 +8,7 @@
 import Foundation
 
 struct Request {
-    static private let session = URLSession.shared
+    private static let session = URLSession.shared
     static let decoder = JSONDecoder()
 
     enum HTTPMethod: String {
@@ -35,7 +35,7 @@ struct Request {
         do {
             let (data, response) = try await session.data(for: request)
 
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
                 print("ERROR: NON 200-LEVEL RESPONSE")
                 return nil
             }
@@ -48,7 +48,7 @@ struct Request {
     }
 
     static func assetToUrl(requestedDataType: Asset, token: String? = nil) async throws -> [String: URL] {
-        var registry: [String:URL] = [:]
+        var registry = [String: URL]()
 
         guard let data = await getAsset(asset: requestedDataType, token: token) else {
             print("Failed to get API data for \(requestedDataType) :(")
@@ -93,35 +93,33 @@ struct Request {
         return registry
     }
 
-    static func getAsset(asset: Asset, token: String? = nil) async -> Data? {
+    static func getAsset(asset: Asset, token: String?) async -> Data? {
         let endpoint: URL
         let headers: [String: String]?
+
+        if let token = token {
+            headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
+        } else {
+            headers = nil
+        }
 
         switch asset {
         case .emoteTwitchGlobal:
             endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
-            headers = ["Authorization": "Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         case .emoteTwitchChannel(let id):
             endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=\(id)")!
-            headers = ["Authorization": "Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         case .emoteBTTVGlobal:
             endpoint = URL(string: "https://api.betterttv.net/3/cached/emotes/global")!
-            headers = nil
         case .emoteBTTVChannel(let id):
             endpoint = URL(string: "https://api.betterttv.net/3/cached/users/twitch/\(id)")!
-            headers = nil
         case .emoteFFZGlobal:
             endpoint = URL(string: "https://api.betterttv.net/3/cached/frankerfacez/emotes/global")!
-            headers = nil
         case .emoteFFZChannel(let id):
             endpoint = URL(string: "https://api.betterttv.net/3/cached/frankerfacez/users/twitch/\(id)")!
-            headers = nil
         case .badgeTwitchGlobal:
             endpoint = URL(string: "https://api.twitch.tv/helix/chat/badges/global")!
-            headers = ["Authorization": "Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         case .badgeTwitchChannel(let id):
             endpoint = URL(string: "https://api.twitch.tv/helix/chat/badges?broadcaster_id=\(id)")!
-            headers = ["Authorization": "Bearer \(token!)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         }
 
         if let data = await perform(.GET, to: endpoint, headers: headers) {
@@ -158,7 +156,7 @@ struct Request {
 
             let registries = try await [twitchGlobalEmotes, bttvGlobalEmotes, ffzGlobalEmotes, twitchGlobalBadges]
             for registry in registries {
-                finalRegisty.merge(registry) {(_, new) in new}
+                finalRegisty.merge(registry) { _, new in new }
             }
         } catch {
             print("Failed to get global assets: ", error.localizedDescription)
@@ -176,7 +174,7 @@ struct Request {
 
             let registries = try await [twitchChannelEmotes, bttvChannelEmotes, ffzChannelEmotes, twitchChannelBadges]
             for registry in registries {
-                finalRegisty.merge(registry) {(_, new) in new}
+                finalRegisty.merge(registry) { _, new in new }
             }
         } catch {
             print("Failed to get channel assets: ", error.localizedDescription)

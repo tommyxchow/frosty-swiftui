@@ -29,6 +29,7 @@ class ChannelListViewModel: ObservableObject {
             return "Followed Channels"
         }
     }
+
     var filteredChannels: [Channel] {
         if search.isEmpty {
             return channels
