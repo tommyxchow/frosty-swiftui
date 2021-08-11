@@ -7,19 +7,46 @@
 
 import SwiftUI
 
+// TODO: Add placeholder items in bottom toolbar when user is logged out.
 // FIXME: Blank bottom toolbars
-// FIXME: Crashes on intl channels (KR)
+// FIXME: Videos don't pause when leaving
 
 struct VideoChatView: View {
+    @EnvironmentObject var settings: Settings
+    @State var isPresented = false
     let channelName: String
 
     var body: some View {
         VStack(spacing: 0) {
-            VideoView(channelName: channelName)
+            if settings.videoEnabled {
+                VideoView(channelName: channelName)
+            }
             ChatView(channelName: channelName)
         }
         .navigationTitle(channelName)
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isPresented) {
+            NavigationView {
+                SettingsView()
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Dismiss") {
+                                isPresented = false
+                            }
+                        }
+                    }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    isPresented = true
+                }, label: {
+                    Label("Settings", systemImage: "gearshape")
+                })
+            }
+        }
     }
 }
 
@@ -28,6 +55,7 @@ struct VideoChatView_Previews: PreviewProvider {
         NavigationView {
             VideoChatView(channelName: Channel.sampleChannels[0].userName)
                 .environmentObject(Authentication())
+                .environmentObject(Settings())
         }
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 // TODO: Add recently searched channels as suggestions when searching.
 
+@MainActor
 class ChannelListViewModel: ObservableObject {
     @Published var channels = [Channel]()
     @Published var searchedChannels = [Channel]()
@@ -54,7 +55,7 @@ class ChannelListViewModel: ObservableObject {
         loaded = true
     }
 
-    @MainActor func updateFollowedChannels(id: String, token: String) async {
+    func updateFollowedChannels(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams/followed?first=10&user_id=\(id)"
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
@@ -70,7 +71,7 @@ class ChannelListViewModel: ObservableObject {
         }
     }
 
-    @MainActor func updateTopChannels(token: String) async {
+    func updateTopChannels(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams?first=10"
 

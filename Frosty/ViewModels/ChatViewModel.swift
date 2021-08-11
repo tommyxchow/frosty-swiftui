@@ -47,10 +47,12 @@ class ChatViewModel: ObservableObject {
         let PASS = URLSessionWebSocketTask.Message.string("PASS oauth:\(token)")
         let NICKNAME = URLSessionWebSocketTask.Message.string("NICK \(user)")
         let JOIN = URLSessionWebSocketTask.Message.string("JOIN #\(channelName)")
-        let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
-        let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
-        let END = URLSessionWebSocketTask.Message.string("CAP END")
+
         let CAP = URLSessionWebSocketTask.Message.string("CAP LS 302")
+        let END = URLSessionWebSocketTask.Message.string("CAP END")
+
+        let COMMAND = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/commands")
+        let TAG = URLSessionWebSocketTask.Message.string("CAP REQ :twitch.tv/tags")
         // let PART = URLSessionWebSocketTask.Message.string("PART #\(chanelName)")
 
         let commands = [CAP, PASS, NICKNAME, COMMAND, TAG, END, JOIN]
@@ -221,7 +223,7 @@ class ChatViewModel: ObservableObject {
     }
 
     func privateMessage(tags: [String: String], chatMessage: String) -> Message {
-        let chatMessage = chatMessage.dropFirst().dropLast().utf16
+        let chatMessage = chatMessage.dropFirst().utf16
         if let emoteTags = tags["emotes"] {
             let emotes = emoteTags.split(separator: "/")
 

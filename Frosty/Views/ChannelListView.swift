@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-// TODO: Add keyboard shortcut that navigates to the searched channel on enter
+// TODO: Add keyboard shortcut that navigates to the searched channel on enter.
+// TODO: Animate navigation title transitions.
 
 struct ChannelListView: View {
     @EnvironmentObject private var auth: Authentication
