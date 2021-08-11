@@ -79,15 +79,26 @@ class ChatViewModel: ObservableObject {
         websocket.receive { result in
             switch result {
             case .failure(let error):
-                print(error)
+                print("Websocket Received Error:", error)
             case .success(let response):
                 switch response {
                 case .data(let data):
-                    print("WS DATA ", data)
+                    print("Websocket Received Data:", data)
                 case .string(let stringResponse):
-                    self.handleWebsocketResponse(response: stringResponse)
+                    // Turns out, we can receive more than 2 messages in one response...?
+                    // Don't know if that's just a IRC, Twitch, or Swift websocket thing...
+                    // Solution: split by carriage return newline (\r\n)
+                    DispatchQueue.main.async {
+                        let responses = stringResponse.split(separator: "\r\n")
+                        if responses.count > 1 {
+                            print("Response more than 1 message")
+                        }
+                        for response in responses {
+                            self.handleWebsocketResponse(response: String(response))
+                        }
+                    }
                 @unknown default:
-                    print("ERROR")
+                    print("Websocket Unknown Response")
                 }
                 self.receive()
             }
@@ -105,15 +116,11 @@ class ChatViewModel: ObservableObject {
             }
         // Receiving a twitch IRC message
         } else if response.first == "@" {
-            DispatchQueue.main.async {
-                if let message = self.parseMessage(response) {
-                    var newList = self.messages
-                    newList.append(message)
-                    // TODO: Investigate array slicing to potentially improve performance
-                    if newList.count > 100, self.autoScrollEnabled {
-                        newList.removeFirst(20)
-                    }
-                    self.messages = newList
+            if let message = self.parseMessage(response) {
+                messages += [message]
+                // TODO: Investigate array slicing to potentially improve performance
+                if messages.count > 100, autoScrollEnabled {
+                    messages.removeFirst(20)
                 }
             }
         } else {
@@ -121,7 +128,6 @@ class ChatViewModel: ObservableObject {
         }
     }
 
-    // FIXME: Messages will occasionally show tags/not parse correctly, maybe whitespace?
     func parseMessage(_ whole: String) -> Message? {
         // We have three parts:
         // 1. The tags of the IRC message
@@ -162,9 +168,9 @@ class ChatViewModel: ObservableObject {
         case "GLOBALUSERSTATE":
             break
         case "PRIVMSG":
-            print(whole)
-            print(chatBoxMessage)
-            print(mappedTags)
+//            print("NEW MESSSAGE")
+//            print("TAGS: \(mappedTags)", "MESSGAE: \(splitMessage[3].dropLast())", "END")
+//            print("NEXT\n")
             return privateMessage(tags: mappedTags, chatMessage: String(splitMessage[3]))
         case "ROOMSTATE":
             roomState(tags: mappedTags)
@@ -184,12 +190,11 @@ class ChatViewModel: ObservableObject {
     func clearChat(tags: [String: String], user: String) {
         let newMessage: String
         // If the ban duration is omitted, the user is permanently banned.
-        // This is the only provided tag, so no tags = perma'd.
-        print(tags)
-        if tags.isEmpty {
-            newMessage = "This user has been permanently banned."
+        print("Banned tags", tags)
+        if let banDuration = tags["ban-duration"] {
+            newMessage = "Banned for \(banDuration) seconds."
         } else {
-            newMessage = "Banned for \(tags["ban-duration"]!) seconds."
+            newMessage = "This user has been permanently banned."
         }
         // Native implementation: Loop through the array, find and replace
         // Future optimization: Maintain dictioanry of user to index
@@ -204,7 +209,7 @@ class ChatViewModel: ObservableObject {
 
     /// Removes a single message from a channel. This is triggered by the/delete <target-msg-id> command on IRC.
     func clearMessage(tags: [String: String]) {
-        print(tags)
+        print("Deleted tags", tags)
         for (index, message) in messages.enumerated() {
             if message.tags["id"] == tags["target-msg-id"]! {
                 var removedMessage = message
@@ -257,7 +262,7 @@ class ChatViewModel: ObservableObject {
 
     // Update the room state
     func roomState(tags: [String: String]) {
-        print(tags)
+        print("Roomstate tags", tags)
         roomState.emoteOnly = tags["emote-only"]
         roomState.followersOnly = tags["followers-only"]
         roomState.r9k = tags["r9k"]
@@ -271,7 +276,7 @@ class ChatViewModel: ObservableObject {
 
         websocket.send(webSocketMessage) { error in
             if let error = error {
-                print(error.localizedDescription)
+                print("Websocket message send failed", error.localizedDescription)
                 return
             }
         }

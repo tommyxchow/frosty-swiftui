@@ -54,7 +54,7 @@ class ChannelListViewModel: ObservableObject {
         loaded = true
     }
 
-    func updateFollowedChannels(id: String, token: String) async {
+    @MainActor func updateFollowedChannels(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams/followed?first=10&user_id=\(id)"
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
@@ -70,7 +70,7 @@ class ChannelListViewModel: ObservableObject {
         }
     }
 
-    func updateTopChannels(token: String) async {
+    @MainActor func updateTopChannels(token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams?first=10"
 
