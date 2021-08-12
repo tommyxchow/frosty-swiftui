@@ -8,6 +8,8 @@
 import SwiftUI
 import WebKit
 
+// FIXME: Videos don't pause when leaving
+
 struct VideoView: View {
     let channelName: String
 

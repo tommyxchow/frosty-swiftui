@@ -14,6 +14,8 @@ import SwiftUI
 // TODO: Maybe instead of closing ws connection when leaving room, use PART and JOIN for faster connection. Only dc the ws connection when user exits the app
 // TODO: Fix this monstrosity of a file
 
+// FIXME: Chat does not resume when exiting and going back to the app.
+
 class ChatViewModel: ObservableObject {
     @Published var messages = [Message]()
     @Published var chatBoxMessage = ""
@@ -137,7 +139,7 @@ class ChatViewModel: ObservableObject {
         // 3. The message itself
         // First, slice the message tags (1) and set aside the rest for later
         let tagAndMessageDivider = whole.firstIndex(of: " ")!
-        let tags = String(whole[...whole.index(before: tagAndMessageDivider)].dropFirst()).unescapeIRCTags()
+        let tags = whole[...whole.index(before: tagAndMessageDivider)].dropFirst().replacingOccurrences(of: "\\s", with: " ")
         let message = whole[whole.index(after: tagAndMessageDivider)...]
 
         // Next, parse and map the tags to a dictionary.
@@ -284,11 +286,5 @@ class ChatViewModel: ObservableObject {
         }
 
         messages.append(Message(tags: [:], type: .PRIVMSG, message: message))
-    }
-}
-
-extension String {
-    func unescapeIRCTags() -> String {
-        return replacingOccurrences(of: "\\s", with: " ")
     }
 }

@@ -40,7 +40,7 @@ class ChannelListViewModel: ObservableObject {
 
     /// Update the list of channels depending on which category is currently being shown.
     func update(auth: Authentication) async {
-        if let token = auth.userToken {
+        if let token = auth.token {
             print("Token already got")
             switch currentlyDisplaying {
             case .top:
@@ -51,7 +51,7 @@ class ChannelListViewModel: ObservableObject {
         } else {
             print("Getting default token")
             await auth.getDefaultToken()
-            await updateTopChannels(token: auth.userToken!)
+            await updateTopChannels(token: auth.token!)
         }
         loaded = true
     }

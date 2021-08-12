@@ -10,8 +10,8 @@ import Foundation
 import KeychainAccess
 
 class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
-    @Published var isLoggedIn: Bool = false
-    @Published var userToken: String?
+    @Published var isLoggedIn = false
+    @Published var token: String?
     @Published var user: User?
 
     private let decoder = JSONDecoder()
@@ -25,14 +25,16 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
     override init() {
         super.init()
 
-        if let token = keychain["userToken"] {
-            userToken = token
-            isLoggedIn = true
-            Task {
+        Task {
+            if let userToken = keychain["userToken"] {
+                token = userToken
+                isLoggedIn = true
                 await getUserInfo()
+            } else {
+                await getDefaultToken()
             }
-        } else if let token = keychain["defaultToken"] {
-            userToken = token
+            await validateToken()
+            print(token!)
         }
     }
 
@@ -53,7 +55,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
 
     func getUserInfo() async {
         let url = "https://api.twitch.tv/helix/users"
-        let headers = ["Authorization": "Bearer \(userToken!)", "Client-Id": clientID]
+        let headers = ["Authorization": "Bearer \(token!)", "Client-Id": clientID]
 
         if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -69,10 +71,10 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
         }
     }
 
-    func getDefaultToken() async {
+    @MainActor func getDefaultToken() async {
         if let existingToken = keychain["defaultToken"] {
             print("Default token already exists")
-            userToken = existingToken
+            token = existingToken
             user = nil
             return
         }
@@ -95,7 +97,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
 
             if let result = try? decoder.decode(DefaultAccess.self, from: data) {
                 keychain["defaultToken"] = result.accessToken
-                userToken = result.accessToken
+                token = result.accessToken
                 user = nil
             } else {
                 print("Failed to decode default token")
@@ -103,13 +105,9 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
         }
     }
 
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return ASPresentationAnchor()
-    }
-
     func login() {
-        if let token = keychain["userToken"] {
-            userToken = token
+        if let userToken = keychain["userToken"] {
+            token = userToken
             isLoggedIn = true
             Task {
                 await getUserInfo()
@@ -139,63 +137,59 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
             let token = queryItems?.filter { $0.name == "access_token" }.first?.value
 
             self.keychain["userToken"] = token!
-            self.userToken = token!
+            self.token = token!
             self.isLoggedIn = true
             Task {
                 await self.getUserInfo()
             }
         }
         session.presentationContextProvider = self
-        session.prefersEphemeralWebBrowserSession = true
+        // session.prefersEphemeralWebBrowserSession = true
         if !session.start() {
             print("fail")
         }
     }
 
-    func logout() {
-        user = nil
-        userToken = nil
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return ASPresentationAnchor()
+    }
+
+    func logout() async {
+        await getDefaultToken()
         isLoggedIn = false
 
         do {
             try keychain.remove("userToken")
         } catch {
-            print("No values in keychain")
+            print("No values in keychain", error.localizedDescription)
         }
     }
 
-    //    func validate() async {
-    //        guard let userToken = userToken else {
-    //            print("Missing user token!")
-    //            return
-    //        }
-    //
-    //        var validateURL = URLComponents()
-    //        validateURL.scheme = "https"
-    //        validateURL.host = "id.twitch.tv"
-    //        validateURL.path = "/oauth2/validate"
-    //
-    //        let headers = ["Authorization" : userToken]
-    //
-    //        if let data = await Request.perform(.GET, to: validateURL.url!, headers: headers) {
-    //            decoder.keyDecodingStrategy = .convertFromSnakeCase
-    //
-    //            if let response = try? decoder.decode(ValidateResponse.self, from: data) {
-    //                print(response)
-    //
-    //            } else {
-    //                print("Failed to decode validate response")
-    //                self.tokenIsValid = false
-    //            }
-    //        }
-    //    }
+    func validateToken() async {
+        let validateURL = URL(string: "https://id.twitch.tv/oauth2/validate")!
+        let headers = ["Authorization": "OAuth \(token!)"]
+
+        if let data = await Request.perform(.GET, to: validateURL, headers: headers) {
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+            print(String(data: data, encoding: .utf8)!)
+
+            if (try? decoder.decode(ValidateResponse.self, from: data)) != nil {
+                tokenIsValid = true
+            } else {
+                print("Failed to decode validate response")
+                tokenIsValid = false
+                await logout()
+            }
+        }
+    }
 }
 
 private struct ValidateResponse: Decodable {
     let clientId: String
-    let login: String
+    let login: String?
     let scopes: [String]
-    let userId: String
+    let userId: String?
     let expiresIn: Int
 }
 

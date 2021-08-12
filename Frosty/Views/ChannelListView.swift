@@ -9,6 +9,9 @@ import SwiftUI
 
 // TODO: Add keyboard shortcut that navigates to the searched channel on enter.
 // TODO: Animate navigation title transitions.
+// TODO: Option to hide channels.
+
+// FIXME: Channel thumbnails do not refresh
 
 struct ChannelListView: View {
     @EnvironmentObject private var auth: Authentication
@@ -27,7 +30,7 @@ struct ChannelListView: View {
                         ProgressView()
                             .task {
                                 await viewModel.getMoreChannels(
-                                    token: auth.userToken!,
+                                    token: auth.token!,
                                     type: viewModel.currentlyDisplaying
                                 )
                             }
@@ -74,21 +77,23 @@ struct ChannelListView: View {
             }
             .onSubmit(of: .search) {
                 Task {
-                    let channel = await viewModel.getChannel(login: viewModel.search, token: auth.userToken!)
+                    let channel = await viewModel.getChannel(login: viewModel.search, token: auth.token!)
                     viewModel.searchedChannels = channel
                     print(channel)
                 }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
-                    Picker("Category", selection: $viewModel.currentlyDisplaying) {
-                        Text("Top").tag(Category.top)
-                        if let user = auth.user {
-                            Text("Followed").tag(Category.followed(id: user.id))
+                    if auth.isLoggedIn {
+                        Picker("Category", selection: $viewModel.currentlyDisplaying) {
+                            Text("Top").tag(Category.top)
+                            if let user = auth.user {
+                                Text("Followed").tag(Category.followed(id: user.id))
+                            }
+                            Text("Categories")
                         }
-                        Text("Categories")
+                        .pickerStyle(.segmented)
                     }
-                    .pickerStyle(.segmented)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsView()) {

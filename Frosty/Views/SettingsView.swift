@@ -23,7 +23,9 @@ struct SettingsView: View {
                         Text(user.displayName)
                     }
                     Button("Log Out") {
-                        auth.logout()
+                        Task {
+                            await auth.logout()
+                        }
                     }
                 } else {
                     Button("Login") {

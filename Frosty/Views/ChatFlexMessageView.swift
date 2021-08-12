@@ -71,7 +71,7 @@ class FlexMessageView: UIView {
                 flex.addItem(spaceView)
                 // 3.1. If emote exists, add it
                 if let emoteUrl = assetToUrl[word] {
-                    let emoteImageView = GIFImageView()
+                    let emoteImageView = FLAnimatedImageView()
                     Nuke.loadImage(with: emoteUrl, options: emoteImageOptions, into: emoteImageView)
                     flex.addItem(emoteImageView)
 

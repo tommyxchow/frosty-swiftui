@@ -7,9 +7,11 @@
 
 import SwiftUI
 
+// FIXME: Chat occasionally black-screens for a second.
+
 struct ChatView: View {
     let channelName: String
-    @EnvironmentObject private var authHandler: Authentication
+    @EnvironmentObject private var auth: Authentication
     @StateObject private var viewModel = ChatViewModel()
     @FocusState private var isFocused: Bool
     @State var text = ""
@@ -58,8 +60,8 @@ struct ChatView: View {
         })
         .task {
             await viewModel.start(
-                token: authHandler.userToken!,
-                user: authHandler.user?.login ?? "justinfan888",
+                token: auth.token!,
+                user: auth.user?.login ?? "justinfan888",
                 channelName: channelName
             )
         }
@@ -68,15 +70,13 @@ struct ChatView: View {
         }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
-                if let user = authHandler.user {
+                if auth.isLoggedIn {
                     ChatTextFieldView(
                         isFocused: _isFocused,
                         viewModel: viewModel,
-                        user: user,
+                        user: auth.user!,
                         channelName: channelName
                     )
-                } else {
-                    Text("Not logged in")
                 }
             }
         }
