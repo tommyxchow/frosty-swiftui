@@ -8,7 +8,6 @@
 import SwiftUI
 
 // TODO: Add placeholder items in bottom toolbar when user is logged out.
-// TODO: Shorten back button title to something like "Back".
 // TODO: Use username in the navigation title instead of userlogin.
 
 // FIXME: Blank bottom toolbars

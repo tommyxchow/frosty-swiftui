@@ -25,16 +25,18 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
     override init() {
         super.init()
 
-        Task {
-            if let userToken = keychain["userToken"] {
-                token = userToken
-                isLoggedIn = true
+        if let userToken = keychain["userToken"] {
+            token = userToken
+            isLoggedIn = true
+            Task {
                 await getUserInfo()
-            } else {
-                await getDefaultToken()
+                await validateToken()
             }
-            await validateToken()
-            print(token!)
+        } else {
+            Task {
+                await getDefaultToken()
+                await validateToken()
+            }
         }
     }
 
@@ -57,7 +59,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
         let url = "https://api.twitch.tv/helix/users"
         let headers = ["Authorization": "Bearer \(token!)", "Client-Id": clientID]
 
-        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: url), headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             print(String(data: data, encoding: .utf8)!)
 
@@ -90,7 +92,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
 
         newLoginUrl.queryItems = [clientQuery, redirectQuery, responseQuery]
 
-        if let data = await Request.perform(.POST, to: newLoginUrl.url!) {
+        if let data = await Request.perform(.POST, to: newLoginUrl.url) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             print("Token")
             print(String(data: data, encoding: .utf8)!)
@@ -166,7 +168,7 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
     }
 
     func validateToken() async {
-        let validateURL = URL(string: "https://id.twitch.tv/oauth2/validate")!
+        let validateURL = URL(string: "https://id.twitch.tv/oauth2/validate")
         let headers = ["Authorization": "OAuth \(token!)"]
 
         if let data = await Request.perform(.GET, to: validateURL, headers: headers) {
@@ -175,13 +177,14 @@ class Authentication: NSObject, ObservableObject, ASWebAuthenticationPresentatio
             print(String(data: data, encoding: .utf8)!)
 
             if (try? decoder.decode(ValidateResponse.self, from: data)) != nil {
+                print("Token validated")
                 tokenIsValid = true
-            } else {
-                print("Failed to decode validate response")
-                tokenIsValid = false
-                await logout()
+                return
             }
         }
+        print("Token invalid")
+        tokenIsValid = false
+        await logout()
     }
 }
 

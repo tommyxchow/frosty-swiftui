@@ -124,7 +124,7 @@ class ChatViewModel: ObservableObject {
                 messages += [message]
                 // TODO: Investigate array slicing to potentially improve performance
                 if messages.count > 100, autoScrollEnabled {
-                    messages.removeFirst(20)
+                    messages.removeFirst(10)
                 }
             }
         } else {
@@ -204,9 +204,7 @@ class ChatViewModel: ObservableObject {
         // Future optimization: Maintain dictioanry of user to index
         for (index, message) in messages.enumerated() {
             if message.tags["display-name"] == user {
-                var bannedMessage = message
-                bannedMessage.message = newMessage
-                messages[index] = bannedMessage
+                messages[index].message = newMessage
             }
         }
     }
@@ -216,9 +214,7 @@ class ChatViewModel: ObservableObject {
         print("Deleted tags", tags)
         for (index, message) in messages.enumerated() {
             if message.tags["id"] == tags["target-msg-id"]! {
-                var removedMessage = message
-                removedMessage.message = "This message has been removed."
-                messages[index] = removedMessage
+                messages[index].message = "This message has been removed."
                 break
             }
         }
@@ -258,7 +254,7 @@ class ChatViewModel: ObservableObject {
                 let emoteWord = String(chatMessage.prefix(endIndex).dropFirst(startIndex))!
 
                 emoteIdToWord[emoteId] = emoteWord
-                assetToUrl[emoteWord] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emoteId)/default/dark/3.0")!
+                assetToUrl[emoteWord] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emoteId)/default/dark/3.0")
             }
         }
         return Message(tags: tags, type: .PRIVMSG, message: String(chatMessage)!)
@@ -275,6 +271,10 @@ class ChatViewModel: ObservableObject {
     }
 
     func sendMessage(message: String, userName: String, channelName: String) {
+        guard !message.isEmpty else {
+            return
+        }
+
         chatBoxMessage.removeAll()
         let webSocketMessage = URLSessionWebSocketTask.Message.string("PRIVMSG #\(channelName) :\(message)")
 

@@ -16,7 +16,12 @@ struct Request {
         case POST
     }
 
-    static func perform(_ method: HTTPMethod, to url: URL, headers: [String: String]? = nil) async -> Data? {
+    static func perform(_ method: HTTPMethod, to url: URL?, headers: [String: String]? = nil) async -> Data? {
+        guard let url = url else {
+            print("Invalid URL")
+            return nil
+        }
+
         var request = URLRequest(url: url)
 
         switch method {
@@ -59,25 +64,25 @@ struct Request {
         case .emoteTwitchGlobal, .emoteTwitchChannel:
             let result = try decoder.decode(EmotesTwitch.self, from: data)
             for emote in result.data {
-                registry[emote.name] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emote.id)/default/dark/3.0")!
+                registry[emote.name] = URL(string: "https://static-cdn.jtvnw.net/emoticons/v2/\(emote.id)/default/dark/3.0")
             }
         case .emoteBTTVGlobal:
             let result = try decoder.decode([EmoteBTTVGlobal].self, from: data)
             for emote in result {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")
             }
         case .emoteBTTVChannel:
             let result = try decoder.decode(EmoteBTTVChannel.self, from: data)
             for emote in result.channelEmotes {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")
             }
             for emote in result.sharedEmotes {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/emote/\(emote.id)/3x")
             }
         case .emoteFFZGlobal, .emoteFFZChannel:
             let result = try decoder.decode([EmotesFFZ].self, from: data)
             for emote in result {
-                registry[emote.code] = URL(string: "https://cdn.betterttv.net/frankerfacez_emote/\(emote.id)/4")!
+                registry[emote.code] = URL(string: "https://cdn.betterttv.net/frankerfacez_emote/\(emote.id)/4")
             }
         case .badgeTwitchGlobal, .badgeTwitchChannel:
             let decoder = JSONDecoder()
@@ -86,7 +91,7 @@ struct Request {
             let result = try decoder.decode(Badges.self, from: data)
             for badge in result.data {
                 for badgeVersion in badge.versions {
-                    registry["\(badge.setId)/\(badgeVersion.id)"] = URL(string: badgeVersion.imageUrl4X)!
+                    registry["\(badge.setId)/\(badgeVersion.id)"] = URL(string: badgeVersion.imageUrl4X)
                 }
             }
         }
@@ -94,7 +99,7 @@ struct Request {
     }
 
     static func getAsset(asset: Asset, token: String?) async -> Data? {
-        let endpoint: URL
+        let endpoint: URL?
         let headers: [String: String]?
 
         if let token = token {
@@ -105,21 +110,21 @@ struct Request {
 
         switch asset {
         case .emoteTwitchGlobal:
-            endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")!
+            endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes/global")
         case .emoteTwitchChannel(let id):
-            endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=\(id)")!
+            endpoint = URL(string: "https://api.twitch.tv/helix/chat/emotes?broadcaster_id=\(id)")
         case .emoteBTTVGlobal:
-            endpoint = URL(string: "https://api.betterttv.net/3/cached/emotes/global")!
+            endpoint = URL(string: "https://api.betterttv.net/3/cached/emotes/global")
         case .emoteBTTVChannel(let id):
-            endpoint = URL(string: "https://api.betterttv.net/3/cached/users/twitch/\(id)")!
+            endpoint = URL(string: "https://api.betterttv.net/3/cached/users/twitch/\(id)")
         case .emoteFFZGlobal:
-            endpoint = URL(string: "https://api.betterttv.net/3/cached/frankerfacez/emotes/global")!
+            endpoint = URL(string: "https://api.betterttv.net/3/cached/frankerfacez/emotes/global")
         case .emoteFFZChannel(let id):
-            endpoint = URL(string: "https://api.betterttv.net/3/cached/frankerfacez/users/twitch/\(id)")!
+            endpoint = URL(string: "https://api.betterttv.net/3/cached/frankerfacez/users/twitch/\(id)")
         case .badgeTwitchGlobal:
-            endpoint = URL(string: "https://api.twitch.tv/helix/chat/badges/global")!
+            endpoint = URL(string: "https://api.twitch.tv/helix/chat/badges/global")
         case .badgeTwitchChannel(let id):
-            endpoint = URL(string: "https://api.twitch.tv/helix/chat/badges?broadcaster_id=\(id)")!
+            endpoint = URL(string: "https://api.twitch.tv/helix/chat/badges?broadcaster_id=\(id)")
         }
 
         if let data = await perform(.GET, to: endpoint, headers: headers) {

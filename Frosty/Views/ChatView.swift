@@ -32,19 +32,19 @@ struct ChatView: View {
                         }
                     }
                     .onChange(of: viewModel.messages) { messages in
-                        if messages.count > 0, viewModel.autoScrollEnabled {
+                        if !messages.isEmpty, viewModel.autoScrollEnabled {
                             scrollProxy.scrollTo(messages[messages.endIndex - 1])
                         }
                     }
                 }
                 .overlay(alignment: .bottom) {
-                    if viewModel.autoScrollEnabled == false {
+                    if viewModel.autoScrollEnabled == false, !viewModel.messages.isEmpty {
                         Button("Resume Scroll") {
                             viewModel.autoScrollEnabled = true
                             scrollProxy.scrollTo(viewModel.messages[viewModel.messages.endIndex - 1])
                         }
                         .buttonStyle(.borderedProminent)
-                        .buttonBorderShape(.capsule)
+                        .padding(.bottom, 5.0)
                     }
                 }
             }

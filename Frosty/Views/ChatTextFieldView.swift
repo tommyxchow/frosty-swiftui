@@ -28,7 +28,6 @@ struct ChatTextFieldView: View {
                 )
             }
             .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
         }
         .padding(5)
     }

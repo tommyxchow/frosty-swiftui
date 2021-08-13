@@ -9,6 +9,8 @@ import Foundation
 
 // TODO: Add recently searched channels as suggestions when searching.
 
+// FIXME: User logout still displays "followed channels" as title.
+
 @MainActor
 class ChannelListViewModel: ObservableObject {
     @Published var channels = [Channel]()
@@ -59,7 +61,7 @@ class ChannelListViewModel: ObservableObject {
     func updateFollowedChannels(id: String, token: String) async {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams/followed?first=10&user_id=\(id)"
-        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: url), headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
 
             do {
@@ -76,7 +78,7 @@ class ChannelListViewModel: ObservableObject {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
         let url = "https://api.twitch.tv/helix/streams?first=10"
 
-        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: url), headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
 
             do {
@@ -102,7 +104,7 @@ class ChannelListViewModel: ObservableObject {
             url = "https://api.twitch.tv/helix/streams/followed?user_id=\(id)&first=10&after=\(cursor!)"
         }
 
-        if let data = await Request.perform(.GET, to: URL(string: url)!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: url), headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
 
             do {
@@ -122,7 +124,7 @@ class ChannelListViewModel: ObservableObject {
     /// Retrieve a single channel.
     func getChannel(login: String, token: String) async -> [Channel] {
         let headers = ["Authorization": "Bearer \(token)", "Client-Id": "k6tnwmfv24ct9pzanhnp2x1yht30oi"]
-        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?user_login=\(login)")!, headers: headers) {
+        if let data = await Request.perform(.GET, to: URL(string: "https://api.twitch.tv/helix/streams?user_login=\(login)"), headers: headers) {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
 
             do {
