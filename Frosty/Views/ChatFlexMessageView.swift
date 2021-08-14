@@ -11,6 +11,9 @@ import Gifu
 import Nuke
 import SwiftUI
 
+// FIXME: Images are not the correct size on first appearance.
+// FIXME: Names with darker colors are hard to see or invisible in dark mode.
+
 class FlexMessageView: UIView {
     private let rootFlexContainer = UIView()
     private var size: CGSize?
@@ -41,7 +44,15 @@ class FlexMessageView: UIView {
                     if let badgeUrl = assetToUrl[badge] {
                         let badgeImageView = UIImageView()
                         Nuke.loadImage(with: badgeUrl, options: badgeImageOptions, into: badgeImageView)
+
                         flex.addItem(badgeImageView)
+
+                        let spaceView = UILabel()
+                        spaceView.font = UIFont.preferredFont(forTextStyle: .footnote)
+                        spaceView.text = " "
+                        spaceView.numberOfLines = 0
+
+                        flex.addItem(spaceView)
                     }
                 }
             }
@@ -53,12 +64,14 @@ class FlexMessageView: UIView {
             nameView.text = message.tags["display-name"]
             nameView.textColor = hexStringToUIColor(hex: message.tags["color"] ?? "#868686")
             nameView.numberOfLines = 0
+
             flex.addItem(nameView)
 
             let colonView = UILabel()
             colonView.font = UIFont.preferredFont(forTextStyle: .footnote)
             colonView.font = UIFont.boldSystemFont(ofSize: nameView.font.pointSize)
             colonView.text = ":"
+
             flex.addItem(colonView)
 
             // 3. Add the message words and emotes if any
@@ -73,6 +86,7 @@ class FlexMessageView: UIView {
                 if let emoteUrl = assetToUrl[word] {
                     let emoteImageView = FLAnimatedImageView()
                     Nuke.loadImage(with: emoteUrl, options: emoteImageOptions, into: emoteImageView)
+
                     flex.addItem(emoteImageView)
 
                     // 3.2. If word exists, add it
@@ -82,6 +96,7 @@ class FlexMessageView: UIView {
                     wordView.font = UIFont.preferredFont(forTextStyle: .footnote)
                     wordView.text = word
                     wordView.numberOfLines = 0
+
                     flex.addItem(wordView)
                 }
             }

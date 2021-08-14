@@ -13,6 +13,7 @@ struct ChannelCardView: View {
     var body: some View {
         HStack {
             LazyImage(source: URL(string: channel.thumbnailUrl.replacingOccurrences(of: "-{width}x{height}", with: "-1024x576"))!, resizingMode: .aspectFit)
+                .frame(width: 150)
             Spacer()
             VStack(alignment: .leading, spacing: 5.0) {
                 Text(channel.userName)
@@ -20,6 +21,7 @@ struct ChannelCardView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     Text(channel.title)
                         .font(.subheadline)
+                        .lineLimit(1)
                 }
                 Text(channel.gameName)
                     .font(.footnote)
