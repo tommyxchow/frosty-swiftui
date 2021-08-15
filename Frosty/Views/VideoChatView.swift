@@ -11,6 +11,8 @@ import SwiftUI
 // TODO: Use username in the navigation title instead of userlogin.
 
 // FIXME: Blank bottom toolbars
+// FIXME: Toggling video breaks textfield
+// FIXME: Textfield does not follow keyboard
 
 struct VideoChatView: View {
     @EnvironmentObject var settings: Settings
