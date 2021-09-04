@@ -6,9 +6,11 @@
 
 A Twitch client for iOS built with SwiftUI (and some UIKit).
 
-<img src="Screenshots/top.PNG" width="32%">
-<img src="Screenshots/search2.PNG" width="32%">
-<img src="Screenshots/chat.PNG" width="32%">
+<p float="left">
+  <img src="Screenshots/top.PNG" width="32%">
+  <img src="Screenshots/search2.PNG" width="32%">
+  <img src="Screenshots/chat.PNG" width="32%">
+</p>
 
 ## The Future of This App
 
