@@ -22,18 +22,18 @@ Unfortunately, SwiftUI is currently not fit to support an effective Twitch chat.
 
 - When constructing a chat message containing various dynamic assets, each item (text, badges, emotes, and GIFs) is contained in a view.
 - These views need to be placed horizontally and wrap when the container width is exceeded in order to emulate a properly formatted chat message.
-- SwiftUI has the [HStack](https://developer.apple.com/documentation/swiftui/hstack) view layout, but it does not support wrapping. Inline images are supported but only static images, not GIFs, will work.
-- FlexLayout was introduced as a workaround, but required the use of [UIViewRepresentable](https://developer.apple.com/documentation/swiftui/uiviewrepresentable), resulting in unforeseen side effects such as having to manually size the view by overriding the [intrinsicContentSize](https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize). This would sometimes cause [chat messages to overlap each other](/Screenshots/glitch1.PNG) and [long strings of text to wrap in their own container](/Screenshots/glitch2.PNG).
+- SwiftUI has the [HStack](https://developer.apple.com/documentation/swiftui/hstack) view layout, but it does not support wrapping. Inline images are supported through [Text](https://developer.apple.com/documentation/swiftui/text) but only static images, not GIFs, will work.
+- [FlexLayout](https://github.com/layoutBox/FlexLayout) was introduced as a workaround, but required the use of some UIKit through [UIViewRepresentable](https://developer.apple.com/documentation/swiftui/uiviewrepresentable), resulting in unforeseen side effects such as having to manually size the view by overriding the [intrinsicContentSize](https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize). This would sometimes cause [chat messages to overlap each other](/Screenshots/glitch1.PNG) and [long strings of text to wrap in their own container](/Screenshots/glitch2.PNG).
 
-### 2. GIF emotes don't sync
+### 2. Duplicate GIF emotes aren't synced
 
 - Each view is created as a new instance, so GIFs will always start at their first frame when appearing.
-- A possible workaround is to keep track of the current frame for each GIF and start from there, but again it's another workaround and would require a bit of overhead.
+- A possible workaround is to keep track of the current frame for each GIF and start playing the GIF from there, but again it's another workaround and would require a bit of overhead.
 
 ### 3. Emotes aren't sized correctly on their first appearance
 
 - Since emotes first have to be fetched before being displayed and cached, there will be a blank placeholder image view until the image request is complete. Once the request is complete, the image will fill in the space of the placeholder.
-- The placeholder image view can only have a predefined size, but with so many emotes having varying widths and heights they won't fit into the view perfectly. Once the emote, such as one that is very wide, is finally loaded and displayed, the emote will appear warped and smaller than anticipated.
+- The placeholder image view can only have a predefined size, but with so many emotes having varying widths and heights they won't fit into the view perfectly. When the emote, such as one that is very wide, is finally loaded and displayed, it will appear warped and smaller than anticipated.
 
 These issues may be fixable, but would lead to a workaround-rabbit-hole that I've already gone far enough into. This led me to look into other mobile frameworks with iOS support, specifically [React Native](https://reactnative.dev/) and [Flutter](https://flutter.dev/).
 
@@ -45,9 +45,11 @@ While experimenting with React Native (RN), issues 1 and 2 persisted.  This was 
 
 ### Flutter
 
-While working with Flutter, it was clear that the team wanted to bring web-specific behaviors to mobile. Features like TextSpan/WidgetSpan, synced GIFs, height-only image sizing, and more are core features of the framework.
+While working with Flutter, it was clear that the team wanted to bring web-specific behaviors to mobile. Features like [TextSpan](https://api.flutter.dev/flutter/painting/TextSpan-class.html)/[WidgetSpan](https://api.flutter.dev/flutter/widgets/WidgetSpan-class.html), synced GIFs, height-only image sizing, and more are core features of the framework.
 
-Since I was trying to emulate the web Twitch chat experience on iOS, it made perfect sense to take advantage of these features. Having the app work identically on Android through the Skia engine was a neat bonus too.
+Since I was trying to emulate the web Twitch chat experience on iOS, it made perfect sense to take advantage of these features. Having the app work identically on Android through the [Skia](https://skia.org/) engine was a neat bonus too.
+
+Flutter is not the perfect framework by any means and has its own issues and caveats, but it's the best framework to achieve the goals of this app. See the Flutter version [here](https://github.com/tommyxchow/frosty).
 
 ## Dependencies
 
