@@ -35,7 +35,7 @@ Unfortunately, SwiftUI is currently not fit to support an effective Twitch chat.
 - Since emotes first have to be fetched before being displayed and cached, there will be a blank placeholder image view until the image request is complete. Once the request is complete, the image will fill in the space of the placeholder.
 - The placeholder image view can only have a predefined size, but with so many emotes having varying widths and heights they won't fit into the view perfectly. When the emote, such as one that is very wide, is finally loaded and displayed, it will appear warped and smaller than anticipated.
 
-These issues may be fixable, but would lead to a workaround-rabbit-hole that I've already gone far enough into. This led me to look into other mobile frameworks with iOS support, specifically [React Native](https://reactnative.dev/) and [Flutter](https://flutter.dev/).
+These issues may be fixable, but would lead to a workaround-rabbit-hole that I've already gone far enough into and don't have enough time for. This led me to look into other declarative mobile frameworks with iOS support, specifically [React Native](https://reactnative.dev/) and [Flutter](https://flutter.dev/).
 
 ## Other Frameworks
 
@@ -61,3 +61,7 @@ Flutter is not the perfect framework by any means and has its own issues and cav
   - Stores user tokens securely.
 - [FLAnimatedImage](https://github.com/Flipboard/FLAnimatedImage)
   - Enables GIFs.
+
+## License
+
+[MIT](https://github.com/tommyxchow/frosty-swiftui/blob/main/LICENSE)
