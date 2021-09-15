@@ -1,5 +1,10 @@
 # Frosty (SwiftUI)
 
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/tommyxchow/frosty-swiftui/blob/main/LICENSE)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-black?logo=swift)](https://developer.apple.com/xcode/swiftui/)
+[![Xcode](https://img.shields.io/badge/Xcode%2013+-black?logo=xcode)](https://developer.apple.com/xcode/)
+[![iOS](https://img.shields.io/badge/15%2B-black?logo=ios)](https://www.apple.com/ios/ios-15/)
+
 **Note**: This app mainly served as a prototype and has been put on hold in favor of a new one built with Flutter. See it [here](https://github.com/tommyxchow/frosty), and if you're interested in why this decision was made, read below.
 
 ---
